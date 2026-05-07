@@ -5,11 +5,12 @@ pub mod base64 {
     #![doc = " Base64 data that encodes to url safe base64, but can decode from multiple"]
     #![doc = " base64 implementations to account for various clients and libraries. Compatible"]
     #![doc = " with serde and JsonSchema."]
+    use std::{convert::TryFrom, fmt};
+
     use serde::{
         de::{Error, Unexpected, Visitor},
         Deserialize, Deserializer, Serialize, Serializer,
     };
-    use std::{convert::TryFrom, fmt};
     static ALLOWED_DECODING_FORMATS: &[data_encoding::Encoding] = &[
         data_encoding::BASE64,
         data_encoding::BASE64URL,
@@ -121,8 +122,9 @@ pub mod base64 {
 
     #[cfg(test)]
     mod tests {
-        use super::Base64Data;
         use std::convert::TryFrom;
+
+        use super::Base64Data;
         #[test]
         fn test_base64_try_from() {
             assert!(Base64Data::try_from("aGVsbG8=").is_ok());
@@ -210,9 +212,11 @@ pub mod paginate {
 }
 
 pub mod phone_number {
-    #![doc = " A library to implement phone numbers for our database and JSON serialization and deserialization."]
-    use schemars::JsonSchema;
+    #![doc = " A library to implement phone numbers for our database and JSON serialization and \
+              deserialization."]
     use std::str::FromStr;
+
+    use schemars::JsonSchema;
     #[doc = " A phone number."]
     #[derive(Debug, Default, Clone, PartialEq, Hash, Eq)]
     pub struct PhoneNumber(pub Option<phonenumber::PhoneNumber>);
@@ -304,8 +308,9 @@ pub mod phone_number {
 
     #[cfg(test)]
     mod test {
-        use super::PhoneNumber;
         use pretty_assertions::assert_eq;
+
+        use super::PhoneNumber;
         #[test]
         fn test_parse_phone_number() {
             let mut phone = "+1-555-555-5555";
@@ -544,7 +549,10 @@ pub enum AccountProvider {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AddHoleFromOffset {
-    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `AddHoleFromOffset` command."]
+    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the \
+             new paths. If the offset path remains as a single path, this will be empty, and the \
+             resulting ID of the (single) new path will be the ID of the `AddHoleFromOffset` \
+             command."]
     pub entity_ids: Vec<uuid::Uuid>,
 }
 
@@ -779,7 +787,8 @@ impl tabled::Tabled for AddressDetails {
     }
 }
 
-#[doc = "Edge info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
+#[doc = "Edge info struct (useful for maintaining mappings between edges and faces and \
+         adjacent/opposite edges)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -873,7 +882,8 @@ impl tabled::Tabled for Angle {
     }
 }
 
-#[doc = "Parameters for defining an MBD Basic Dimension Annotation state which is measured between two positions in 3D"]
+#[doc = "Parameters for defining an MBD Basic Dimension Annotation state which is measured between \
+         two positions in 3D"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -883,7 +893,8 @@ pub struct AnnotationBasicDimension {
     pub arrow_scale: Option<f64>,
     #[doc = "Basic dimension parameters (symbol and tolerance)"]
     pub dimension: AnnotationMbdBasicDimension,
-    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
+             values can negatively affect performance."]
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
@@ -893,7 +904,8 @@ pub struct AnnotationBasicDimension {
     pub from_entity_pos: Point2D,
     #[doc = "2D Position offset of the annotation within the plane."]
     pub offset: Point2D,
-    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about \
+             the leader position as its origin."]
     pub plane_id: uuid::Uuid,
     #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
     pub precision: u32,
@@ -971,7 +983,8 @@ pub struct AnnotationFeatureControl {
     pub entity_id: uuid::Uuid,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
-    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
+             values can negatively affect performance."]
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
@@ -982,7 +995,8 @@ pub struct AnnotationFeatureControl {
     pub leader_type: AnnotationLineEnd,
     #[doc = "2D Position offset of the annotation within the plane."]
     pub offset: Point2D,
-    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about \
+             the leader position as its origin."]
     pub plane_id: uuid::Uuid,
     #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
     pub precision: u32,
@@ -1079,7 +1093,8 @@ pub struct AnnotationFeatureTag {
     pub entity_id: uuid::Uuid,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
-    #[doc = "The point size of the fonts used to generate the annotation label.  Very large values can negatively affect performance."]
+    #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
+             values can negatively affect performance."]
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
@@ -1092,7 +1107,8 @@ pub struct AnnotationFeatureTag {
     pub leader_type: AnnotationLineEnd,
     #[doc = "2D Position offset of the annotation within the plane."]
     pub offset: Point2D,
-    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about the leader position as its origin."]
+    #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about \
+             the leader position as its origin."]
     pub plane_id: uuid::Uuid,
     #[doc = "Whether or not to display the key on the annotation label"]
     pub show_key: bool,
@@ -1217,7 +1233,8 @@ impl tabled::Tabled for AnnotationLineEndOptions {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationMbdBasicDimension {
-    #[doc = "The explicitly defined dimension.  Only required if the measurement is not automatically calculated."]
+    #[doc = "The explicitly defined dimension.  Only required if the measurement is not \
+             automatically calculated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dimension: Option<f64>,
     #[doc = "Type of symbol to use for this dimension (if required)"]
@@ -1266,7 +1283,8 @@ impl tabled::Tabled for AnnotationMbdBasicDimension {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationMbdControlFrame {
-    #[doc = "Diameter symbol (if required) whether the geometric control requires a cylindrical or diameter tolerance"]
+    #[doc = "Diameter symbol (if required) whether the geometric control requires a cylindrical \
+             or diameter tolerance"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub diameter_symbol: Option<MbdSymbol>,
     #[doc = "Feature of size or tolerance modifiers"]
@@ -1283,7 +1301,8 @@ pub struct AnnotationMbdControlFrame {
     #[doc = "Tertiary datum"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tertiary_datum: Option<String>,
-    #[doc = "Tolerance value - the total tolerance of the geometric control.  The unit is based on the drawing standard."]
+    #[doc = "Tolerance value - the total tolerance of the geometric control.  The unit is based \
+             on the drawing standard."]
     pub tolerance: f64,
 }
 
@@ -1944,7 +1963,8 @@ pub struct ApiToken {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the API token."]
     pub id: uuid::Uuid,
-    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token."]
+    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
+             We save them for ever to preserve the history of the API token."]
     pub is_valid: bool,
     #[doc = "An optional label for the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -2141,7 +2161,8 @@ pub enum AsyncApiCallOutput {
         #[doc = "The output format options of the file conversion."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         output_format_options: Option<OutputFormat3D>,
-        #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. The key of the map is the path of the output file."]
+        #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. \
+                 The key of the map is the path of the output file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The source format of the file conversion."]
@@ -2322,7 +2343,8 @@ pub enum AsyncApiCallOutput {
     #[doc = "Text to CAD."]
     #[serde(rename = "text_to_cad")]
     TextToCad {
-        #[doc = "The code for the model. This is optional but will be required in the future once we are at v1."]
+        #[doc = "The code for the model. This is optional but will be required in the future once \
+                 we are at v1."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         code: Option<String>,
         #[doc = "The time and date the API call was completed."]
@@ -2349,7 +2371,8 @@ pub enum AsyncApiCallOutput {
         model_version: String,
         #[doc = "The output format of the model."]
         output_format: FileExportFormat,
-        #[doc = "The output of the model in the given file format the user requested, base64 encoded. The key of the map is the path of the output file."]
+        #[doc = "The output of the model in the given file format the user requested, base64 \
+                 encoded. The key of the map is the path of the output file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The prompt."]
@@ -2390,7 +2413,8 @@ pub enum AsyncApiCallOutput {
         model_version: String,
         #[doc = "The original source code for the model, previous to the changes."]
         original_source_code: String,
-        #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges."]
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         prompt: Option<String>,
         #[doc = "The source ranges the user suggested to change."]
@@ -2430,13 +2454,16 @@ pub enum AsyncApiCallOutput {
         model: TextToCadModel,
         #[doc = "The version of the model."]
         model_version: String,
-        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
-        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us \
+                 make our models better over time."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
-        #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files."]
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges. This will apply to all the files."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         prompt: Option<String>,
         #[doc = "The source ranges the user suggested to change."]
@@ -2484,7 +2511,8 @@ impl tabled::Tabled for AuthApiKeyResponse {
     }
 }
 
-#[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the redirect URL as query params after authenticating."]
+#[doc = "The authentication callback from the OAuth 2.0 client. This is typically posted to the \
+         redirect URL as query params after authenticating."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -2498,7 +2526,9 @@ pub struct AuthCallback {
     #[doc = "The state that we had passed in through the user consent URL."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
-    #[doc = "For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`"]
+    #[doc = "For Apple only, a JSON string containing the data requested in the scope property. \
+             The returned data is in the following format: `{ \"name\": { \"firstName\": string, \
+             \"lastName\": string }, \"email\": string }`"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub user: Option<String>,
 }
@@ -2612,7 +2642,8 @@ impl tabled::Tabled for AxisDirectionPair {
     }
 }
 
-#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case."]
+#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
+         in either case."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -3630,18 +3661,15 @@ pub enum BillingUnitGranularity {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
 pub enum BlendType {
     #[doc = "Use the tangent of the surfaces to calculate the blend."]
     #[serde(rename = "tangent")]
     #[display("tangent")]
+    #[default]
     Tangent,
 }
 
-impl std::default::Default for BlendType {
-    fn default() -> Self {
-        BlendType::Tangent
-    }
-}
 
 #[doc = "The reason for blocking a user."]
 #[derive(
@@ -3658,7 +3686,8 @@ impl std::default::Default for BlendType {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum BlockReason {
-    #[doc = "The user is missing a payment method and has exceeded their free API call credits for the month."]
+    #[doc = "The user is missing a payment method and has exceeded their free API call credits \
+             for the month."]
     #[serde(rename = "missing_payment_method")]
     #[display("missing_payment_method")]
     MissingPaymentMethod,
@@ -3770,7 +3799,8 @@ impl tabled::Tabled for BodyCreated {
     }
 }
 
-#[doc = "Body type determining if the operation will create a manifold (solid) body or a non-manifold collection of surfaces."]
+#[doc = "Body type determining if the operation will create a manifold (solid) body or a \
+         non-manifold collection of surfaces."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -3836,7 +3866,9 @@ impl tabled::Tabled for BodyUpdated {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanImprint {
-    #[doc = "If the operation produced just one body, then its ID will be the ID of the modeling command request. But if any extra bodies are produced, then their IDs will be included here."]
+    #[doc = "If the operation produced just one body, then its ID will be the ID of the modeling \
+             command request. But if any extra bodies are produced, then their IDs will be \
+             included here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
@@ -3872,7 +3904,9 @@ impl tabled::Tabled for BooleanImprint {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanIntersection {
-    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here."]
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
@@ -3908,7 +3942,9 @@ impl tabled::Tabled for BooleanIntersection {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanSubtract {
-    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here."]
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
@@ -3944,7 +3980,9 @@ impl tabled::Tabled for BooleanSubtract {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanUnion {
-    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling command request. But if any extra solids are produced, then their IDs will be included here."]
+    #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
+             command request. But if any extra solids are produced, then their IDs will be \
+             included here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub extra_solid_ids: Option<Vec<uuid::Uuid>>,
 }
@@ -4280,7 +4318,8 @@ pub enum CameraDragInteractionType {
     Zoom,
 }
 
-#[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel message, so this data may need more data like a \"sequence\""]
+#[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel \
+         message, so this data may need more data like a \"sequence\""]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -4494,7 +4533,8 @@ impl tabled::Tabled for CameraViewState {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CardDetails {
-    #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, `visa`, or `unknown`."]
+    #[doc = "Card brand.\n\nCan be `amex`, `diners`, `discover`, `jcb`, `mastercard`, `unionpay`, \
+             `visa`, or `unknown`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub brand: Option<String>,
     #[doc = "Checks on Card address and CVC if provided."]
@@ -4940,7 +4980,8 @@ impl tabled::Tabled for ClosePath {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ClosestEdge {
-    #[doc = "The ID of the edge closest to the point given in the request. If there are no edges in the scene, returns None."]
+    #[doc = "The ID of the edge closest to the point given in the request. If there are no edges \
+             in the scene, returns None."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub edge_id: Option<uuid::Uuid>,
 }
@@ -4971,7 +5012,12 @@ impl tabled::Tabled for ClosestEdge {
     }
 }
 
-#[doc = "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>"]
+#[doc = "The language code is written in.\n\n<details><summary>JSON schema</summary>\n\n```json { \
+         \"description\": \"The language code is written in.\", \"oneOf\": [ { \"description\": \
+         \"The `go` programming language.\", \"type\": \"string\", \"enum\": [ \"go\" ] }, { \
+         \"description\": \"The `python` programming language.\", \"type\": \"string\", \"enum\": \
+         [ \"python\" ] }, { \"description\": \"The `node` programming language.\", \"type\": \
+         \"string\", \"enum\": [ \"node\" ] } ] } ``` </details>"]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -5000,7 +5046,8 @@ pub enum CodeLanguage {
     Node,
 }
 
-#[doc = "`CodeOption`\n\n<details><summary>JSON schema</summary>\n\n```json { \"type\": \"string\", \"enum\": [ \"parse\", \"mock_execute\", \"execute\" ] } ``` </details>"]
+#[doc = "`CodeOption`\n\n<details><summary>JSON schema</summary>\n\n```json { \"type\": \
+         \"string\", \"enum\": [ \"parse\", \"mock_execute\", \"execute\" ] } ``` </details>"]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -5026,7 +5073,13 @@ pub enum CodeOption {
     Execute,
 }
 
-#[doc = "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \"properties\": { \"output_files\": { \"description\": \"The contents of the files requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
+#[doc = "Output of the code being executed.\n\n<details><summary>JSON schema</summary>\n\n```json \
+         { \"description\": \"Output of the code being executed.\", \"type\": \"object\", \
+         \"properties\": { \"output_files\": { \"description\": \"The contents of the files \
+         requested if they were passed.\", \"type\": \"array\", \"items\": { \"$ref\": \
+         \"#/components/schemas/OutputFile\" } }, \"stderr\": { \"description\": \"The stderr of \
+         the code.\", \"default\": \"\", \"type\": \"string\" }, \"stdout\": { \"description\": \
+         \"The stdout of the code.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -5174,7 +5227,8 @@ pub enum CompanySize {
 pub struct ComplementaryEdges {
     #[doc = "Every edge that shared one common vertex with the original edge."]
     pub adjacent_ids: Vec<uuid::Uuid>,
-    #[doc = "The opposite edge has no common vertices with the original edge. A wall may not have an opposite edge (i.e. a revolve that touches the axis of rotation)."]
+    #[doc = "The opposite edge has no common vertices with the original edge. A wall may not have \
+             an opposite edge (i.e. a revolve that touches the axis of rotation)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub opposite_id: Option<uuid::Uuid>,
 }
@@ -5208,12 +5262,14 @@ impl tabled::Tabled for ComplementaryEdges {
     }
 }
 
-#[doc = "Container that holds a translate, rotate and scale. Defaults to no change, everything stays the same (i.e. the identity function)."]
+#[doc = "Container that holds a translate, rotate and scale. Defaults to no change, everything \
+         stays the same (i.e. the identity function)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ComponentTransform {
-    #[doc = "Rotate component of the transform. The rotation is specified as an axis and an angle (xyz are the components of the axis, w is the angle in degrees)."]
+    #[doc = "Rotate component of the transform. The rotation is specified as an axis and an angle \
+             (xyz are the components of the axis, w is the angle in degrees)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rotate_angle_axis: Option<TransformByForPoint4D>,
     #[doc = "Rotate component of the transform. The rotation is specified as a roll, pitch, yaw."]
@@ -5489,7 +5545,8 @@ pub enum ConversionSortMode {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Coupon {
-    #[doc = "Amount (in the `currency` specified) that will be taken off the subtotal of any invoices for this customer."]
+    #[doc = "Amount (in the `currency` specified) that will be taken off the subtotal of any \
+             invoices for this customer."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_off: Option<f64>,
     #[doc = "Unique identifier for the object."]
@@ -5498,10 +5555,13 @@ pub struct Coupon {
     #[doc = "Set of key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
-    #[doc = "Name of the coupon displayed to customers on, for instance invoices, or receipts.\n\nBy default the `id` is shown if `name` is not set."]
+    #[doc = "Name of the coupon displayed to customers on, for instance invoices, or \
+             receipts.\n\nBy default the `id` is shown if `name` is not set."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    #[doc = "Percent that will be taken off the subtotal of any invoices for this customer for the duration of the coupon.\n\nFor example, a coupon with percent_off of 50 will make a %s100 invoice %s50 instead."]
+    #[doc = "Percent that will be taken off the subtotal of any invoices for this customer for \
+             the duration of the coupon.\n\nFor example, a coupon with percent_off of 50 will \
+             make a %s100 invoice %s50 instead."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub percent_off: Option<f64>,
 }
@@ -5565,7 +5625,8 @@ impl tabled::Tabled for Coupon {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateCustomModel {
-    #[doc = "Org dataset IDs that should be linked to the model. Must contain at least one dataset owned by the org."]
+    #[doc = "Org dataset IDs that should be linked to the model. Must contain at least one \
+             dataset owned by the org."]
     pub dataset_ids: Vec<uuid::Uuid>,
     #[doc = "The model's display name."]
     pub name: String,
@@ -5738,12 +5799,14 @@ impl tabled::Tabled for CreateProjectShareLinkRequest {
     }
 }
 
-#[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
+#[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of \
+         the 'CreateRegion' modeling command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateRegion {
-    #[doc = "a mapping from the curves within this region to the source component segment curves they were split from"]
+    #[doc = "a mapping from the curves within this region to the source component segment curves \
+             they were split from"]
     pub region_mapping: std::collections::HashMap<String, uuid::Uuid>,
 }
 
@@ -5769,12 +5832,14 @@ impl tabled::Tabled for CreateRegion {
     }
 }
 
-#[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+#[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken \
+         from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateRegionFromQueryPoint {
-    #[doc = "a mapping from the curves within this region to the source component segment curves they were split from"]
+    #[doc = "a mapping from the curves within this region to the source component segment curves \
+             they were split from"]
     pub region_mapping: std::collections::HashMap<String, uuid::Uuid>,
 }
 
@@ -5805,10 +5870,15 @@ impl tabled::Tabled for CreateRegionFromQueryPoint {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateShortlinkRequest {
-    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only be set if your subscription allows for it. Otherwise, it will return an error. When you access the link it will be required to enter this password through basic auth. The username will be `{anything}` and the password will be the password you set here."]
+    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only \
+             be set if your subscription allows for it. Otherwise, it will return an error. When \
+             you access the link it will be required to enter this password through basic auth. \
+             The username will be `{anything}` and the password will be the password you set here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
-    #[doc = "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail."]
+    #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
+             applies to org shortlinks. If you are creating a user shortlink and you are not a \
+             member of a team or enterprise and you try to set this to true, it will fail."]
     #[serde(default)]
     pub restrict_to_org: bool,
     #[doc = "The URL to redirect back to."]
@@ -5850,7 +5920,8 @@ impl tabled::Tabled for CreateShortlinkRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateShortlinkResponse {
-    #[doc = "The key for this url. This is what you use to update or delete the specific shortlink."]
+    #[doc = "The key for this url. This is what you use to update or delete the specific \
+             shortlink."]
     pub key: String,
     #[doc = "The shortened url."]
     pub url: String,
@@ -5878,7 +5949,8 @@ impl tabled::Tabled for CreateShortlinkResponse {
     }
 }
 
-#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only support scanning in ascending order."]
+#[doc = "Supported set of sort modes for scanning by created_at only.\n\nCurrently, we only \
+         support scanning in ascending order."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -6118,15 +6190,25 @@ pub struct Customer {
     #[doc = "The customer's address."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address: Option<AddressDetails>,
-    #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf negative, the customer has credit to apply to their next invoice. If positive, the customer has an amount owed that will be added to their next invoice. The balance does not refer to any unpaid invoices; it solely takes into account amounts that have yet to be successfully applied to any invoice. This balance is only taken into account as invoices are finalized."]
+    #[doc = "Current balance, if any, being stored on the customer in the payments service.\n\nIf \
+             negative, the customer has credit to apply to their next invoice. If positive, the \
+             customer has an amount owed that will be added to their next invoice. The balance \
+             does not refer to any unpaid invoices; it solely takes into account amounts that \
+             have yet to be successfully applied to any invoice. This balance is only taken into \
+             account as invoices are finalized."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub balance: Option<f64>,
     #[doc = "Time at which the object was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring billing purposes."]
+    #[doc = "Three-letter ISO code for the currency the customer can be charged in for recurring \
+             billing purposes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub currency: Option<String>,
-    #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't paid by its due date.  If an invoice is marked uncollectible by dunning, `delinquent` doesn't get reset to `false`."]
+    #[doc = "When the customer's latest invoice is billed by charging automatically, `delinquent` \
+             is `true` if the invoice's latest charge failed.\n\nWhen the customer's latest \
+             invoice is billed by sending an invoice, `delinquent` is `true` if the invoice isn't \
+             paid by its due date.  If an invoice is marked uncollectible by dunning, \
+             `delinquent` doesn't get reset to `false`."]
     #[serde(default)]
     pub delinquent: bool,
     #[doc = "The customer's email address."]
@@ -6218,20 +6300,36 @@ impl tabled::Tabled for Customer {
     }
 }
 
-#[doc = "A balance for a customer.\n\nThis holds information about the financial balance for the customer."]
+#[doc = "A balance for a customer.\n\nThis holds information about the financial balance for the \
+         customer."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CustomerBalance {
     #[doc = "The date and time the balance was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
+    #[doc = "The number of monthly API credits remaining in the balance. This is the number of \
+             credits remaining in the balance.\n\nBoth the monetary value and the number of \
+             credits are returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining: u64,
-    #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
+    #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets \
+             re-upped every month, but if the credits are not used for a month they do not carry \
+             over to the next month.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining_monetary_value: f64,
-    #[doc = "The number of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
+    #[doc = "The number of stable API credits remaining in the balance. These do not get reset or \
+             re-upped every month. This is separate from the monthly credits. Credits will first \
+             pull from the monthly credits, then the stable credits. Stable just means that they \
+             do not get reset every month. A user will have stable credits if a Zoo employee \
+             granted them credits.\n\nBoth the monetary value and the number of credits are \
+             returned, but they reflect the same value in the database."]
     pub stable_api_credits_remaining: u64,
-    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
+    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
+             reset or re-upped every month. This is separate from the monthly credits. Credits \
+             will first pull from the monthly credits, then the stable credits. Stable just means \
+             that they do not get reset every month. A user will have stable credits if a Zoo \
+             employee granted them credits.\n\nBoth the monetary value and the number of credits \
+             are returned, but they reflect the same value in the database."]
     pub stable_api_credits_remaining_monetary_value: f64,
     #[doc = "Details about the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -6239,7 +6337,9 @@ pub struct CustomerBalance {
     #[doc = "The subscription ID for the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<String>,
-    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice items. This does not include any credits the customer has on their account. This amount is only returned if requested from the api."]
+    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
+             items. This does not include any credits the customer has on their account. This \
+             amount is only returned if requested from the api."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_due: Option<f64>,
     #[doc = "The date and time the balance was last updated."]
@@ -6315,11 +6415,13 @@ impl tabled::Tabled for CustomerBalance {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum CutStrategy {
-    #[doc = "Basic fillet cut. This has limitations, like the filletted edges can't touch each other. But it's very fast and simple."]
+    #[doc = "Basic fillet cut. This has limitations, like the filletted edges can't touch each \
+             other. But it's very fast and simple."]
     #[serde(rename = "basic")]
     #[display("basic")]
     Basic,
-    #[doc = "More complicated fillet cut. It works for more use-cases, like edges that touch each other. But it's slower than the Basic method."]
+    #[doc = "More complicated fillet cut. It works for more use-cases, like edges that touch each \
+             other. But it's slower than the Basic method."]
     #[serde(rename = "csg")]
     #[display("csg")]
     Csg,
@@ -6364,7 +6466,8 @@ pub enum CutTypeV2 {
     Fillet {
         #[doc = "The radius of the fillet."]
         radius: f64,
-        #[doc = "The second length affects the edge length of the second face of the cut. This will cause the fillet to take on the shape of a conic section, instead of an arc."]
+        #[doc = "The second length affects the edge length of the second face of the cut. This \
+                 will cause the fillet to take on the shape of a conic section, instead of an arc."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         second_length: Option<f64>,
     },
@@ -6865,7 +6968,8 @@ impl tabled::Tabled for DeviceAccessTokenRequestForm {
     }
 }
 
-#[doc = "The request parameters to confirm the `user_code` for the OAuth 2.0 Device Authorization Grant."]
+#[doc = "The request parameters to confirm the `user_code` for the OAuth 2.0 Device Authorization \
+         Grant."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -8195,7 +8299,9 @@ pub enum ErrorCode {
     #[serde(rename = "internal_api")]
     #[display("internal_api")]
     InternalApi,
-    #[doc = "User requested something geometrically or graphically impossible. Don't retry this request, as it's inherently impossible. Instead, read the error message and change your request."]
+    #[doc = "User requested something geometrically or graphically impossible. Don't retry this \
+             request, as it's inherently impossible. Instead, read the error message and change \
+             your request."]
     #[serde(rename = "bad_request")]
     #[display("bad_request")]
     BadRequest,
@@ -8227,7 +8333,8 @@ pub enum ErrorCode {
     #[serde(rename = "message_type_not_accepted")]
     #[display("message_type_not_accepted")]
     MessageTypeNotAccepted,
-    #[doc = "Client sent a Websocket message intended for WebRTC but it was configured as a WebRTC connection."]
+    #[doc = "Client sent a Websocket message intended for WebRTC but it was configured as a \
+             WebRTC connection."]
     #[serde(rename = "message_type_not_accepted_for_web_r_t_c")]
     #[display("message_type_not_accepted_for_web_r_t_c")]
     MessageTypeNotAcceptedForWebRTC,
@@ -8390,7 +8497,9 @@ impl tabled::Tabled for ExtendPath {
     }
 }
 
-#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: Stripe"]
+#[doc = "Extended user information.\n\nThis is mostly used for internal purposes. It returns a \
+         mapping of the user's information, including that of our third party services we use for \
+         users: Stripe"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -8398,7 +8507,8 @@ pub struct ExtendedUser {
     #[doc = "If the user should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
-    #[doc = "If we can train on the user's data. If the user is a member of an organization, the organization's setting will override this."]
+    #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
+             organization's setting will override this."]
     #[serde(default)]
     pub can_train_on_data: bool,
     #[doc = "The user's company."]
@@ -8437,7 +8547,9 @@ pub struct ExtendedUser {
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[doc = "The name of the user. This is auto populated at first from the authentication \
+             provider (if there was a name). It can be updated by the user by updating their \
+             `first_name` and `last_name` fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "The user's phone number."]
@@ -8607,7 +8719,8 @@ impl tabled::Tabled for Extrude {
     }
 }
 
-#[doc = "Extrusion method determining if the extrusion will be part of the existing object or an entirely new object."]
+#[doc = "Extrusion method determining if the extrusion will be part of the existing object or an \
+         entirely new object."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -8622,11 +8735,13 @@ impl tabled::Tabled for Extrude {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ExtrudeMethod {
-    #[doc = "Create a new object that is not connected to the object it is extruded from. This will result in two objects after the operation."]
+    #[doc = "Create a new object that is not connected to the object it is extruded from. This \
+             will result in two objects after the operation."]
     #[serde(rename = "new")]
     #[display("new")]
     New,
-    #[doc = "This extrusion will be part of object it is extruded from. This will result in one object after the operation."]
+    #[doc = "This extrusion will be part of object it is extruded from. This will result in one \
+             object after the operation."]
     #[serde(rename = "merge")]
     #[display("merge")]
     Merge,
@@ -8637,7 +8752,8 @@ pub enum ExtrudeMethod {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub enum ExtrudeReference {
-    #[doc = "Extrudes along the normal of the top face until it is as close to the entity as possible. An entity can be a solid, a path, a face, etc."]
+    #[doc = "Extrudes along the normal of the top face until it is as close to the entity as \
+             possible. An entity can be a solid, a path, a face, etc."]
     #[serde(rename = "entity_reference")]
     EntityReference {
         #[doc = "The UUID of the entity to extrude to."]
@@ -8711,12 +8827,15 @@ impl tabled::Tabled for ExtrudeToReference {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtrudedFaceInfo {
-    #[doc = "The face made from the original 2D shape being extruded. If the solid is extruded from a shape which already has an ID (e.g. extruding something which was sketched on a face), this doesn't need to be sent."]
+    #[doc = "The face made from the original 2D shape being extruded. If the solid is extruded \
+             from a shape which already has an ID (e.g. extruding something which was sketched on \
+             a face), this doesn't need to be sent."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub bottom: Option<uuid::Uuid>,
     #[doc = "Any intermediate sides between the top and bottom."]
     pub sides: Vec<SideFace>,
-    #[doc = "Top face of the extrusion (parallel and further away from the original 2D shape being extruded)."]
+    #[doc = "Top face of the extrusion (parallel and further away from the original 2D shape \
+             being extruded)."]
     pub top: uuid::Uuid,
 }
 
@@ -8783,12 +8902,14 @@ pub enum ExtrusionFaceCapType {
     Both,
 }
 
-#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
+         ids and extrusion faces)"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtrusionFaceInfo {
-    #[doc = "Whether or not this extrusion face is a top/bottom cap face or not. Note that top/bottom cap faces will not have associated curve IDs."]
+    #[doc = "Whether or not this extrusion face is a top/bottom cap face or not. Note that \
+             top/bottom cap faces will not have associated curve IDs."]
     pub cap: ExtrusionFaceCapType,
     #[doc = "Path component (curve) UUID."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -8832,7 +8953,8 @@ impl tabled::Tabled for ExtrusionFaceInfo {
     }
 }
 
-#[doc = "Faces and edges id info (most used in identifying geometry in patterned and mirrored objects)."]
+#[doc = "Faces and edges id info (most used in identifying geometry in patterned and mirrored \
+         objects)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -9046,7 +9168,8 @@ impl tabled::Tabled for FaceIsPlanar {
 pub struct FailureWebSocketResponse {
     #[doc = "The errors that occurred."]
     pub errors: Vec<ApiError>,
-    #[doc = "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null."]
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<uuid::Uuid>,
     #[doc = "Always false"]
@@ -9223,7 +9346,8 @@ pub struct FileConversion {
     #[doc = "The output format options of the file conversion."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub output_format_options: Option<OutputFormat3D>,
-    #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. The key of the map is the path of the output file."]
+    #[doc = "The converted files (if multiple file conversion), if completed, base64 encoded. The \
+             key of the map is the path of the output file."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
     #[doc = "The source format of the file conversion."]
@@ -9443,15 +9567,22 @@ pub enum FileExportFormat {
     #[serde(rename = "fbx")]
     #[display("fbx")]
     Fbx,
-    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better if you want a compressed format as opposed to the human readable glTF that lacks compression."]
+    #[doc = "Binary glTF 2.0.\n\nThis is a single binary with .glb extension.\n\nThis is better \
+             if you want a compressed format as opposed to the human readable glTF that lacks \
+             compression."]
     #[serde(rename = "glb")]
     #[display("glb")]
     Glb,
-    #[doc = "glTF 2.0. Embedded glTF 2.0 (pretty printed).\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.\n\nThe JSON contents are pretty printed.\n\nIt is human readable, single file, and you can view the diff easily in a git commit."]
+    #[doc = "glTF 2.0. Embedded glTF 2.0 (pretty printed).\n\nSingle JSON file with .gltf \
+             extension binary data encoded as base64 data URIs.\n\nThe JSON contents are pretty \
+             printed.\n\nIt is human readable, single file, and you can view the diff easily in a \
+             git commit."]
     #[serde(rename = "gltf")]
     #[display("gltf")]
     Gltf,
-    #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not."]
+    #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or \
+             may not have an an attached material (mtl // mtllib) within the file, but we \
+             interact with it as if it does not."]
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
@@ -9492,7 +9623,9 @@ pub enum FileImportFormat {
     #[serde(rename = "gltf")]
     #[display("gltf")]
     Gltf,
-    #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or may not have an an attached material (mtl // mtllib) within the file, but we interact with it as if it does not."]
+    #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or \
+             may not have an an attached material (mtl // mtllib) within the file, but we \
+             interact with it as if it does not."]
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
@@ -9819,10 +9952,14 @@ impl tabled::Tabled for FileVolume {
 pub struct FractionOfEdge {
     #[doc = "The id of the edge"]
     pub edge_id: uuid::Uuid,
-    #[doc = "A value between [0.0, 1.0] (default 0.0) that is a percentage along the edge. This bound will control how much of the edge is used during the blend. If lower_bound is larger than upper_bound, the edge is effectively \"flipped\"."]
+    #[doc = "A value between [0.0, 1.0] (default 0.0) that is a percentage along the edge. This \
+             bound will control how much of the edge is used during the blend. If lower_bound is \
+             larger than upper_bound, the edge is effectively \"flipped\"."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lower_bound: Option<f64>,
-    #[doc = "A value between [0.0, 1.0] (default 1.0) that is a percentage along the edge. This bound will control how much of the edge is used during the blend. If lower_bound is larger than upper_bound, the edge is effectively \"flipped\"."]
+    #[doc = "A value between [0.0, 1.0] (default 1.0) that is a percentage along the edge. This \
+             bound will control how much of the edge is used during the blend. If lower_bound is \
+             larger than upper_bound, the edge is effectively \"flipped\"."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub upper_bound: Option<f64>,
 }
@@ -10043,11 +10180,13 @@ pub enum GltfStorage {
     #[serde(rename = "binary")]
     #[display("binary")]
     Binary,
-    #[doc = "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a separate binary blob file with .bin extension."]
+    #[doc = "Standard glTF 2.0.\n\nThis is a JSON file with .gltf extension paired with a \
+             separate binary blob file with .bin extension."]
     #[serde(rename = "standard")]
     #[display("standard")]
     Standard,
-    #[doc = "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as base64 data URIs.\n\nThis is the default setting."]
+    #[doc = "Embedded glTF 2.0.\n\nSingle JSON file with .gltf extension binary data encoded as \
+             base64 data URIs.\n\nThis is the default setting."]
     #[serde(rename = "embedded")]
     #[display("embedded")]
     Embedded,
@@ -10219,7 +10358,8 @@ pub struct IceServer {
     #[doc = "Credentials for a given TURN server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credential: Option<String>,
-    #[doc = "URLs for a given STUN/TURN server. IceServer urls can either be a string or an array of strings But, we choose to always convert to an array of strings for consistency"]
+    #[doc = "URLs for a given STUN/TURN server. IceServer urls can either be a string or an array \
+             of strings But, we choose to always convert to an array of strings for consistency"]
     pub urls: Vec<String>,
     #[doc = "Username for a given TURN server."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -10276,7 +10416,8 @@ pub enum IdpMetadataSource {
     #[doc = "A base64 encoded XML document containing the identity provider metadata descriptor."]
     #[serde(rename = "base64_encoded_xml")]
     Base64EncodedXml {
-        #[doc = "The base64 encoded XML document containing the identity provider metadata descriptor."]
+        #[doc = "The base64 encoded XML document containing the identity provider metadata \
+                 descriptor."]
         data: base64::Base64Data,
     },
 }
@@ -10306,7 +10447,8 @@ pub enum ImageFormat {
     Jpeg,
 }
 
-#[doc = "File to import into the current model. If you are sending binary data for a file, be sure to send the WebSocketRequest as binary/bson, not text/json."]
+#[doc = "File to import into the current model. If you are sending binary data for a file, be sure \
+         to send the WebSocketRequest as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -10420,48 +10562,58 @@ pub enum InputFormat3D {
     #[doc = "Autodesk Filmbox (FBX) format."]
     #[serde(rename = "fbx")]
     Fbx {},
-    #[doc = "Binary glTF 2.0. We refer to this as glTF since that is how our customers refer to it, but this can also import binary glTF (glb)."]
+    #[doc = "Binary glTF 2.0. We refer to this as glTF since that is how our customers refer to \
+             it, but this can also import binary glTF (glb)."]
     #[serde(rename = "gltf")]
     Gltf {},
     #[doc = "Wavefront OBJ format."]
     #[serde(rename = "obj")]
     Obj {
-        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "The PLY Polygon File Format."]
     #[serde(rename = "ply")]
     Ply {
-        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
     #[doc = "SolidWorks part (SLDPRT) format."]
     #[serde(rename = "sldprt")]
     Sldprt {
-        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine."]
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
         #[serde(default)]
         split_closed_faces: bool,
     },
     #[doc = "ISO 10303-21 (STEP) format."]
     #[serde(rename = "step")]
     Step {
-        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         coords: Option<System>,
-        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine."]
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
         #[serde(default)]
         split_closed_faces: bool,
     },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
     Stl {
-        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
-        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
+        #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
+                 when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
     },
 }
@@ -10471,7 +10623,12 @@ pub enum InputFormat3D {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Invoice {
-    #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller than the minimum charge amount, for example, or if there is account credit that can be applied to the invoice, the `amount_due` may be 0. If there is a positive `starting_balance` for the invoice (the customer owes money), the `amount_due` will also take that into account. The charge that gets generated for the invoice will be for the amount specified in `amount_due`."]
+    #[doc = "Final amount due at this time for this invoice.\n\nIf the invoice's total is smaller \
+             than the minimum charge amount, for example, or if there is account credit that can \
+             be applied to the invoice, the `amount_due` may be 0. If there is a positive \
+             `starting_balance` for the invoice (the customer owes money), the `amount_due` will \
+             also take that into account. The charge that gets generated for the invoice will be \
+             for the amount specified in `amount_due`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_due: Option<f64>,
     #[doc = "The amount, in USD, that was paid."]
@@ -10483,10 +10640,15 @@ pub struct Invoice {
     #[doc = "The amount remaining, in USD, that is due."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub amount_remaining: Option<f64>,
-    #[doc = "Number of payment attempts made for this invoice, from the perspective of the payment retry schedule.\n\nAny payment attempt counts as the first attempt, and subsequently only automatic retries increment the attempt count. In other words, manual payment attempts after the first attempt do not affect the retry schedule."]
+    #[doc = "Number of payment attempts made for this invoice, from the perspective of the \
+             payment retry schedule.\n\nAny payment attempt counts as the first attempt, and \
+             subsequently only automatic retries increment the attempt count. In other words, \
+             manual payment attempts after the first attempt do not affect the retry schedule."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub attempt_count: Option<u64>,
-    #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted until 1 hour after the `invoice.created` webhook, for example, so you might not want to display that invoice as unpaid to your users."]
+    #[doc = "Whether an attempt has been made to pay the invoice.\n\nAn invoice is not attempted \
+             until 1 hour after the `invoice.created` webhook, for example, so you might not want \
+             to display that invoice as unpaid to your users."]
     #[serde(default)]
     pub attempted: bool,
     #[doc = "Why this invoice was created (e.g. `subscription_cycle`)."]
@@ -10500,10 +10662,13 @@ pub struct Invoice {
     #[doc = "Three-letter [ISO currency code](https://www.iso.org/iso-4217-currency-codes.html)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub currency: Option<String>,
-    #[doc = "The email address for the customer. Until the invoice is finalized, this field will equal customer.email. Once the invoice is finalized, this field will no longer be updated."]
+    #[doc = "The email address for the customer. Until the invoice is finalized, this field will \
+             equal customer.email. Once the invoice is finalized, this field will no longer be \
+             updated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub customer_email: Option<String>,
-    #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is the customer ID in the payments service, not our database customer ID."]
+    #[doc = "Customer ID. The unique identifier for the customer this invoice belongs to. This is \
+             the customer ID in the payments service, not our database customer ID."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub customer_id: Option<String>,
     #[doc = "Default payment method."]
@@ -10518,16 +10683,20 @@ pub struct Invoice {
     #[doc = "Unique identifier for the object."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: invoice items in reverse chronological order, followed by the subscription, if any."]
+    #[doc = "The individual line items that make up the invoice.\n\n`lines` is sorted as follows: \
+             invoice items in reverse chronological order, followed by the subscription, if any."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub lines: Option<Vec<InvoiceLineItem>>,
     #[doc = "Set of key-value pairs."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::HashMap<String, String>>,
-    #[doc = "A unique, identifying string that appears on emails sent to the customer for this invoice."]
+    #[doc = "A unique, identifying string that appears on emails sent to the customer for this \
+             invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number: Option<String>,
-    #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be paid (most commonly) with a charge or with credit from the customer's account balance."]
+    #[doc = "Whether payment was successfully collected for this invoice.\n\nAn invoice can be \
+             paid (most commonly) with a charge or with credit from the customer's account \
+             balance."]
     #[serde(default)]
     pub paid: bool,
     #[doc = "The link to download the PDF for the invoice."]
@@ -10542,22 +10711,26 @@ pub struct Invoice {
     #[doc = "Extra information about an invoice for the customer's credit card statement."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub statement_descriptor: Option<String>,
-    #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or `void`."]
+    #[doc = "The status of the invoice, one of `draft`, `open`, `paid`, `uncollectible`, or \
+             `void`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<InvoiceStatus>,
     #[doc = "Subscription ID tied to this invoice, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<String>,
-    #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
+    #[doc = "Total of all subscriptions, invoice items, and prorations on the invoice before any \
+             invoice level discount or tax is applied.\n\nItem discounts are already incorporated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subtotal: Option<f64>,
-    #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this invoice."]
+    #[doc = "The amount of tax on this invoice.\n\nThis is the sum of all the tax amounts on this \
+             invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tax: Option<f64>,
     #[doc = "Total after discounts and taxes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total: Option<f64>,
-    #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an invoice."]
+    #[doc = "The URL for the hosted invoice page, which allows customers to view and pay an \
+             invoice."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
@@ -11245,7 +11418,8 @@ pub struct KclCodeCompletionRequest {
     #[doc = "Extra parameters for the completions."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub extra: Option<KclCodeCompletionParams>,
-    #[doc = "The maximum number of tokens that can be generated for the completions. The total length of input tokens and generated tokens is limited by the model’s context length."]
+    #[doc = "The maximum number of tokens that can be generated for the completions. The total \
+             length of input tokens and generated tokens is limited by the model’s context length."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<u16>,
     #[doc = "Zoo provided model, or custom model which should be used to process this request."]
@@ -11254,7 +11428,8 @@ pub struct KclCodeCompletionRequest {
     #[doc = "How many completion choices to generate for each input message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub n: Option<u8>,
-    #[doc = "For GitHub copilot this is the `{org}/{repo}`. This does not do anything yet. But we wanted the same API as GitHub Copilot. It might be used in the future."]
+    #[doc = "For GitHub copilot this is the `{org}/{repo}`. This does not do anything yet. But we \
+             wanted the same API as GitHub Copilot. It might be used in the future."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub nwo: Option<String>,
     #[doc = "The prompt for the desired part."]
@@ -11263,7 +11438,9 @@ pub struct KclCodeCompletionRequest {
     #[doc = "Up to 4 sequences where the API will stop generating further tokens."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stop: Option<Vec<String>>,
-    #[doc = "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message."]
+    #[doc = "If set, partial message deltas will be sent, like in ChatGPT or OpenAPI. Tokens will \
+             be sent as data-only server-sent events as they become available, with the stream \
+             terminated by a data: [DONE] message."]
     #[serde(default)]
     pub stream: bool,
     #[doc = "The suffix for the desired part."]
@@ -11613,7 +11790,9 @@ impl tabled::Tabled for MakeAxesGizmo {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct MakeOffsetPath {
-    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the new paths. If the offset path remains as a single path, this will be empty, and the resulting ID of the (single) new path will be the ID of the `MakeOffsetPath` command."]
+    #[doc = "If the offset path splits into multiple paths, this will contain the UUIDs of the \
+             new paths. If the offset path remains as a single path, this will be empty, and the \
+             resulting ID of the (single) new path will be the ID of the `MakeOffsetPath` command."]
     pub entity_ids: Vec<uuid::Uuid>,
 }
 
@@ -11985,7 +12164,9 @@ pub enum MlCopilotClientMessage {
     #[doc = "Updates the active project context without creating a new prompt."]
     #[serde(rename = "project_context")]
     ProjectContext {
-        #[doc = "The current files in the project, if any. This can be used to provide context for the AI. This should be sent in binary format if the files are not text files, like an imported binary file."]
+        #[doc = "The current files in the project, if any. This can be used to provide context \
+                 for the AI. This should be sent in binary format if the files are not text \
+                 files, like an imported binary file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
         #[doc = "The project name, if any."]
@@ -12000,7 +12181,9 @@ pub enum MlCopilotClientMessage {
         additional_files: Option<Vec<MlCopilotFile>>,
         #[doc = "The content of the user's message."]
         content: String,
-        #[doc = "The current files in the project, if any. This can be used to provide context for the AI. This should be sent in binary format, if the files are not text files, like an imported binary file."]
+        #[doc = "The current files in the project, if any. This can be used to provide context \
+                 for the AI. This should be sent in binary format, if the files are not text \
+                 files, like an imported binary file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
         #[doc = "The user can force specific tools to be used for this message."]
@@ -12012,13 +12195,15 @@ pub enum MlCopilotClientMessage {
         #[doc = "Override the default or mode model with another."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         model: Option<MlCopilotSupportedModels>,
-        #[doc = "The project name, if any. This can be used to associate the message with a specific project."]
+        #[doc = "The project name, if any. This can be used to associate the message with a \
+                 specific project."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
         #[doc = "Change the default or mode reasoning effort."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reasoning_effort: Option<MlReasoningEffort>,
-        #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) will be used and is required."]
+        #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) \
+                 will be used and is required."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         source_ranges: Option<Vec<SourceRangePrompt>>,
     },
@@ -12128,7 +12313,11 @@ pub enum MlCopilotServerMessage {
     #[doc = "Pong response to a Ping message."]
     #[serde(rename = "pong")]
     Pong {},
-    #[doc = "Session metadata sent by the server right after authentication.\n\nSemantics: - This message is NOT persisted in the database and will NEVER appear in a subsequent `Replay` message. However, we do have the `api_call_id` in the database. - Timing: sent immediately after a client is authenticated on a websocket. Useful for correlating logs and traces."]
+    #[doc = "Session metadata sent by the server right after authentication.\n\nSemantics: - This \
+             message is NOT persisted in the database and will NEVER appear in a subsequent \
+             `Replay` message. However, we do have the `api_call_id` in the database. - Timing: \
+             sent immediately after a client is authenticated on a websocket. Useful for \
+             correlating logs and traces."]
     #[serde(rename = "session_data")]
     SessionData {
         #[doc = "The API call id associated with this websocket session."]
@@ -12174,22 +12363,39 @@ pub enum MlCopilotServerMessage {
     #[doc = "Notification that the KCL project has been updated."]
     #[serde(rename = "project_updated")]
     ProjectUpdated {
-        #[doc = "Map of file paths to their latest contents. The file contents are not encoded since kcl files are not binary."]
+        #[doc = "Map of file paths to their latest contents. The file contents are not encoded \
+                 since kcl files are not binary."]
         files: std::collections::HashMap<String, String>,
     },
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
     Reasoning(ReasoningMessage),
-    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
+    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. \
+             Includes server messages and client `User` messages.\n\nInvariants: - Includes \
+             server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. \
+             }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
+             messages. - The following are NEVER included: `SessionData`, `ConversationId`, \
+             `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt \
+             creation time within the conversation, then by the per-prompt `seq` value \
+             (monotonically increasing as seen in the original stream).\n\nWire format: - Each \
+             element is canonical serialized bytes (typically JSON) for either a \
+             `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an \
+             initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the \
+             server sends a single WebSocket Binary frame containing a MsgPack-encoded document \
+             of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
-        #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation time, then message sequence number."]
+        #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation \
+                 time, then message sequence number."]
         messages: Vec<Vec<u8>>,
     },
     #[doc = "Marks the end of a streamed answer."]
     #[serde(rename = "end_of_stream")]
     EndOfStream {
-        #[doc = "This indicates the time that the server has finished processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
+        #[doc = "This indicates the time that the server has finished processing the request. \
+                 This can be used by the client to measure the total time taken for the request. \
+                 Although this might be passed in other contexts, outside of copilot mode, it is \
+                 only relevant in copilot mode."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         completed_at: Option<chrono::DateTime<chrono::Utc>>,
         #[doc = "The conversation id for this session."]
@@ -12198,10 +12404,15 @@ pub enum MlCopilotServerMessage {
         #[doc = "The ML prompt id for this turn."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         id: Option<uuid::Uuid>,
-        #[doc = "This indicates the time that the server had started processing the request. This can be used by the client to measure the total time taken for the request. Although this might be passed in other contexts, outside of copilot mode, it is only relevant in copilot mode."]
+        #[doc = "This indicates the time that the server had started processing the request. This \
+                 can be used by the client to measure the total time taken for the request. \
+                 Although this might be passed in other contexts, outside of copilot mode, it is \
+                 only relevant in copilot mode."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         started_at: Option<chrono::DateTime<chrono::Utc>>,
-        #[doc = "The whole response text, which is the final output of the AI. This is only relevant if in copilot mode, where the AI is expected to return the whole response at once."]
+        #[doc = "The whole response text, which is the final output of the AI. This is only \
+                 relevant if in copilot mode, where the AI is expected to return the whole \
+                 response at once."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         whole_response: Option<String>,
     },
@@ -12213,7 +12424,8 @@ pub enum MlCopilotServerMessage {
     },
 }
 
-#[doc = "AI models that we support using with the system. In theory any model with reasoning capabilities can work."]
+#[doc = "AI models that we support using with the system. In theory any model with reasoning \
+         capabilities can work."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -12415,7 +12627,8 @@ pub enum MlToolResult {
         #[doc = "Any error that occurred during the tool execution."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
-        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
         #[doc = "The name of the project, if any."]
@@ -12430,7 +12643,8 @@ pub enum MlToolResult {
         #[doc = "Any error that occurred during the tool execution."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         error: Option<String>,
-        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
         #[doc = "The name of the project, if any."]
@@ -12501,10 +12715,13 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
-    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit."]
+    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
+             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
+             the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
-    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month."]
+    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
+             the modeling app per month. This re-ups on the 1st of each month."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
@@ -12512,7 +12729,9 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "The price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
-    #[doc = "The price of the tier per month. If this is for an individual, this is the price they pay. If this is for an organization, this is the price the organization pays per member in the org. This is in USD."]
+    #[doc = "The price of the tier per month. If this is for an individual, this is the price \
+             they pay. If this is for an organization, this is the price the organization pays \
+             per member in the org. This is in USD."]
     pub price: SubscriptionTierPrice,
     #[doc = "The options for sharable links through the modeling app."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -12648,7 +12867,12 @@ pub enum ModelingCmd {
     #[doc = "Start a new path."]
     #[serde(rename = "start_path")]
     StartPath {},
-    #[doc = "Move the path's \"pen\". If you're in sketch mode, these coordinates are in the local coordinate system, not the world's coordinate system. For example, say you're sketching on the plane {x: (1,0,0), y: (0,1,0), origin: (0, 0, 50)}. In other words, the plane 50 units above the default XY plane. Then, moving the pen to (1, 1, 0) with this command uses local coordinates. So, it would move the pen to (1, 1, 50) in global coordinates."]
+    #[doc = "Move the path's \"pen\". If you're in sketch mode, these coordinates are in the \
+             local coordinate system, not the world's coordinate system. For example, say you're \
+             sketching on the plane {x: (1,0,0), y: (0,1,0), origin: (0, 0, 50)}. In other words, \
+             the plane 50 units above the default XY plane. Then, moving the pen to (1, 1, 0) \
+             with this command uses local coordinates. So, it would move the pen to (1, 1, 50) in \
+             global coordinates."]
     #[serde(rename = "move_path_pen")]
     MovePathPen {
         #[doc = "The ID of the command which created the path."]
@@ -12656,7 +12880,8 @@ pub enum ModelingCmd {
         #[doc = "Where the path's pen should be."]
         to: Point3D,
     },
-    #[doc = "Extend a path by adding a new segment which starts at the path's \"pen\". If no \"pen\" location has been set before (via `MovePen`), then the pen is at the origin."]
+    #[doc = "Extend a path by adding a new segment which starts at the path's \"pen\". If no \
+             \"pen\" location has been set before (via `MovePen`), then the pen is at the origin."]
     #[serde(rename = "extend_path")]
     ExtendPath {
         #[doc = "Optional label to associate with the new path segment."]
@@ -12664,7 +12889,8 @@ pub enum ModelingCmd {
         label: Option<String>,
         #[doc = "The ID of the command which created the path."]
         path: uuid::Uuid,
-        #[doc = "Segment to append to the path. This segment will implicitly begin at the current \"pen\" location."]
+        #[doc = "Segment to append to the path. This segment will implicitly begin at the current \
+                 \"pen\" location."]
         segment: PathSegment,
     },
     #[doc = "Command for extruding a solid 2d."]
@@ -12678,13 +12904,17 @@ pub enum ModelingCmd {
         #[doc = "Should the extrusion create a new object or be part of the existing object."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         extrude_method: Option<ExtrudeMethod>,
-        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will \
+                 generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
-        #[doc = "Only used if the extrusion is created from a face and extrude_method = Merge If true, coplanar faces will be merged and seams will be hidden. Otherwise, seams between the extrusion and original body will be shown."]
+        #[doc = "Only used if the extrusion is created from a face and extrude_method = Merge If \
+                 true, coplanar faces will be merged and seams will be hidden. Otherwise, seams \
+                 between the extrusion and original body will be shown."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         merge_coplanar_faces: Option<bool>,
-        #[doc = "Should the extrusion also extrude in the opposite direction? If so, this specifies its distance."]
+        #[doc = "Should the extrusion also extrude in the opposite direction? If so, this \
+                 specifies its distance."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         opposite: Option<String>,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
@@ -12699,10 +12929,12 @@ pub enum ModelingCmd {
         #[doc = "Should the extrusion create a new object or be part of the existing object."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         extrude_method: Option<ExtrudeMethod>,
-        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will \
+                 generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
-        #[doc = "Reference to extrude to. Extrusion occurs along the target's normal until it is as close to the reference as possible."]
+        #[doc = "Reference to extrude to. Extrusion occurs along the target's normal until it is \
+                 as close to the reference as possible."]
         reference: ExtrudeReference,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
         target: uuid::Uuid,
@@ -12710,18 +12942,21 @@ pub enum ModelingCmd {
     #[doc = "Command for twist extruding a solid 2d."]
     #[serde(rename = "twist_extrude")]
     TwistExtrude {
-        #[doc = "Angle step interval (converted to whole number degrees and bounded between 4° and 90°)"]
+        #[doc = "Angle step interval (converted to whole number degrees and bounded between 4° \
+                 and 90°)"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         angle_step_size: Option<Angle>,
         #[doc = "Should this extrude create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "Center to twist about (relative to plane's origin) Defaults to `[0, 0]` i.e. the plane's origin"]
+        #[doc = "Center to twist about (relative to plane's origin) Defaults to `[0, 0]` i.e. the \
+                 plane's origin"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         center_2d: Option<Point2D>,
         #[doc = "How far off the plane to extrude"]
         distance: f64,
-        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will generate IDs."]
+        #[doc = "Which IDs should the new faces have? If this isn't given, the engine will \
+                 generate IDs."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         faces: Option<ExtrudedFaceInfo>,
         #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
@@ -12740,15 +12975,18 @@ pub enum ModelingCmd {
         #[doc = "What is this sweep relative to?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         relative_to: Option<RelativeTo>,
-        #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, sweeps) based on the trajectory path components."]
+        #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, \
+                 sweeps) based on the trajectory path components."]
         sectional: bool,
         #[doc = "Which sketch to sweep. Must be a closed 2D solid."]
         target: uuid::Uuid,
-        #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface \
+                 joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "Path along which to sweep."]
         trajectory: uuid::Uuid,
-        #[doc = "What version of the sweeping algorithm to use. If None, or zero, the engine's default algorithm will be used"]
+        #[doc = "What version of the sweeping algorithm to use. If None, or zero, the engine's \
+                 default algorithm will be used"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         version: Option<u8>,
     },
@@ -12764,14 +13002,16 @@ pub enum ModelingCmd {
         #[doc = "Should this extrude create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "Should the revolution also revolve in the opposite direction along the given axis? If so, this specifies its angle."]
+        #[doc = "Should the revolution also revolve in the opposite direction along the given \
+                 axis? If so, this specifies its angle."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         opposite: Option<String>,
         #[doc = "The origin of the extrusion axis"]
         origin: Point3D,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
-        #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface \
+                 joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
     #[doc = "Command for shelling a solid3d face"]
@@ -12787,7 +13027,11 @@ pub enum ModelingCmd {
         #[doc = "How thick the shell should be. Smaller values mean a thinner shell."]
         shell_thickness: f64,
     },
-    #[doc = "Command for joining a Surface (non-manifold) body back to a Solid. All of the surfaces should already be contained within the body mated topologically. This operation should be the final step after a sequence of Solid modeling commands such as BooleanImprint, EntityDeleteChildren, Solid3dFlipFace If successful, the new body type will become \"Solid\"."]
+    #[doc = "Command for joining a Surface (non-manifold) body back to a Solid. All of the \
+             surfaces should already be contained within the body mated topologically. This \
+             operation should be the final step after a sequence of Solid modeling commands such \
+             as BooleanImprint, EntityDeleteChildren, Solid3dFlipFace If successful, the new body \
+             type will become \"Solid\"."]
     #[serde(rename = "solid3d_join")]
     Solid3DJoin {
         #[doc = "Which Solid3D is being joined."]
@@ -12798,7 +13042,8 @@ pub enum ModelingCmd {
     Solid3DMultiJoin {
         #[doc = "Which bodies are being joined."]
         object_ids: Vec<uuid::Uuid>,
-        #[doc = "The maximum acceptable surface gap computed between the joints. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the joints. Must be positive \
+                 (i.e. greater than zero)."]
         tolerance: f64,
     },
     #[doc = "Command for creating a blend between the edge of two given surfaces"]
@@ -12840,32 +13085,40 @@ pub enum ModelingCmd {
         #[doc = "Should this extrude create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane of the solid"]
+        #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane \
+                 of the solid"]
         edge_id: uuid::Uuid,
-        #[doc = "Should the revolution also revolve in the opposite direction along the given axis? If so, this specifies its angle."]
+        #[doc = "Should the revolution also revolve in the opposite direction along the given \
+                 axis? If so, this specifies its angle."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         opposite: Option<String>,
         #[doc = "Which sketch to revolve. Must be a closed 2D solid."]
         target: uuid::Uuid,
-        #[doc = "The maximum acceptable surface gap computed between the revolution surface joints. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the revolution surface \
+                 joints. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
     },
     #[doc = "Command for lofting sections to create a solid"]
     #[serde(rename = "loft")]
     Loft {
-        #[doc = "This can be set to override the automatically determined topological base curve, which is usually the first section encountered."]
+        #[doc = "This can be set to override the automatically determined topological base curve, \
+                 which is usually the first section encountered."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         base_curve_index: Option<u32>,
-        #[doc = "Attempt to approximate rational curves (such as arcs) using a bezier. This will remove banding around interpolations between arcs and non-arcs.  It may produce errors in other scenarios Over time, this field won't be necessary."]
+        #[doc = "Attempt to approximate rational curves (such as arcs) using a bezier. This will \
+                 remove banding around interpolations between arcs and non-arcs.  It may produce \
+                 errors in other scenarios Over time, this field won't be necessary."]
         bez_approximate_rational: bool,
         #[doc = "Should this loft create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "The closed section curves to create a lofted solid from. Currently, these must be Solid2Ds"]
+        #[doc = "The closed section curves to create a lofted solid from. Currently, these must \
+                 be Solid2Ds"]
         section_ids: Vec<uuid::Uuid>,
         #[doc = "Tolerance"]
         tolerance: f64,
-        #[doc = "Degree of the interpolation. Must be greater than zero. For example, use 2 for quadratic, or 3 for cubic interpolation in the V direction."]
+        #[doc = "Degree of the interpolation. Must be greater than zero. For example, use 2 for \
+                 quadratic, or 3 for cubic interpolation in the V direction."]
         v_degree: u32,
     },
     #[doc = "Closes a path, converting it to a 2D solid."]
@@ -12887,7 +13140,9 @@ pub enum ModelingCmd {
     CameraDragMove {
         #[doc = "The type of camera drag interaction."]
         interaction: CameraDragInteractionType,
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "The current mouse position."]
@@ -12918,7 +13173,9 @@ pub enum ModelingCmd {
     DefaultCameraLookAt {
         #[doc = "What the camera is looking at. Center of the camera's field of vision"]
         center: Point3D,
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Which way is \"up\", from the camera's point of view."]
@@ -12934,7 +13191,9 @@ pub enum ModelingCmd {
         #[doc = "The field of view angle in the y direction, in degrees."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         fov_y: Option<f64>,
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Which way is \"up\", from the camera's point of view."]
@@ -12951,7 +13210,9 @@ pub enum ModelingCmd {
     #[doc = "Adjust zoom of the default camera."]
     #[serde(rename = "default_camera_zoom")]
     DefaultCameraZoom {
-        #[doc = "Move the camera forward along the vector it's looking at, by this magnitudedefaultCameraZoom. Basically, how much should the camera move forward by."]
+        #[doc = "Move the camera forward along the vector it's looking at, by this \
+                 magnitudedefaultCameraZoom. Basically, how much should the camera move forward \
+                 by."]
         magnitude: f64,
     },
     #[doc = "Export a sketch to a file."]
@@ -12965,7 +13226,8 @@ pub enum ModelingCmd {
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export3d")]
     Export3D {
-        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are exported."]
+        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
+                 exported."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat3D,
@@ -12973,7 +13235,8 @@ pub enum ModelingCmd {
     #[doc = "Export the scene to a file."]
     #[serde(rename = "export")]
     Export {
-        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are exported."]
+        #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
+                 exported."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat3D,
@@ -13004,13 +13267,15 @@ pub enum ModelingCmd {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
-    #[doc = "What is this edge or face entity's primitive index within its parent body's edges or faces array respectively"]
+    #[doc = "What is this edge or face entity's primitive index within its parent body's edges or \
+             faces array respectively"]
     #[serde(rename = "entity_get_primitive_index")]
     EntityGetPrimitiveIndex {
         #[doc = "ID of the entity being queried."]
         entity_id: uuid::Uuid,
     },
-    #[doc = "Attempts to delete children entity from an entity. Note that this API may change the body type of certain entities from Solid to Surface."]
+    #[doc = "Attempts to delete children entity from an entity. Note that this API may change the \
+             body type of certain entities from Solid to Surface."]
     #[serde(rename = "entity_delete_children")]
     EntityDeleteChildren {
         #[doc = "ID of the entity's child being deleted"]
@@ -13042,28 +13307,37 @@ pub enum ModelingCmd {
         #[serde(rename = "entity_id2")]
         entity_id_2: uuid::Uuid,
     },
-    #[doc = "Create a pattern using this entity by specifying the transform for each desired repetition. Transformations are performed in the following order (first applied to last applied): scale, rotate, translate."]
+    #[doc = "Create a pattern using this entity by specifying the transform for each desired \
+             repetition. Transformations are performed in the following order (first applied to \
+             last applied): scale, rotate, translate."]
     #[serde(rename = "entity_clone")]
     EntityClone {
         #[doc = "ID of the entity being cloned."]
         entity_id: uuid::Uuid,
     },
-    #[doc = "Create a pattern using this entity by specifying the transform for each desired repetition. Transformations are performed in the following order (first applied to last applied): scale, rotate, translate."]
+    #[doc = "Create a pattern using this entity by specifying the transform for each desired \
+             repetition. Transformations are performed in the following order (first applied to \
+             last applied): scale, rotate, translate."]
     #[serde(rename = "entity_linear_pattern_transform")]
     EntityLinearPatternTransform {
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
-        #[doc = "How to transform each repeated solid. The 0th transform will create the first copy of the entity. The total number of (optional) repetitions equals the size of this list."]
+        #[doc = "How to transform each repeated solid. The 0th transform will create the first \
+                 copy of the entity. The total number of (optional) repetitions equals the size \
+                 of this list."]
         #[serde(default)]
         transform: Vec<Transform>,
-        #[doc = "Alternatively, you could set this key instead. If you want to use multiple transforms per item. If this is non-empty then the `transform` key must be empty, and vice-versa."]
+        #[doc = "Alternatively, you could set this key instead. If you want to use multiple \
+                 transforms per item. If this is non-empty then the `transform` key must be \
+                 empty, and vice-versa."]
         #[serde(default)]
         transforms: Vec<Vec<Transform>>,
     },
     #[doc = "Create a linear pattern using this entity."]
     #[serde(rename = "entity_linear_pattern")]
     EntityLinearPattern {
-        #[doc = "Axis along which to make the copies. For Solid2d patterns, the z component is ignored."]
+        #[doc = "Axis along which to make the copies. For Solid2d patterns, the z component is \
+                 ignored."]
         axis: Point3D,
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
@@ -13079,7 +13353,8 @@ pub enum ModelingCmd {
         arc_degrees: f64,
         #[doc = "Axis around which to make the copies. For Solid2d patterns, this is ignored."]
         axis: Point3D,
-        #[doc = "Point around which to make the copies. For Solid2d patterns, the z component is ignored."]
+        #[doc = "Point around which to make the copies. For Solid2d patterns, the z component is \
+                 ignored."]
         center: Point3D,
         #[doc = "ID of the entity being copied."]
         entity_id: uuid::Uuid,
@@ -13107,7 +13382,8 @@ pub enum ModelingCmd {
     #[doc = "Create a helix using the specified parameters."]
     #[serde(rename = "entity_make_helix_from_params")]
     EntityMakeHelixFromParams {
-        #[doc = "Axis of the helix. The helix will be created around and in the direction of this axis."]
+        #[doc = "Axis of the helix. The helix will be created around and in the direction of this \
+                 axis."]
         axis: Point3D,
         #[doc = "Center of the helix at the base of the helix."]
         center: Point3D,
@@ -13154,12 +13430,14 @@ pub enum ModelingCmd {
     #[doc = "Mirror the input entities over the specified edge. (Currently only supports sketches)"]
     #[serde(rename = "entity_mirror_across_edge")]
     EntityMirrorAcrossEdge {
-        #[doc = "The edge to use as the mirror axis, must be linear and lie in the plane of the solid"]
+        #[doc = "The edge to use as the mirror axis, must be linear and lie in the plane of the \
+                 solid"]
         edge_id: uuid::Uuid,
         #[doc = "ID of the mirror entities."]
         ids: Vec<uuid::Uuid>,
     },
-    #[doc = "Modifies the selection by simulating a \"mouse click\" at the given x,y window coordinate Returns ID of whatever was selected."]
+    #[doc = "Modifies the selection by simulating a \"mouse click\" at the given x,y window \
+             coordinate Returns ID of whatever was selected."]
     #[serde(rename = "select_with_point")]
     SelectWithPoint {
         #[doc = "Where in the window was selected"]
@@ -13188,12 +13466,15 @@ pub enum ModelingCmd {
         #[doc = "Which entities to select"]
         entities: Vec<uuid::Uuid>,
     },
-    #[doc = "Changes the current highlighted entity to whichever one is at the given window coordinate. If there's no entity at this location, clears the highlight."]
+    #[doc = "Changes the current highlighted entity to whichever one is at the given window \
+             coordinate. If there's no entity at this location, clears the highlight."]
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
         #[doc = "Coordinates of the window being clicked"]
         selected_at_window: Point2D,
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
     },
@@ -13208,7 +13489,8 @@ pub enum ModelingCmd {
     NewAnnotation {
         #[doc = "What type of annotation to create."]
         annotation_type: AnnotationType,
-        #[doc = "If true, any existing drawables within the obj will be replaced (the object will be reset)"]
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
         clobber: bool,
         #[doc = "What should the annotation contain?"]
         options: AnnotationOptions,
@@ -13218,7 +13500,8 @@ pub enum ModelingCmd {
     UpdateAnnotation {
         #[doc = "Which annotation to update"]
         annotation_id: uuid::Uuid,
-        #[doc = "If any of these fields are set, they will overwrite the previous options for the annotation."]
+        #[doc = "If any of these fields are set, they will overwrite the previous options for the \
+                 annotation."]
         options: AnnotationOptions,
     },
     #[doc = "Changes visibility of scene-wide edge lines on brep solids"]
@@ -13278,7 +13561,8 @@ pub enum ModelingCmd {
         #[doc = "Which object is being flipped."]
         object_id: uuid::Uuid,
     },
-    #[doc = "Flips (reverses) a face.  If the solid3d body type is \"Solid\", then body type will become non-manifold (\"Surface\")."]
+    #[doc = "Flips (reverses) a face.  If the solid3d body type is \"Solid\", then body type will \
+             become non-manifold (\"Surface\")."]
     #[serde(rename = "solid3d_flip_face")]
     Solid3DFlipFace {
         #[doc = "Which face you want to flip."]
@@ -13355,17 +13639,23 @@ pub enum ModelingCmd {
         #[doc = "Which edges you want to fillet."]
         #[serde(default)]
         edge_ids: Vec<uuid::Uuid>,
-        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its ID will be the command ID used to send this command, and this field should be empty. If you've passed `n` IDs (to fillet `n` edges), then this should be length `n-1`, and the first edge will use the command ID used to send this command."]
+        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its \
+                 ID will be the command ID used to send this command, and this field should be \
+                 empty. If you've passed `n` IDs (to fillet `n` edges), then this should be \
+                 length `n-1`, and the first edge will use the command ID used to send this \
+                 command."]
         #[serde(default)]
         extra_face_ids: Vec<uuid::Uuid>,
         #[doc = "Which object is being filletted."]
         object_id: uuid::Uuid,
-        #[doc = "The radius of the fillet. Measured in length (using the same units that the current sketch uses). Must be positive (i.e. greater than zero)."]
+        #[doc = "The radius of the fillet. Measured in length (using the same units that the \
+                 current sketch uses). Must be positive (i.e. greater than zero)."]
         radius: f64,
         #[doc = "Which cutting algorithm to use."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         strategy: Option<CutStrategy>,
-        #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must \
+                 be positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "If true, use the legacy CSG algorithm."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -13379,7 +13669,10 @@ pub enum ModelingCmd {
         #[doc = "Which edges you want to cut."]
         #[serde(default)]
         edge_ids: Vec<uuid::Uuid>,
-        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its ID will be the command ID used to send this command, and this field should be empty. If you've passed `n` IDs (to cut `n` edges), then this should be length `n-1`, and the first edge will use the command ID used to send this command."]
+        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its \
+                 ID will be the command ID used to send this command, and this field should be \
+                 empty. If you've passed `n` IDs (to cut `n` edges), then this should be length \
+                 `n-1`, and the first edge will use the command ID used to send this command."]
         #[serde(default)]
         extra_face_ids: Vec<uuid::Uuid>,
         #[doc = "Which object is being cut."]
@@ -13387,13 +13680,15 @@ pub enum ModelingCmd {
         #[doc = "Which cutting algorithm to use."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         strategy: Option<CutStrategy>,
-        #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
+                 positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "If true, use the legacy CSG algorithm."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes if so"]
+    #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes \
+             if so"]
     #[serde(rename = "face_is_planar")]
     FaceIsPlanar {
         #[doc = "Which face is being queried."]
@@ -13413,7 +13708,8 @@ pub enum ModelingCmd {
         #[doc = "Which face is being queried."]
         object_id: uuid::Uuid,
     },
-    #[doc = "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by parameters u,v"]
+    #[doc = "Determines the gradient (dFdu, dFdv) + normal vector on a brep face evaluated by \
+             parameters u,v"]
     #[serde(rename = "face_get_gradient")]
     FaceGetGradient {
         #[doc = "Which face is being queried."]
@@ -13434,7 +13730,8 @@ pub enum ModelingCmd {
     EntitySetOpacity {
         #[doc = "Which entity is being changed."]
         entity_id: uuid::Uuid,
-        #[doc = "How transparent should it be? 0 or lower is totally transparent. 1 or greater is totally opaque."]
+        #[doc = "How transparent should it be? 0 or lower is totally transparent. 1 or greater is \
+                 totally opaque."]
         opacity: f64,
     },
     #[doc = "Fade entity in or out."]
@@ -13451,14 +13748,16 @@ pub enum ModelingCmd {
     #[doc = "Make a new plane"]
     #[serde(rename = "make_plane")]
     MakePlane {
-        #[doc = "If true, any existing drawables within the obj will be replaced (the object will be reset)"]
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
         clobber: bool,
         #[doc = "If true, the plane will be created but hidden initially."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         hide: Option<bool>,
         #[doc = "Origin of the plane"]
         origin: Point3D,
-        #[doc = "What should the plane's span/extent? When rendered visually, this is both the width and height along X and Y axis respectively."]
+        #[doc = "What should the plane's span/extent? When rendered visually, this is both the \
+                 width and height along X and Y axis respectively."]
         size: f64,
         #[doc = "What should the plane's X axis be?"]
         x_axis: Point3D,
@@ -13482,7 +13781,9 @@ pub enum ModelingCmd {
     #[doc = "Send a mouse move event"]
     #[serde(rename = "mouse_move")]
     MouseMove {
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "Where the mouse is"]
@@ -13494,7 +13795,8 @@ pub enum ModelingCmd {
         #[doc = "Where the mouse is"]
         window: Point2D,
     },
-    #[doc = "Disable sketch mode. If you are sketching on a face, be sure to not disable sketch mode until you have extruded. Otherwise, your object will not be fused with the face."]
+    #[doc = "Disable sketch mode. If you are sketching on a face, be sure to not disable sketch \
+             mode until you have extruded. Otherwise, your object will not be fused with the face."]
     #[serde(rename = "sketch_mode_disable")]
     SketchModeDisable {},
     #[doc = "Get the plane for sketch mode."]
@@ -13519,16 +13821,24 @@ pub enum ModelingCmd {
         animated: bool,
         #[doc = "Which entity to sketch on."]
         entity_id: uuid::Uuid,
-        #[doc = "Should the camera use orthographic projection? In other words, should an object's size in the rendered image stay constant regardless of its distance from the camera."]
+        #[doc = "Should the camera use orthographic projection? In other words, should an \
+                 object's size in the rendered image stay constant regardless of its distance \
+                 from the camera."]
         ortho: bool,
-        #[doc = "If provided, ensures that the normal of the sketch plane must be aligned with this supplied normal (otherwise the camera position will be used to infer the normal to point towards the viewer)"]
+        #[doc = "If provided, ensures that the normal of the sketch plane must be aligned with \
+                 this supplied normal (otherwise the camera position will be used to infer the \
+                 normal to point towards the viewer)"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         planar_normal: Option<Point3D>,
     },
-    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change."]
+    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
+             run\" In a dry run, successful commands won't actually change the model. This is \
+             useful for catching errors before actually making the change."]
     #[serde(rename = "enable_dry_run")]
     EnableDryRun {},
-    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change."]
+    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
+             run\" In a dry run, successful commands won't actually change the model. This is \
+             useful for catching errors before actually making the change."]
     #[serde(rename = "disable_dry_run")]
     DisableDryRun {},
     #[doc = "Set the background color of the scene."]
@@ -13579,7 +13889,8 @@ pub enum ModelingCmd {
         entity_id: uuid::Uuid,
         #[doc = "Which plane to project entity_id onto."]
         plane_id: uuid::Uuid,
-        #[doc = "If true: the projected points are returned in the plane_id's coordinate system, else: the projected points are returned in the world coordinate system."]
+        #[doc = "If true: the projected points are returned in the plane_id's coordinate system, \
+                 else: the projected points are returned in the world coordinate system."]
         use_plane_coords: bool,
     },
     #[doc = "Project a list of points on to a plane."]
@@ -13589,7 +13900,8 @@ pub enum ModelingCmd {
         plane_id: uuid::Uuid,
         #[doc = "The list of points that will be projected."]
         points: Vec<Point3D>,
-        #[doc = "If true: the projected points are returned in the plane_id's coordinate sysetm. else: the projected points are returned in the world coordinate system."]
+        #[doc = "If true: the projected points are returned in the plane_id's coordinate sysetm. \
+                 else: the projected points are returned in the world coordinate system."]
         use_plane_coords: bool,
     },
     #[doc = "Take a snapshot of the current view."]
@@ -13601,9 +13913,11 @@ pub enum ModelingCmd {
     #[doc = "Add a gizmo showing the axes."]
     #[serde(rename = "make_axes_gizmo")]
     MakeAxesGizmo {
-        #[doc = "If true, any existing drawables within the obj will be replaced (the object will be reset)"]
+        #[doc = "If true, any existing drawables within the obj will be replaced (the object will \
+                 be reset)"]
         clobber: bool,
-        #[doc = "If true, axes gizmo will be placed in the corner of the screen. If false, it will be placed at the origin of the scene."]
+        #[doc = "If true, axes gizmo will be placed in the corner of the screen. If false, it \
+                 will be placed at the origin of the scene."]
         gizmo_mode: bool,
     },
     #[doc = "Query the given path."]
@@ -13649,7 +13963,9 @@ pub enum ModelingCmd {
     #[doc = "Continue dragging the mouse."]
     #[serde(rename = "handle_mouse_drag_move")]
     HandleMouseDragMove {
-        #[doc = "Logical timestamp. The client should increment this with every event in the current mouse drag. That way, if the events are being sent over an unordered channel, the API can ignore the older events."]
+        #[doc = "Logical timestamp. The client should increment this with every event in the \
+                 current mouse drag. That way, if the events are being sent over an unordered \
+                 channel, the API can ignore the older events."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         sequence: Option<u32>,
         #[doc = "The mouse position."]
@@ -13667,7 +13983,8 @@ pub enum ModelingCmd {
         #[doc = "Objects to remove."]
         object_ids: Vec<uuid::Uuid>,
     },
-    #[doc = "Utility method. Performs both a ray cast and projection to plane-local coordinates. Returns the plane coordinates for the given window coordinates."]
+    #[doc = "Utility method. Performs both a ray cast and projection to plane-local coordinates. \
+             Returns the plane coordinates for the given window coordinates."]
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
         #[doc = "The plane you're intersecting against."]
@@ -13702,7 +14019,10 @@ pub enum ModelingCmd {
         #[doc = "Input file format."]
         format: InputFormat3D,
     },
-    #[doc = "Set the units of the scene. For all following commands, the units will be interpreted as the given units. Any previously executed commands will not be affected or have their units changed. They will remain in the units they were originally executed in."]
+    #[doc = "Set the units of the scene. For all following commands, the units will be \
+             interpreted as the given units. Any previously executed commands will not be \
+             affected or have their units changed. They will remain in the units they were \
+             originally executed in."]
     #[serde(rename = "set_scene_units")]
     SetSceneUnits {
         #[doc = "Which units the scene uses."]
@@ -13711,7 +14031,8 @@ pub enum ModelingCmd {
     #[doc = "Get the mass of entities in the scene or the default scene."]
     #[serde(rename = "mass")]
     Mass {
-        #[doc = "IDs of the entities to get the mass of. If this is empty, then the default scene is included in the mass."]
+        #[doc = "IDs of the entities to get the mass of. If this is empty, then the default scene \
+                 is included in the mass."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The material density."]
         material_density: f64,
@@ -13723,7 +14044,8 @@ pub enum ModelingCmd {
     #[doc = "Get the density of entities in the scene or the default scene."]
     #[serde(rename = "density")]
     Density {
-        #[doc = "IDs of the entities to get the density of. If this is empty, then the default scene is included in the density."]
+        #[doc = "IDs of the entities to get the density of. If this is empty, then the default \
+                 scene is included in the density."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The material mass."]
         material_mass: f64,
@@ -13735,7 +14057,8 @@ pub enum ModelingCmd {
     #[doc = "Get the volume of entities in the scene or the default scene."]
     #[serde(rename = "volume")]
     Volume {
-        #[doc = "IDs of the entities to get the volume of. If this is empty, then the default scene is included in the volume."]
+        #[doc = "IDs of the entities to get the volume of. If this is empty, then the default \
+                 scene is included in the volume."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the volume."]
         output_unit: UnitVolume,
@@ -13743,7 +14066,8 @@ pub enum ModelingCmd {
     #[doc = "Get the center of mass of entities in the scene or the default scene."]
     #[serde(rename = "center_of_mass")]
     CenterOfMass {
-        #[doc = "IDs of the entities to get the center of mass of. If this is empty, then the default scene is included in the center of mass."]
+        #[doc = "IDs of the entities to get the center of mass of. If this is empty, then the \
+                 default scene is included in the center of mass."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the center of mass."]
         output_unit: UnitLength,
@@ -13751,7 +14075,8 @@ pub enum ModelingCmd {
     #[doc = "Get the surface area of entities in the scene or the default scene."]
     #[serde(rename = "surface_area")]
     SurfaceArea {
-        #[doc = "IDs of the entities to get the surface area of. If this is empty, then the default scene is included in the surface area."]
+        #[doc = "IDs of the entities to get the surface area of. If this is empty, then the \
+                 default scene is included in the surface area."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
@@ -13771,7 +14096,8 @@ pub enum ModelingCmd {
     #[doc = "What kind of entities can be selected?"]
     #[serde(rename = "set_selection_filter")]
     SetSelectionFilter {
-        #[doc = "If vector is empty, clear all filters. If vector is non-empty, only the given entity types will be selectable."]
+        #[doc = "If vector is empty, clear all filters. If vector is non-empty, only the given \
+                 entity types will be selectable."]
         filter: Vec<EntityType>,
     },
     #[doc = "Get the ids of a given entity type."]
@@ -13779,9 +14105,13 @@ pub enum ModelingCmd {
     SceneGetEntityIds {
         #[doc = "The entity types to be queried."]
         filter: Vec<EntityType>,
-        #[doc = "Skip the first n returned ids. If multiple filters are provided, this skip will apply to each filter individually."]
+        #[doc = "Skip the first n returned ids. If multiple filters are provided, this skip will \
+                 apply to each filter individually."]
         skip: u32,
-        #[doc = "Take n ids after any ids skipped. This value must be greater than zero and not exceed 1000. If multiple filters are provided, this take will apply to each filter individually. If there are fewer than `take` items of the provided filter type then the returned list's length will be the smaller value."]
+        #[doc = "Take n ids after any ids skipped. This value must be greater than zero and not \
+                 exceed 1000. If multiple filters are provided, this take will apply to each \
+                 filter individually. If there are fewer than `take` items of the provided filter \
+                 type then the returned list's length will be the smaller value."]
         take: u32,
     },
     #[doc = "Use orthographic projection."]
@@ -13790,21 +14120,27 @@ pub enum ModelingCmd {
     #[doc = "Use perspective projection."]
     #[serde(rename = "default_camera_set_perspective")]
     DefaultCameraSetPerspective {
-        #[doc = "If this is not given, use the same parameters as last time the perspective camera was used."]
+        #[doc = "If this is not given, use the same parameters as last time the perspective \
+                 camera was used."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         parameters: Option<PerspectiveCameraParameters>,
     },
-    #[doc = "Updates the camera to center to the center of the current selection (or the origin if nothing is selected)"]
+    #[doc = "Updates the camera to center to the center of the current selection (or the origin \
+             if nothing is selected)"]
     #[serde(rename = "default_camera_center_to_selection")]
     DefaultCameraCenterToSelection {
-        #[doc = "Dictates whether or not the camera position should be adjusted during this operation If no movement is requested, the camera will orbit around the new center from its current position"]
+        #[doc = "Dictates whether or not the camera position should be adjusted during this \
+                 operation If no movement is requested, the camera will orbit around the new \
+                 center from its current position"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         camera_movement: Option<CameraMovement>,
     },
     #[doc = "Updates the camera to center to the center of the current scene's bounds"]
     #[serde(rename = "default_camera_center_to_scene")]
     DefaultCameraCenterToScene {
-        #[doc = "Dictates whether or not the camera position should be adjusted during this operation If no movement is requested, the camera will orbit around the new center from its current position"]
+        #[doc = "Dictates whether or not the camera position should be adjusted during this \
+                 operation If no movement is requested, the camera will orbit around the new \
+                 center from its current position"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         camera_movement: Option<CameraMovement>,
     },
@@ -13814,29 +14150,41 @@ pub enum ModelingCmd {
         #[doc = "Whether or not to animate the camera movement."]
         #[serde(default)]
         animated: bool,
-        #[doc = "Which objects to fit camera to; if empty, fit to all non-default objects. Defaults to empty vector."]
+        #[doc = "Which objects to fit camera to; if empty, fit to all non-default objects. \
+                 Defaults to empty vector."]
         #[serde(default)]
         object_ids: Vec<uuid::Uuid>,
-        #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box."]
+        #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box \
+                 size. Negative padding will crop the view of the object proportionally. e.g. \
+                 padding = 0.2 means the view will span 120% of the object(s) bounding box, and \
+                 padding = -0.2 means the view will span 80% of the object(s) bounding box."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         padding: Option<f64>,
     },
-    #[doc = "Looks along the normal of the specified face (if it is planar!), and fits the view to it."]
+    #[doc = "Looks along the normal of the specified face (if it is planar!), and fits the view \
+             to it."]
     #[serde(rename = "orient_to_face")]
     OrientToFace {
-        #[doc = "Whether or not to animate the camera movement. (Animation is currently not supported.)"]
+        #[doc = "Whether or not to animate the camera movement. (Animation is currently not \
+                 supported.)"]
         #[serde(default)]
         animated: bool,
         #[doc = "Which face to orient camera to. If the face is not planar, no action will occur."]
         face_id: uuid::Uuid,
-        #[doc = "How much to pad the view frame by, as a fraction of the face bounding box size. Negative padding will crop the view of the face proportionally. e.g. padding = 0.2 means the view will span 120% of the face bounding box, and padding = -0.2 means the view will span 80% of the face bounding box."]
+        #[doc = "How much to pad the view frame by, as a fraction of the face bounding box size. \
+                 Negative padding will crop the view of the face proportionally. e.g. padding = \
+                 0.2 means the view will span 120% of the face bounding box, and padding = -0.2 \
+                 means the view will span 80% of the face bounding box."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         padding: Option<f64>,
     },
     #[doc = "Fit the view to the scene with an isometric view."]
     #[serde(rename = "view_isometric")]
     ViewIsometric {
-        #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box size. Negative padding will crop the view of the object proportionally. e.g. padding = 0.2 means the view will span 120% of the object(s) bounding box, and padding = -0.2 means the view will span 80% of the object(s) bounding box."]
+        #[doc = "How much to pad the view frame by, as a fraction of the object(s) bounding box \
+                 size. Negative padding will crop the view of the object proportionally. e.g. \
+                 padding = 0.2 means the view will span 120% of the object(s) bounding box, and \
+                 padding = -0.2 means the view will span 80% of the object(s) bounding box."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         padding: Option<f64>,
     },
@@ -13873,7 +14221,8 @@ pub enum ModelingCmd {
         #[doc = "List of transforms to be applied to the object."]
         transforms: Vec<ComponentTransform>,
     },
-    #[doc = "Create a new solid from combining other smaller solids. In other words, every part of the input solids will be included in the output solid."]
+    #[doc = "Create a new solid from combining other smaller solids. In other words, every part \
+             of the input solids will be included in the output solid."]
     #[serde(rename = "boolean_union")]
     BooleanUnion {
         #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
@@ -13881,13 +14230,15 @@ pub enum ModelingCmd {
         separate_bodies: bool,
         #[doc = "Which solids to union together. Cannot be empty."]
         solid_ids: Vec<uuid::Uuid>,
-        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
+                 positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "If true, use the legacy CSG algorithm."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Create a new solid from intersecting several other solids. In other words, the part of the input solids where they all overlap will be the output solid."]
+    #[doc = "Create a new solid from intersecting several other solids. In other words, the part \
+             of the input solids where they all overlap will be the output solid."]
     #[serde(rename = "boolean_intersection")]
     BooleanIntersection {
         #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
@@ -13895,13 +14246,15 @@ pub enum ModelingCmd {
         separate_bodies: bool,
         #[doc = "Which solids to intersect together"]
         solid_ids: Vec<uuid::Uuid>,
-        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
+                 positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "If true, use the legacy CSG algorithm."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will be cut from. The 'tool' is what will be cut out from 'target'."]
+    #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will \
+             be cut from. The 'tool' is what will be cut out from 'target'."]
     #[serde(rename = "boolean_subtract")]
     BooleanSubtract {
         #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
@@ -13909,7 +14262,8 @@ pub enum ModelingCmd {
         separate_bodies: bool,
         #[doc = "Geometry to cut out from."]
         target_ids: Vec<uuid::Uuid>,
-        #[doc = "The maximum acceptable surface gap computed between the target and the solids cut out from it. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap computed between the target and the solids \
+                 cut out from it. Must be positive (i.e. greater than zero)."]
         tolerance: f64,
         #[doc = "Will be cut out from the 'target'."]
         tool_ids: Vec<uuid::Uuid>,
@@ -13917,30 +14271,40 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and splitting all the faces at the intersection boundaries."]
+    #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and \
+             splitting all the faces at the intersection boundaries."]
     #[serde(rename = "boolean_imprint")]
     BooleanImprint {
-        #[doc = "Which target input bodies to intersect. Inputs with non-solid body types are permitted"]
+        #[doc = "Which target input bodies to intersect. Inputs with non-solid body types are \
+                 permitted"]
         body_ids: Vec<uuid::Uuid>,
         #[doc = "If true, the provided tool bodies will not be modified"]
         #[serde(default)]
         keep_tools: bool,
-        #[doc = "If true, target bodies will be separated into multiple objects at their intersection boundaries."]
+        #[doc = "If true, target bodies will be separated into multiple objects at their \
+                 intersection boundaries."]
         #[serde(default)]
         separate_bodies: bool,
-        #[doc = "The maximum acceptable surface gap between the intersected bodies. Must be positive (i.e. greater than zero)."]
+        #[doc = "The maximum acceptable surface gap between the intersected bodies. Must be \
+                 positive (i.e. greater than zero)."]
         tolerance: f64,
-        #[doc = "If provided, only these bodies will be used to intersect with the target bodies in body_ids, Otherwise, all bodies in body_ids will be intersected with themselves."]
+        #[doc = "If provided, only these bodies will be used to intersect with the target bodies \
+                 in body_ids, Otherwise, all bodies in body_ids will be intersected with \
+                 themselves."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         tool_ids: Option<Vec<uuid::Uuid>>,
         #[doc = "If true, use the legacy CSG algorithm."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will be the ID of this command."]
+    #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
+             be the ID of this command."]
     #[serde(rename = "make_offset_path")]
     MakeOffsetPath {
-        #[doc = "If the object is a solid, this is the ID of the face to base the offset on. If given, and `object_id` refers to a solid, then this face on the solid will be offset. If given but `object_id` doesn't refer to a solid, responds with an error. If not given, then `object_id` itself will be offset directly."]
+        #[doc = "If the object is a solid, this is the ID of the face to base the offset on. If \
+                 given, and `object_id` refers to a solid, then this face on the solid will be \
+                 offset. If given but `object_id` doesn't refer to a solid, responds with an \
+                 error. If not given, then `object_id` itself will be offset directly."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         face_id: Option<uuid::Uuid>,
         #[doc = "The object that will be offset (can be a path, sketch, or a solid)"]
@@ -13961,7 +14325,8 @@ pub enum ModelingCmd {
     SetGridReferencePlane {
         #[doc = "The grid to be moved."]
         grid_id: uuid::Uuid,
-        #[doc = "The plane or face that the grid will be aligned to. If a face, it must be planar to succeed."]
+        #[doc = "The plane or face that the grid will be aligned to. If a face, it must be planar \
+                 to succeed."]
         reference_id: uuid::Uuid,
     },
     #[doc = "Set the scale of the grid lines in the video feed."]
@@ -13972,23 +14337,29 @@ pub enum ModelingCmd {
         #[doc = "Distance between grid lines represents this much distance."]
         value: f64,
     },
-    #[doc = "Set the grid lines to auto scale. The grid will get larger the further you zoom out, and smaller the more you zoom in."]
+    #[doc = "Set the grid lines to auto scale. The grid will get larger the further you zoom out, \
+             and smaller the more you zoom in."]
     #[serde(rename = "set_grid_auto_scale")]
     SetGridAutoScale {},
-    #[doc = "Render transparent surfaces more accurately, but this might make rendering slower. Because it can interfere with runtime performance, it defaults to false."]
+    #[doc = "Render transparent surfaces more accurately, but this might make rendering slower. \
+             Because it can interfere with runtime performance, it defaults to false."]
     #[serde(rename = "set_order_independent_transparency")]
     SetOrderIndependentTransparency {
         #[doc = "Enables or disables OIT. If not given, toggles it."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         enabled: Option<bool>,
     },
-    #[doc = "Create a region bounded by the intersection of various paths. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
+    #[doc = "Create a region bounded by the intersection of various paths. The region should have \
+             an ID taken from the ID of the 'CreateRegion' modeling command."]
     #[serde(rename = "create_region")]
     CreateRegion {
-        #[doc = "By default, curve counterclockwise at intersections. If this is true, instead curve clockwise."]
+        #[doc = "By default, curve counterclockwise at intersections. If this is true, instead \
+                 curve clockwise."]
         #[serde(default)]
         curve_clockwise: bool,
-        #[doc = "At which intersection between `segment` and `intersection_segment` should we stop following the `segment` and start following `intersection_segment`? Defaults to -1, which means the last intersection."]
+        #[doc = "At which intersection between `segment` and `intersection_segment` should we \
+                 stop following the `segment` and start following `intersection_segment`? \
+                 Defaults to -1, which means the last intersection."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         intersection_index: Option<i32>,
         #[doc = "Second segment to follow to find the region. Intersects the first segment."]
@@ -13998,21 +14369,25 @@ pub enum ModelingCmd {
         #[doc = "First segment to follow to find the region."]
         segment: uuid::Uuid,
     },
-    #[doc = "Create a region with a query point. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+    #[doc = "Create a region with a query point. The region should have an ID taken from the ID \
+             of the 'CreateRegionFromQueryPoint' modeling command."]
     #[serde(rename = "create_region_from_query_point")]
     CreateRegionFromQueryPoint {
         #[doc = "Which sketch object to create the region from."]
         object_id: uuid::Uuid,
-        #[doc = "The query point (in the same coordinates as the sketch itself) if a possible sketch region contains this point, then that region will be created"]
+        #[doc = "The query point (in the same coordinates as the sketch itself) if a possible \
+                 sketch region contains this point, then that region will be created"]
         query_point: Point2D,
     },
-    #[doc = "Finds a suitable point inside the region for calling such that CreateRegionFromQueryPoint will generate an identical region."]
+    #[doc = "Finds a suitable point inside the region for calling such that \
+             CreateRegionFromQueryPoint will generate an identical region."]
     #[serde(rename = "region_get_query_point")]
     RegionGetQueryPoint {
         #[doc = "Which region to search within"]
         region_id: uuid::Uuid,
     },
-    #[doc = "The user clicked on a point in the window, returns the region the user clicked on, if any."]
+    #[doc = "The user clicked on a point in the window, returns the region the user clicked on, \
+             if any."]
     #[serde(rename = "select_region_from_point")]
     SelectRegionFromPoint {
         #[doc = "Where in the window was selected"]
@@ -14021,7 +14396,8 @@ pub enum ModelingCmd {
     #[doc = "Get the smallest box that could contain the given parts."]
     #[serde(rename = "bounding_box")]
     BoundingBox {
-        #[doc = "IDs of the entities to be included in the box. If this is empty, then all entities are included (the entire scene)."]
+        #[doc = "IDs of the entities to be included in the box. If this is empty, then all \
+                 entities are included (the entire scene)."]
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the box's dimensions. Defaults to millimeters."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -14040,9 +14416,11 @@ pub enum ModelingCmd {
     #[doc = "Returns the closest edge to this point."]
     #[serde(rename = "closest_edge")]
     ClosestEdge {
-        #[doc = "Find the edge closest to this point. Assumed to be in absolute coordinates, relative to global (scene) origin."]
+        #[doc = "Find the edge closest to this point. Assumed to be in absolute coordinates, \
+                 relative to global (scene) origin."]
         closest_to: Point3D,
-        #[doc = "The body whose edges are being queried. If not given, will search all bodies in the scene."]
+        #[doc = "The body whose edges are being queried. If not given, will search all bodies in \
+                 the scene."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         object_id: Option<uuid::Uuid>,
     },
@@ -14308,7 +14686,8 @@ pub enum Oauth2AppGrantType {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Oauth2AppMode {
-    #[doc = "Development mode permits HTTPS redirect URIs and local HTTP redirect URIs. Only the app owner, or an org admin for organization apps, can authorize development apps."]
+    #[doc = "Development mode permits HTTPS redirect URIs and local HTTP redirect URIs. Only the \
+             app owner, or an org admin for organization apps, can authorize development apps."]
     #[serde(rename = "development")]
     #[display("development")]
     Development,
@@ -14575,31 +14954,32 @@ impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
 pub enum Oauth2AuthorizationResponseType {
     #[doc = "The authorization code response type."]
     #[serde(rename = "code")]
     #[display("code")]
+    #[default]
     Code,
 }
 
-impl std::default::Default for Oauth2AuthorizationResponseType {
-    fn default() -> Self {
-        Oauth2AuthorizationResponseType::Code
-    }
-}
 
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Oauth2ClientInfo {
-    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection via the `state` parameter."]
+    #[doc = "Value used for [CSRF](https://tools.ietf.org/html/rfc6749#section-10.12) protection \
+             via the `state` parameter."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub csrf_token: Option<String>,
     #[doc = "Nonce required for OIDC flows."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub oidc_nonce: Option<String>,
-    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via the `code_verifier` parameter. The value must have a minimum length of 43 characters and a maximum length of 128 characters.  Each character must be ASCII alphanumeric or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
+    #[doc = "Code Verifier used for [PKCE]((https://tools.ietf.org/html/rfc7636)) protection via \
+             the `code_verifier` parameter. The value must have a minimum length of 43 characters \
+             and a maximum length of 128 characters.  Each character must be ASCII alphanumeric \
+             or one of the characters \"-\" / \".\" / \"_\" / \"~\"."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pkce_code_verifier: Option<String>,
     #[doc = "The URL for consent."]
@@ -14692,18 +15072,15 @@ pub enum Oauth2CodeChallengeMethod {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
 pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     #[display("urn:ietf:params:oauth:grant-type:device_code")]
+    #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
-impl std::default::Default for Oauth2GrantType {
-    fn default() -> Self {
-        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
-    }
-}
 
 #[doc = "Supported OAuth 2.0 scopes."]
 #[derive(
@@ -14942,14 +15319,16 @@ impl tabled::Tabled for OffsetSurface {
     }
 }
 
-#[doc = "A successful response from a modeling command. This can be one of several types of responses, depending on the command."]
+#[doc = "A successful response from a modeling command. This can be one of several types of \
+         responses, depending on the command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum OkModelingCmdResponse {
-    #[doc = "An empty response, used for any command that does not explicitly have a response defined here."]
+    #[doc = "An empty response, used for any command that does not explicitly have a response \
+             defined here."]
     #[serde(rename = "empty")]
     Empty {},
     #[serde(rename = "engine_util_evaluate_path")]
@@ -15344,7 +15723,8 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "camera_drag_move")]
     CameraDragMove {
-        #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" channel message, so this data may need more data like a \"sequence\""]
+        #[doc = "The response from the `CameraDragMove` command. Note this is an \"unreliable\" \
+                 channel message, so this data may need more data like a \"sequence\""]
         data: CameraDragMove,
     },
     #[serde(rename = "camera_drag_end")]
@@ -15419,7 +15799,9 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "solid3d_get_adjacency_info")]
     Solid3DGetAdjacencyInfo {
-        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
+                 segment ids and extrusion faces) This includes the opposite and adjacent faces \
+                 and edges."]
         data: Solid3DGetAdjacencyInfo,
     },
     #[serde(rename = "solid3d_get_all_edge_faces")]
@@ -15559,7 +15941,8 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "plane_intersect_and_project")]
     PlaneIntersectAndProject {
-        #[doc = "Corresponding coordinates of given window coordinates, intersected on given plane."]
+        #[doc = "Corresponding coordinates of given window coordinates, intersected on given \
+                 plane."]
         data: PlaneIntersectAndProject,
     },
     #[serde(rename = "import_files")]
@@ -15609,7 +15992,8 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "face_edge_info")]
     FaceEdgeInfo {
-        #[doc = "Faces and edges id info (most used in identifying geometry in patterned and mirrored objects)."]
+        #[doc = "Faces and edges id info (most used in identifying geometry in patterned and \
+                 mirrored objects)."]
         data: FaceEdgeInfo,
     },
     #[serde(rename = "edge_info")]
@@ -15664,12 +16048,14 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
-        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
+                 segment ids and extrusion faces)"]
         data: Solid3DGetExtrusionFaceInfo,
     },
     #[serde(rename = "extrusion_face_info")]
     ExtrusionFaceInfo {
-        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+        #[doc = "Extrusion face info struct (useful for maintaining mappings between source path \
+                 segment ids and extrusion faces)"]
         data: ExtrusionFaceInfo,
     },
     #[serde(rename = "complementary_edges")]
@@ -15679,7 +16065,8 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "adjacency_info")]
     AdjacencyInfo {
-        #[doc = "Edge info struct (useful for maintaining mappings between edges and faces and adjacent/opposite edges)."]
+        #[doc = "Edge info struct (useful for maintaining mappings between edges and faces and \
+                 adjacent/opposite edges)."]
         data: AdjacencyInfo,
     },
     #[serde(rename = "set_grid_reference_plane")]
@@ -15724,12 +16111,14 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "create_region")]
     CreateRegion {
-        #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
+        #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from \
+                 the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
     },
     #[serde(rename = "create_region_from_query_point")]
     CreateRegionFromQueryPoint {
-        #[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
+        #[doc = "The response from the 'CreateRegionFromQueryPoint'. The region should have an ID \
+                 taken from the ID of the 'CreateRegionFromQueryPoint' modeling command."]
         data: CreateRegionFromQueryPoint,
     },
     #[serde(rename = "region_get_query_point")]
@@ -15739,7 +16128,8 @@ pub enum OkModelingCmdResponse {
     },
     #[serde(rename = "select_region_from_point")]
     SelectRegionFromPoint {
-        #[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct this region, this chooses arbitrarily."]
+        #[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to \
+                 construct this region, this chooses arbitrarily."]
         data: SelectRegionFromPoint,
     },
     #[serde(rename = "bounding_box")]
@@ -15827,7 +16217,8 @@ pub enum OkWebSocketResponseData {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct Org {
-    #[doc = "If we should allow all future users who are created with email addresses from this domain to join the org."]
+    #[doc = "If we should allow all future users who are created with email addresses from this \
+             domain to join the org."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_users_in_domain_to_auto_join: Option<bool>,
     #[doc = "ExternalId our workers supply when assuming customer roles, following AWS guidance for avoiding the [confused deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html). Required before an org can register external datasets."]
@@ -15841,7 +16232,8 @@ pub struct Org {
     #[doc = "If the org should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
-    #[doc = "If we can train on the orgs's data. This value overrides any individual user's `can_train_on_data` value if they are a member of the org."]
+    #[doc = "If we can train on the orgs's data. This value overrides any individual user's \
+             `can_train_on_data` value if they are a member of the org."]
     #[serde(default)]
     pub can_train_on_data: bool,
     #[doc = "The date and time the org was created."]
@@ -16282,7 +16674,8 @@ impl tabled::Tabled for OrgDatasetConversionStatsResponse {
     }
 }
 
-#[doc = "Detailed response that bundles conversion metadata with converted file and snapshot contents."]
+#[doc = "Detailed response that bundles conversion metadata with converted file and snapshot \
+         contents."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -16294,7 +16687,8 @@ pub struct OrgDatasetFileConversionDetails {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the dataset this file is being converted from."]
     pub dataset_id: uuid::Uuid,
-    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be reconverted."]
+    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be \
+             reconverted."]
     pub file_etag: String,
     #[doc = "Location within dataset `path`."]
     pub file_path: String,
@@ -16308,7 +16702,8 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Plain-text contents of the admin-provided manual KCL override, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub manual_kcl_override: Option<String>,
-    #[doc = "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically."]
+    #[doc = "Indicates whether a persisted manual KCL override will be used instead of \
+             regenerating KCL automatically."]
     pub manual_kcl_override_active: bool,
     #[doc = "Timestamp when the manual KCL override was last updated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -16326,7 +16721,8 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Plain-text contents of the raw KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_output: Option<String>,
-    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the original model."]
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the \
+             original model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the raw KCL model."]
@@ -16334,7 +16730,8 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Plain-text contents of the salon/refactored KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub salon_kcl_output: Option<String>,
-    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches the raw KCL model."]
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches \
+             the raw KCL model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the salon/refactored KCL model."]
@@ -16500,11 +16897,13 @@ pub enum OrgDatasetFileConversionPhase {
     #[serde(rename = "snapshot_original")]
     #[display("snapshot_original")]
     SnapshotOriginal,
-    #[doc = "Phase index `3`: discovering optional user-provided metadata files (`.json`, `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file."]
+    #[doc = "Phase index `3`: discovering optional user-provided metadata files (`.json`, \
+             `.yaml`, `.yml`, `.toml`, `.txt`) stored next to the source CAD file."]
     #[serde(rename = "user_provided_metadata")]
     #[display("user_provided_metadata")]
     UserProvidedMetadata,
-    #[doc = "Phase index `4`: loading a persisted manual KCL override instead of regenerating KCL automatically."]
+    #[doc = "Phase index `4`: loading a persisted manual KCL override instead of regenerating KCL \
+             automatically."]
     #[serde(rename = "manual_kcl_override")]
     #[display("manual_kcl_override")]
     ManualKclOverride,
@@ -16561,7 +16960,8 @@ pub enum OrgDatasetFileConversionStatus {
     #[serde(rename = "canceled")]
     #[display("canceled")]
     Canceled,
-    #[doc = "The file is currently being converted. If `started_at` passes a certain threshold, we assume it got dropped and will retry."]
+    #[doc = "The file is currently being converted. If `started_at` passes a certain threshold, \
+             we assume it got dropped and will retry."]
     #[serde(rename = "in_progress")]
     #[display("in_progress")]
     InProgress,
@@ -16573,15 +16973,18 @@ pub enum OrgDatasetFileConversionStatus {
     #[serde(rename = "error_user")]
     #[display("error_user")]
     ErrorUser,
-    #[doc = "Conversion produced a raw KCL result whose geometry diverged from the source model beyond the accepted threshold."]
+    #[doc = "Conversion produced a raw KCL result whose geometry diverged from the source model \
+             beyond the accepted threshold."]
     #[serde(rename = "error_geometry_mismatch")]
     #[display("error_geometry_mismatch")]
     ErrorGeometryMismatch,
-    #[doc = "Conversion failed because we didn't know how to handle the file. The conversion should be retried with a new converter version."]
+    #[doc = "Conversion failed because we didn't know how to handle the file. The conversion \
+             should be retried with a new converter version."]
     #[serde(rename = "error_unsupported")]
     #[display("error_unsupported")]
     ErrorUnsupported,
-    #[doc = "Conversion failed with some other unrecoverable error. The conversion should be retried with a new converter version."]
+    #[doc = "Conversion failed with some other unrecoverable error. The conversion should be \
+             retried with a new converter version."]
     #[serde(rename = "error_internal")]
     #[display("error_internal")]
     ErrorInternal,
@@ -16599,7 +17002,8 @@ pub struct OrgDatasetFileConversionSummary {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The ID of the dataset this file is being converted from."]
     pub dataset_id: uuid::Uuid,
-    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be reconverted."]
+    #[doc = "File's ETag from dataset bucket, for detecting whether a file needs to be \
+             reconverted."]
     pub file_etag: String,
     #[doc = "Location within dataset `path`."]
     pub file_path: String,
@@ -16610,7 +17014,8 @@ pub struct OrgDatasetFileConversionSummary {
     #[doc = "Tracks which version processed this file when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub importer_version: Option<String>,
-    #[doc = "Indicates whether a persisted manual KCL override will be used instead of regenerating KCL automatically."]
+    #[doc = "Indicates whether a persisted manual KCL override will be used instead of \
+             regenerating KCL automatically."]
     pub manual_kcl_override_active: bool,
     #[doc = "Timestamp when the manual KCL override was last updated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -16620,10 +17025,12 @@ pub struct OrgDatasetFileConversionSummary {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
-    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the original model."]
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the \
+             original model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_similarity_score: Option<f64>,
-    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches the raw KCL model."]
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches \
+             the raw KCL model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "The date and time the conversion started."]
@@ -16990,7 +17397,8 @@ pub struct OrgDatasetSource {
     pub access_role_arn: Option<String>,
     #[doc = "Storage provider identifier."]
     pub provider: StorageProvider,
-    #[doc = "Fully-qualified URI for the dataset contents. Required when `provider` is `s3`; ignored for Zoo-managed datasets."]
+    #[doc = "Fully-qualified URI for the dataset contents. Required when `provider` is `s3`; \
+             ignored for Zoo-managed datasets."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub uri: Option<String>,
 }
@@ -17063,7 +17471,8 @@ pub enum OrgDatasetStatus {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OrgDetails {
-    #[doc = "If we should allow all future users who are created with email addresses from this domain to join the org."]
+    #[doc = "If we should allow all future users who are created with email addresses from this \
+             domain to join the org."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_users_in_domain_to_auto_join: Option<bool>,
     #[doc = "The billing email address of the org."]
@@ -17173,7 +17582,9 @@ pub struct OrgMember {
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[doc = "The name of the user. This is auto populated at first from the authentication \
+             provider (if there was a name). It can be updated by the user by updating their \
+             `first_name` and `last_name` fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "The user's phone number."]
@@ -17431,12 +17842,17 @@ pub enum OriginType {
     },
 }
 
-#[doc = "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \"description\": \"Output file contents.\", \"type\": \"object\", \"properties\": { \"contents\": { \"description\": \"The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON.\", \"type\": \"string\" }, \"name\": { \"description\": \"The name of the file.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
+#[doc = "Output file contents.\n\n<details><summary>JSON schema</summary>\n\n```json { \
+         \"description\": \"Output file contents.\", \"type\": \"object\", \"properties\": { \
+         \"contents\": { \"description\": \"The contents of the file. This is base64 encoded so we \
+         can ensure it is UTF-8 for JSON.\", \"type\": \"string\" }, \"name\": { \"description\": \
+         \"The name of the file.\", \"default\": \"\", \"type\": \"string\" } } } ``` </details>"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct OutputFile {
-    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for JSON."]
+    #[doc = "The contents of the file. This is base64 encoded so we can ensure it is UTF-8 for \
+             JSON."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub contents: Option<String>,
     #[doc = "The name of the file."]
@@ -17490,17 +17906,14 @@ impl tabled::Tabled for OutputFile {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
 pub enum Type {
     #[serde(rename = "dxf")]
     #[display("dxf")]
+    #[default]
     Dxf,
 }
 
-impl std::default::Default for Type {
-    fn default() -> Self {
-        Type::Dxf
-    }
-}
 
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
@@ -17559,7 +17972,9 @@ pub enum OutputFormat3D {
         #[doc = "Specifies which kind of FBX will be exported."]
         storage: FbxStorage,
     },
-    #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ASCII output, you can set that option for the export."]
+    #[doc = "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, \
+             although by default it will be in binary format and thus technically (glb). If you \
+             prefer ASCII output, you can set that option for the export."]
     #[serde(rename = "gltf")]
     Gltf {
         #[doc = "Specifies how the JSON will be presented."]
@@ -17570,7 +17985,8 @@ pub enum OutputFormat3D {
     #[doc = "Wavefront OBJ format."]
     #[serde(rename = "obj")]
     Obj {
-        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
         #[doc = "Export length unit.\n\nDefaults to millimeters."]
         units: UnitLength,
@@ -17578,7 +17994,8 @@ pub enum OutputFormat3D {
     #[doc = "The PLY Polygon File Format."]
     #[serde(rename = "ply")]
     Ply {
-        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
         #[doc = "Export selection."]
         selection: Selection,
@@ -17590,7 +18007,8 @@ pub enum OutputFormat3D {
     #[doc = "ISO 10303-21 (STEP) format."]
     #[serde(rename = "step")]
     Step {
-        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         coords: Option<System>,
         #[doc = "Timestamp override."]
@@ -17606,7 +18024,8 @@ pub enum OutputFormat3D {
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
     Stl {
-        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
+        #[doc = "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate \
+                 system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html"]
         coords: System,
         #[doc = "Export selection."]
         selection: Selection,
@@ -17899,7 +18318,8 @@ pub enum PathSegment {
         #[doc = "Start of the arc along circle's perimeter."]
         start: Angle,
     },
-    #[doc = "A cubic bezier curve segment. Start at the end of the current line, go through control point 1 and 2, then end at a given point."]
+    #[doc = "A cubic bezier curve segment. Start at the end of the current line, go through \
+             control point 1 and 2, then end at a given point."]
     #[serde(rename = "bezier")]
     Bezier {
         #[doc = "First control point."]
@@ -17921,16 +18341,19 @@ pub enum PathSegment {
         #[doc = "Radius of the arc. Not to be confused with Raiders of the Lost Ark."]
         radius: f64,
     },
-    #[doc = "Adds a tangent arc from current pen position to the new position. Arcs will choose a clockwise or counter-clockwise direction based on the arc end position."]
+    #[doc = "Adds a tangent arc from current pen position to the new position. Arcs will choose a \
+             clockwise or counter-clockwise direction based on the arc end position."]
     #[serde(rename = "tangential_arc_to")]
     TangentialArcTo {
         #[doc = "0 will be interpreted as none/null."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         angle_snap_increment: Option<Angle>,
-        #[doc = "Where the arc should end. Must lie in the same plane as the current path pen position. Must not be colinear with current path pen position."]
+        #[doc = "Where the arc should end. Must lie in the same plane as the current path pen \
+                 position. Must not be colinear with current path pen position."]
         to: Point3D,
     },
-    #[doc = "Adds an arc from the current position that goes through the given interior point and ends at the given end position"]
+    #[doc = "Adds an arc from the current position that goes through the given interior point and \
+             ends at the given end position"]
     #[serde(rename = "arc_to")]
     ArcTo {
         #[doc = "End point of the arc."]
@@ -17940,16 +18363,21 @@ pub enum PathSegment {
         #[doc = "Whether or not interior and end are relative to the previous path position"]
         relative: bool,
     },
-    #[doc = "Adds a circular involute from the current position that goes through the given end_radius and is rotated around the current point by angle."]
+    #[doc = "Adds a circular involute from the current position that goes through the given \
+             end_radius and is rotated around the current point by angle."]
     #[serde(rename = "circular_involute")]
     CircularInvolute {
-        #[doc = "The angle to rotate the involute by. A value of zero will produce a curve with a tangent along the x-axis at the start point of the curve."]
+        #[doc = "The angle to rotate the involute by. A value of zero will produce a curve with a \
+                 tangent along the x-axis at the start point of the curve."]
         angle: Angle,
-        #[doc = "The involute is described between two circles, end_radius is the radius of the outer circle."]
+        #[doc = "The involute is described between two circles, end_radius is the radius of the \
+                 outer circle."]
         end_radius: f64,
-        #[doc = "If reverse is true, the segment will start from the end of the involute, otherwise it will start from that start."]
+        #[doc = "If reverse is true, the segment will start from the end of the involute, \
+                 otherwise it will start from that start."]
         reverse: bool,
-        #[doc = "The involute is described between two circles, start_radius is the radius of the inner circle."]
+        #[doc = "The involute is described between two circles, start_radius is the radius of the \
+                 inner circle."]
         start_radius: f64,
     },
     #[doc = "Adds an elliptical arc segment."]
@@ -17966,7 +18394,8 @@ pub enum PathSegment {
         #[doc = "Start of the path along the perimeter of the ellipse."]
         start_angle: Angle,
     },
-    #[doc = "Adds a generic conic section specified by the end point, interior point and tangents at the start and end of the section."]
+    #[doc = "Adds a generic conic section specified by the end point, interior point and tangents \
+             at the start and end of the section."]
     #[serde(rename = "conic_to")]
     ConicTo {
         #[doc = "End point of the conic."]
@@ -17975,7 +18404,8 @@ pub enum PathSegment {
         end_tangent: Point2D,
         #[doc = "Interior point that lies on the conic."]
         interior: Point2D,
-        #[doc = "Whether or not the interior and end points are relative to the previous path position."]
+        #[doc = "Whether or not the interior and end points are relative to the previous path \
+                 position."]
         relative: bool,
         #[doc = "Tangent at the start of the conic."]
         start_tangent: Point2D,
@@ -17989,7 +18419,8 @@ pub enum PathSegment {
 pub struct PathSegmentInfo {
     #[doc = "What is the path segment?"]
     pub command: PathCommand,
-    #[doc = "Which command created this path? This field is absent if the path command is not actually creating a path segment, e.g. moving the pen doesn't create a path segment."]
+    #[doc = "Which command created this path? This field is absent if the path command is not \
+             actually creating a path segment, e.g. moving the pen doesn't create a path segment."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub command_id: Option<uuid::Uuid>,
     #[doc = "Whether or not this segment is a relative offset"]
@@ -18031,7 +18462,10 @@ impl tabled::Tabled for PathSegmentInfo {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentIntent {
-    #[doc = "The client secret is used for client-side retrieval using a publishable key. The client secret can be used to complete payment setup from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret."]
+    #[doc = "The client secret is used for client-side retrieval using a publishable key. The \
+             client secret can be used to complete payment setup from your frontend. It should \
+             not be stored, logged, or exposed to anyone other than the customer. Make sure that \
+             you have TLS enabled on any page that includes the client secret."]
     pub client_secret: String,
 }
 
@@ -18064,7 +18498,8 @@ impl tabled::Tabled for PaymentIntent {
 pub struct PaymentMethod {
     #[doc = "The billing info for the payment method."]
     pub billing_info: BillingInfo,
-    #[doc = "The card, if it is one. For our purposes, this is the only type of payment method that we support."]
+    #[doc = "The card, if it is one. For our purposes, this is the only type of payment method \
+             that we support."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub card: Option<CardDetails>,
     #[doc = "Time at which the object was created."]
@@ -18133,17 +18568,20 @@ impl tabled::Tabled for PaymentMethod {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PaymentMethodCardChecks {
-    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[doc = "If a address line1 was provided, results of the check, one of `pass`, `fail`, \
+             `unavailable`, or `unchecked`."]
     #[serde(
         rename = "address_line1_check",
         default,
         skip_serializing_if = "Option::is_none"
     )]
     pub address_line_1_check: Option<String>,
-    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[doc = "If a address postal code was provided, results of the check, one of `pass`, `fail`, \
+             `unavailable`, or `unchecked`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub address_postal_code_check: Option<String>,
-    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, or `unchecked`."]
+    #[doc = "If a CVC was provided, results of the check, one of `pass`, `fail`, `unavailable`, \
+             or `unchecked`."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cvc_check: Option<String>,
 }
@@ -18204,18 +18642,15 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
 pub enum PaymentMethodType {
     #[doc = "A card payment method."]
     #[serde(rename = "card")]
     #[display("card")]
+    #[default]
     Card,
 }
 
-impl std::default::Default for PaymentMethodType {
-    fn default() -> Self {
-        PaymentMethodType::Card
-    }
-}
 
 #[doc = "Defines a perspective view."]
 #[derive(
@@ -18423,7 +18858,8 @@ impl tabled::Tabled for PlaneSetColor {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum PlyStorage {
-    #[doc = "Write numbers in their ascii representation (e.g. -13, 6.28, etc.). Properties are separated by spaces and elements are separated by line breaks."]
+    #[doc = "Write numbers in their ascii representation (e.g. -13, 6.28, etc.). Properties are \
+             separated by spaces and elements are separated by line breaks."]
     #[serde(rename = "ascii")]
     #[display("ascii")]
     Ascii,
@@ -18655,7 +19091,8 @@ impl tabled::Tabled for PriceUpsertRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct PrivacySettings {
-    #[doc = "If we can train on the data. If the user is a member of an organization, the organization's setting will override this. The organization's setting takes priority."]
+    #[doc = "If we can train on the data. If the user is a member of an organization, the \
+             organization's setting will override this. The organization's setting takes priority."]
     pub can_train_on_data: bool,
 }
 
@@ -19382,7 +19819,8 @@ impl tabled::Tabled for PublicProjectVoteResponse {
     }
 }
 
-#[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files come back for exports it is sent as binary/bson, not text/json."]
+#[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files \
+         come back for exports it is sent as binary/bson, not text/json."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -19465,7 +19903,8 @@ pub enum ReasoningMessage {
         #[doc = "The steps in the design plan."]
         steps: Vec<PlanStep>,
     },
-    #[doc = "Reasoning that contains potential KCL code, this code has not been executed yet. It might not even compile or be valid KCL code."]
+    #[doc = "Reasoning that contains potential KCL code, this code has not been executed yet. It \
+             might not even compile or be valid KCL code."]
     #[serde(rename = "generated_kcl_code")]
     GeneratedKclCode {
         #[doc = "The content of the reasoning."]
@@ -19534,7 +19973,8 @@ impl tabled::Tabled for ReconfigureStream {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct RegionGetQueryPoint {
-    #[doc = "A point that is inside of the queried region, in the same coordinate frame as the sketch itself"]
+    #[doc = "A point that is inside of the queried region, in the same coordinate frame as the \
+             sketch itself"]
     pub query_point: Point2D,
 }
 
@@ -19714,7 +20154,8 @@ pub struct Rotation {
     pub angle: Angle,
     #[doc = "Rotation axis. Defaults to (0, 0, 1) (i.e. the Z axis)."]
     pub axis: Point3D,
-    #[doc = "Origin of the rotation. If one isn't provided, the object will rotate about its own bounding box center."]
+    #[doc = "Origin of the rotation. If one isn't provided, the object will rotate about its own \
+             bounding box center."]
     pub origin: OriginType,
 }
 
@@ -19751,7 +20192,8 @@ impl tabled::Tabled for Rotation {
 pub struct RtcIceCandidateInit {
     #[doc = "The candidate string associated with the object."]
     pub candidate: String,
-    #[doc = "The index (starting at zero) of the m-line in the SDP this candidate is associated with."]
+    #[doc = "The index (starting at zero) of the m-line in the SDP this candidate is associated \
+             with."]
     #[serde(
         rename = "sdpMLineIndex",
         default,
@@ -19837,15 +20279,23 @@ pub enum RtcSdpType {
     #[serde(rename = "offer")]
     #[display("offer")]
     Offer,
-    #[doc = "indicates that a description MUST be treated as an SDP answer, but not a final answer. A description used as an SDP pranswer may be applied as a response to an SDP offer, or an update to a previously sent SDP pranswer."]
+    #[doc = "indicates that a description MUST be treated as an SDP answer, but not a final \
+             answer. A description used as an SDP pranswer may be applied as a response to an SDP \
+             offer, or an update to a previously sent SDP pranswer."]
     #[serde(rename = "pranswer")]
     #[display("pranswer")]
     Pranswer,
-    #[doc = "indicates that a description MUST be treated as an SDP final answer, and the offer-answer exchange MUST be considered complete. A description used as an SDP answer may be applied as a response to an SDP offer or as an update to a previously sent SDP pranswer."]
+    #[doc = "indicates that a description MUST be treated as an SDP final answer, and the \
+             offer-answer exchange MUST be considered complete. A description used as an SDP \
+             answer may be applied as a response to an SDP offer or as an update to a previously \
+             sent SDP pranswer."]
     #[serde(rename = "answer")]
     #[display("answer")]
     Answer,
-    #[doc = "indicates that a description MUST be treated as canceling the current SDP negotiation and moving the SDP offer and answer back to what it was in the previous stable state. Note the local or remote SDP descriptions in the previous stable state could be null if there has not yet been a successful offer-answer negotiation."]
+    #[doc = "indicates that a description MUST be treated as canceling the current SDP \
+             negotiation and moving the SDP offer and answer back to what it was in the previous \
+             stable state. Note the local or remote SDP descriptions in the previous stable state \
+             could be null if there has not yet been a successful offer-answer negotiation."]
     #[serde(rename = "rollback")]
     #[display("rollback")]
     Rollback,
@@ -19945,10 +20395,15 @@ pub struct SamlIdentityProvider {
     pub idp_metadata_document_string: Option<String>,
     #[doc = "The organization ID the SAML identity provider belongs to."]
     pub org_id: uuid::Uuid,
-    #[doc = "The private key for the SAML identity provider. This is the PEM corresponding to the X509 pair.\n\nNever serialized in API responses: the SP signing key is a secret used internally to sign AuthnRequests, and would otherwise leak to admin GETs, audit logs, support tooling, and browser history. Input is accepted via the dedicated `SamlIdentityProviderCreate` body type, not by deserializing this struct."]
+    #[doc = "The private key for the SAML identity provider. This is the PEM corresponding to the \
+             X509 pair.\n\nNever serialized in API responses: the SP signing key is a secret used \
+             internally to sign AuthnRequests, and would otherwise leak to admin GETs, audit \
+             logs, support tooling, and browser history. Input is accepted via the dedicated \
+             `SamlIdentityProviderCreate` body type, not by deserializing this struct."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub private_key: Option<base64::Base64Data>,
-    #[doc = "The public certificate for the SAML identity provider. This is the PEM corresponding to the X509 pair."]
+    #[doc = "The public certificate for the SAML identity provider. This is the PEM corresponding \
+             to the X509 pair."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub public_cert: Option<base64::Base64Data>,
     #[doc = "The SLO (Single Logout) URL."]
@@ -20301,12 +20756,14 @@ impl tabled::Tabled for SelectGet {
     }
 }
 
-#[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct this region, this chooses arbitrarily."]
+#[doc = "The response from the 'SelectRegionFromPoint'. If there are multiple ways to construct \
+         this region, this chooses arbitrarily."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SelectRegionFromPoint {
-    #[doc = "The region the user clicked on. If they clicked an open space which isn't a region, this returns None."]
+    #[doc = "The region the user clicked on. If they clicked an open space which isn't a region, \
+             this returns None."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub region: Option<SelectedRegion>,
 }
@@ -20434,10 +20891,13 @@ impl tabled::Tabled for SelectWithPoint {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SelectedRegion {
-    #[doc = "By default (when this is false), curve counterclockwise at intersections. If this is true, instead curve clockwise."]
+    #[doc = "By default (when this is false), curve counterclockwise at intersections. If this is \
+             true, instead curve clockwise."]
     #[serde(default)]
     pub curve_clockwise: bool,
-    #[doc = "At which intersection between `segment` and `intersection_segment` should we stop following the `segment` and start following `intersection_segment`? Defaults to -1, which means the last intersection."]
+    #[doc = "At which intersection between `segment` and `intersection_segment` should we stop \
+             following the `segment` and start following `intersection_segment`? Defaults to -1, \
+             which means the last intersection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub intersection_index: Option<i32>,
     #[doc = "Second segment to follow to find the region. Intersects the first segment."]
@@ -20546,7 +21006,9 @@ impl tabled::Tabled for SendObject {
     }
 }
 
-#[doc = "A service account.\n\nThese are used to authenticate orgs with Bearer authentication.\n\nThis works just like an API token, but it is tied to an organization versus an individual user."]
+#[doc = "A service account.\n\nThese are used to authenticate orgs with Bearer \
+         authentication.\n\nThis works just like an API token, but it is tied to an organization \
+         versus an individual user."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -20555,7 +21017,8 @@ pub struct ServiceAccount {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The unique identifier for the API token."]
     pub id: uuid::Uuid,
-    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. We save them for ever to preserve the history of the API token."]
+    #[doc = "If the token is valid. We never delete API tokens, but we can mark them as invalid. \
+             We save them for ever to preserve the history of the API token."]
     pub is_valid: bool,
     #[doc = "An optional label for the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -21102,7 +21565,9 @@ pub struct Shortlink {
     #[doc = "The hash of the password for the shortlink."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub password_hash: Option<String>,
-    #[doc = "If the shortlink should be restricted to the organization. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail."]
+    #[doc = "If the shortlink should be restricted to the organization. This only applies to org \
+             shortlinks. If you are creating a user shortlink and you are not a member of a team \
+             or enterprise and you try to set this to true, it will fail."]
     #[serde(default)]
     pub restrict_to_org: bool,
     #[doc = "The date and time the shortlink was last updated."]
@@ -21448,7 +21913,8 @@ impl tabled::Tabled for Solid3DFlipFace {
     }
 }
 
-#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
+         ids and extrusion faces) This includes the opposite and adjacent faces and edges."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -21639,7 +22105,8 @@ impl tabled::Tabled for Solid3DGetEdgeUuid {
     }
 }
 
-#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment ids and extrusion faces)"]
+#[doc = "Extrusion face info struct (useful for maintaining mappings between source path segment \
+         ids and extrusion faces)"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -21965,12 +22432,14 @@ impl tabled::Tabled for SourceRange {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SourceRangePrompt {
-    #[doc = "The name of the file the source range applies to. This is the relative path to the file from the root of the project. This only applies to multi-file iterations."]
+    #[doc = "The name of the file the source range applies to. This is the relative path to the \
+             file from the root of the project. This only applies to multi-file iterations."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub file: Option<String>,
     #[doc = "The prompt for the changes."]
     pub prompt: String,
-    #[doc = "The range of the source code to change. If you want to apply the prompt to the whole file, set the start to 0 and the end to the end of the file."]
+    #[doc = "The range of the source code to change. If you want to apply the prompt to the whole \
+             file, set the start to 0 and the end to the end of the file."]
     pub range: SourceRange,
 }
 
@@ -22051,7 +22520,8 @@ pub enum StepPresentation {
     #[serde(rename = "compact")]
     #[display("compact")]
     Compact,
-    #[doc = "Add extra spaces to make the text more easily readable.\n\nThis is the default setting."]
+    #[doc = "Add extra spaces to make the text more easily readable.\n\nThis is the default \
+             setting."]
     #[serde(rename = "pretty")]
     #[display("pretty")]
     Pretty,
@@ -22138,7 +22608,8 @@ impl tabled::Tabled for StoreCouponParams {
     }
 }
 
-#[doc = "Indicates which kind of Stripe intent requires customer action during subscription creation."]
+#[doc = "Indicates which kind of Stripe intent requires customer action during subscription \
+         creation."]
 #[derive(
     serde :: Serialize,
     serde :: Deserialize,
@@ -22344,7 +22815,8 @@ pub enum SubscriptionTierPrice {
         #[doc = "The price."]
         price: f64,
     },
-    #[doc = "Contract-managed pricing. The price is not self-serve and the customer must contact sales."]
+    #[doc = "Contract-managed pricing. The price is not self-serve and the customer must contact \
+             sales."]
     #[serde(rename = "contract")]
     Contract {},
 }
@@ -22401,10 +22873,12 @@ pub enum SubscriptionTrainingDataBehavior {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct SuccessWebSocketResponse {
-    #[doc = "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null."]
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<uuid::Uuid>,
-    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and 'data' field."]
+    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
+             'data' field."]
     pub resp: OkWebSocketResponseData,
     #[doc = "Always true"]
     pub success: bool,
@@ -22763,7 +23237,8 @@ impl tabled::Tabled for TakeSnapshot {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCad {
-    #[doc = "The code for the model. This is optional but will be required in the future once we are at v1."]
+    #[doc = "The code for the model. This is optional but will be required in the future once we \
+             are at v1."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
     #[doc = "The time and date the API call was completed."]
@@ -22790,7 +23265,8 @@ pub struct TextToCad {
     pub model_version: String,
     #[doc = "The output format of the model."]
     pub output_format: FileExportFormat,
-    #[doc = "The output of the model in the given file format the user requested, base64 encoded. The key of the map is the path of the output file."]
+    #[doc = "The output of the model in the given file format the user requested, base64 encoded. \
+             The key of the map is the path of the output file."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
     #[doc = "The prompt."]
@@ -22903,7 +23379,8 @@ pub struct TextToCadCreateBody {
     #[doc = "Zoo provided model, or custom model which should be used to process this request."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_version: Option<String>,
-    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
     #[doc = "The prompt for the desired part."]
@@ -22982,7 +23459,8 @@ pub struct TextToCadIteration {
     pub model_version: String,
     #[doc = "The original source code for the model, previous to the changes."]
     pub original_source_code: String,
-    #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges."]
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
     #[doc = "The source ranges the user suggested to change."]
@@ -23084,13 +23562,15 @@ pub struct TextToCadIterationBody {
     pub kcl_version: Option<String>,
     #[doc = "The source code for the model (in kcl) that is to be edited."]
     pub original_source_code: String,
-    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
     #[doc = "The prompt for the model, if not using source ranges."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
-    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used and is required."]
+    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
+             and is required."]
     pub source_ranges: Vec<SourceRangePrompt>,
 }
 
@@ -23196,13 +23676,16 @@ pub struct TextToCadMultiFileIteration {
     pub model: TextToCadModel,
     #[doc = "The version of the model."]
     pub model_version: String,
-    #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+    #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+             contents are not encoded since kcl files are not binary."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub outputs: Option<std::collections::HashMap<String, String>>,
-    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
-    #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files."]
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges. This will apply to all the files."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
     #[doc = "The source ranges the user suggested to change."]
@@ -23313,19 +23796,26 @@ impl tabled::Tabled for TextToCadMultiFileIteration {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct TextToCadMultiFileIterationBody {
-    #[doc = "The conversation ID Conversations group different prompts together. This should be omitted when starting a new conversation. The conversation_id returned in the response should be used to link future messages in the same conversation."]
+    #[doc = "The conversation ID Conversations group different prompts together. This should be \
+             omitted when starting a new conversation. The conversation_id returned in the \
+             response should be used to link future messages in the same conversation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub conversation_id: Option<uuid::Uuid>,
     #[doc = "The version of kcl to use. If empty, the latest version will be used."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kcl_version: Option<String>,
-    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+    #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make \
+             our models better over time."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub project_name: Option<String>,
-    #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files. If you want to apply a prompt to just a single file, use the source_ranges field and you can leave this empty."]
+    #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+             specific source ranges. This will apply to all the files. If you want to apply a \
+             prompt to just a single file, use the source_ranges field and you can leave this \
+             empty."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt: Option<String>,
-    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used and is required."]
+    #[doc = "The source ranges the user suggested to change. If empty, the prompt will be used \
+             and is required."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source_ranges: Option<Vec<SourceRangePrompt>>,
 }
@@ -23384,7 +23874,8 @@ impl tabled::Tabled for TextToCadMultiFileIterationBody {
     }
 }
 
-#[doc = "Type that encompasses all Text-to-CAD response types, including iteration and multi-file iteration."]
+#[doc = "Type that encompasses all Text-to-CAD response types, including iteration and multi-file \
+         iteration."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -23394,7 +23885,8 @@ pub enum TextToCadResponse {
     #[doc = "A response from a text to CAD prompt."]
     #[serde(rename = "text_to_cad")]
     TextToCad {
-        #[doc = "The code for the model. This is optional but will be required in the future once we are at v1."]
+        #[doc = "The code for the model. This is optional but will be required in the future once \
+                 we are at v1."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         code: Option<String>,
         #[doc = "The time and date the API call was completed."]
@@ -23421,7 +23913,8 @@ pub enum TextToCadResponse {
         model_version: String,
         #[doc = "The output format of the model."]
         output_format: FileExportFormat,
-        #[doc = "The output of the model in the given file format the user requested, base64 encoded. The key of the map is the path of the output file."]
+        #[doc = "The output of the model in the given file format the user requested, base64 \
+                 encoded. The key of the map is the path of the output file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, base64::Base64Data>>,
         #[doc = "The prompt."]
@@ -23462,7 +23955,8 @@ pub enum TextToCadResponse {
         model_version: String,
         #[doc = "The original source code for the model, previous to the changes."]
         original_source_code: String,
-        #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges."]
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         prompt: Option<String>,
         #[doc = "The source ranges the user suggested to change."]
@@ -23502,13 +23996,16 @@ pub enum TextToCadResponse {
         model: TextToCadModel,
         #[doc = "The version of the model."]
         model_version: String,
-        #[doc = "The output files. Returns a map of the file name to the file contents. The file contents are not encoded since kcl files are not binary."]
+        #[doc = "The output files. Returns a map of the file name to the file contents. The file \
+                 contents are not encoded since kcl files are not binary."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         outputs: Option<std::collections::HashMap<String, String>>,
-        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us make our models better over time."]
+        #[doc = "The project name. This is used to tie the prompt to a project. Which helps us \
+                 make our models better over time."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
-        #[doc = "The prompt for the overall changes. This is optional if you only want changes on specific source ranges. This will apply to all the files."]
+        #[doc = "The prompt for the overall changes. This is optional if you only want changes on \
+                 specific source ranges. This will apply to all the files."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         prompt: Option<String>,
         #[doc = "The source ranges the user suggested to change."]
@@ -23658,13 +24155,16 @@ pub struct Transform {
     #[doc = "Whether to replicate the original solid in this instance."]
     #[serde(default)]
     pub replicate: bool,
-    #[doc = "Rotate the replica about the specified rotation axis and origin. Defaults to no rotation."]
+    #[doc = "Rotate the replica about the specified rotation axis and origin. Defaults to no \
+             rotation."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rotation: Option<Rotation>,
-    #[doc = "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size as the original)."]
+    #[doc = "Scale the replica's size along each axis. Defaults to (1, 1, 1) (i.e. the same size \
+             as the original)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scale: Option<Point3D>,
-    #[doc = "Translate the replica this far along each dimension. Defaults to zero vector (i.e. same position as the original)."]
+    #[doc = "Translate the replica this far along each dimension. Defaults to zero vector (i.e. \
+             same position as the original)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub translate: Option<Point3D>,
 }
@@ -23723,7 +24223,9 @@ pub struct TransformByForPoint3D {
     pub origin: Option<OriginType>,
     #[doc = "The scale, or rotation, or translation."]
     pub property: Point3D,
-    #[doc = "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z."]
+    #[doc = "If true, overwrite the previous value with this. If false, the previous value will \
+             be modified. E.g. when translating, `set=true` will set a new location, and \
+             `set=false` will translate the current location by the given X/Y/Z."]
     pub set: bool,
 }
 
@@ -23767,7 +24269,9 @@ pub struct TransformByForPoint4D {
     pub origin: Option<OriginType>,
     #[doc = "The scale, or rotation, or translation."]
     pub property: Point4D,
-    #[doc = "If true, overwrite the previous value with this. If false, the previous value will be modified. E.g. when translating, `set=true` will set a new location, and `set=false` will translate the current location by the given X/Y/Z."]
+    #[doc = "If true, overwrite the previous value with this. If false, the previous value will \
+             be modified. E.g. when translating, `set=true` will set a new location, and \
+             `set=false` will translate the current location by the given X/Y/Z."]
     pub set: bool,
 }
 
@@ -26014,10 +26518,15 @@ impl tabled::Tabled for UpdateOrgDatasetSource {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdatePaymentBalance {
-    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets re-upped every month,"]
+    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets \
+             re-upped every month,"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_api_credits_remaining_monetary_value: Option<f64>,
-    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits."]
+    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
+             reset or re-upped every month. This is separate from the monthly credits. Credits \
+             will first pull from the monthly credits, then the stable credits. Stable just means \
+             that they do not get reset every month. A user will have stable credits if a Zoo \
+             employee granted them credits."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub stable_api_credits_remaining_monetary_value: Option<f64>,
 }
@@ -26067,10 +26576,15 @@ impl tabled::Tabled for UpdatePaymentBalance {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateShortlinkRequest {
-    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only be set if your subscription allows for it. Otherwise, it will return an error. When you access the link it will be required to enter this password through basic auth. The username will be `{anything}` and the password will be the password you set here."]
+    #[doc = "The password for the shortlink, if you want to restrict access to it. This can only \
+             be set if your subscription allows for it. Otherwise, it will return an error. When \
+             you access the link it will be required to enter this password through basic auth. \
+             The username will be `{anything}` and the password will be the password you set here."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub password: Option<String>,
-    #[doc = "If the shortlink should be restricted to the user's organization to view. This only applies to org shortlinks. If you are creating a user shortlink and you are not a member of a team or enterprise and you try to set this to true, it will fail."]
+    #[doc = "If the shortlink should be restricted to the user's organization to view. This only \
+             applies to org shortlinks. If you are creating a user shortlink and you are not a \
+             member of a team or enterprise and you try to set this to true, it will fail."]
     pub restrict_to_org: bool,
 }
 
@@ -26120,7 +26634,8 @@ pub struct UpdateUser {
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
-    #[doc = "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be overwritten by the provider's image URL when the user logs in next."]
+    #[doc = "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be \
+             overwritten by the provider's image URL when the user logs in next."]
     pub image: String,
     #[doc = "If the user is now onboarded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -26605,7 +27120,8 @@ impl tabled::Tabled for UserFeatureList {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserOrgInfo {
-    #[doc = "If we should allow all future users who are created with email addresses from this domain to join the org."]
+    #[doc = "If we should allow all future users who are created with email addresses from this \
+             domain to join the org."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allow_users_in_domain_to_auto_join: Option<bool>,
     #[doc = "The billing email address of the org."]
@@ -26762,7 +27278,8 @@ pub struct UserResponse {
     #[doc = "Human-friendly block reason message."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block_message: Option<String>,
-    #[doc = "If we can train on the user's data. If the user is a member of an organization, the organization's setting will override this."]
+    #[doc = "If we can train on the user's data. If the user is a member of an organization, the \
+             organization's setting will override this."]
     #[serde(default)]
     pub can_train_on_data: bool,
     #[doc = "The user's company."]
@@ -26801,7 +27318,9 @@ pub struct UserResponse {
     #[doc = "The user's last name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_name: Option<String>,
-    #[doc = "The name of the user. This is auto populated at first from the authentication provider (if there was a name). It can be updated by the user by updating their `first_name` and `last_name` fields."]
+    #[doc = "The name of the user. This is auto populated at first from the authentication \
+             provider (if there was a name). It can be updated by the user by updating their \
+             `first_name` and `last_name` fields."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[doc = "The user's phone number."]
@@ -26931,12 +27450,15 @@ pub struct VerificationTokenResponse {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the verification token expires."]
     pub expires: chrono::DateTime<chrono::Utc>,
-    #[doc = "The token used for verification. This is used as the id for the table since it is unique per record."]
+    #[doc = "The token used for verification. This is used as the id for the table since it is \
+             unique per record."]
     pub id: uuid::Uuid,
-    #[doc = "The identifier for the user. This is typically the user's email address since that is what we are verifying."]
+    #[doc = "The identifier for the user. This is typically the user's email address since that \
+             is what we are verifying."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub identifier: Option<String>,
-    #[doc = "The URL to redirect to if the user requires SAML authentication or belongs somewhere else."]
+    #[doc = "The URL to redirect to if the user requires SAML authentication or belongs somewhere \
+             else."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub redirect_url: Option<String>,
     #[doc = "The date and time the verification token was last updated."]
@@ -27081,14 +27603,18 @@ pub enum WebSocketRequest {
         #[doc = "ID of command being submitted."]
         cmd_id: uuid::Uuid,
     },
-    #[doc = "A sequence of modeling requests. If any request fails, following requests will not be tried."]
+    #[doc = "A sequence of modeling requests. If any request fails, following requests will not \
+             be tried."]
     #[serde(rename = "modeling_cmd_batch_req")]
     ModelingCmdBatchReq {
-        #[doc = "ID of batch being submitted. Each request has their own individual ModelingCmdId, but this is the ID of the overall batch."]
+        #[doc = "ID of batch being submitted. Each request has their own individual \
+                 ModelingCmdId, but this is the ID of the overall batch."]
         batch_id: uuid::Uuid,
-        #[doc = "A sequence of modeling requests. If any request fails, following requests will not be tried."]
+        #[doc = "A sequence of modeling requests. If any request fails, following requests will \
+                 not be tried."]
         requests: Vec<ModelingCmdReq>,
-        #[doc = "If false or omitted, responses to each batch command will just be Ok(()). If true, responses will be the actual response data for that modeling command."]
+        #[doc = "If false or omitted, responses to each batch command will just be Ok(()). If \
+                 true, responses will be the actual response data for that modeling command."]
         #[serde(default)]
         responses: bool,
     },
@@ -27112,15 +27638,18 @@ pub enum WebSocketRequest {
     },
 }
 
-#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas in either case."]
+#[doc = "Websocket responses can either be successful or unsuccessful. Slightly different schemas \
+         in either case."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct WebSocketResponse {
-    #[doc = "Which request this is a response to. If the request was a modeling command, this is the modeling command ID. If no request ID was sent, this will be null."]
+    #[doc = "Which request this is a response to. If the request was a modeling command, this is \
+             the modeling command ID. If no request ID was sent, this will be null."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub request_id: Option<uuid::Uuid>,
-    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and 'data' field."]
+    #[doc = "The data sent with a successful response. This will be flattened into a 'type' and \
+             'data' field."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resp: Option<OkWebSocketResponseData>,
     #[doc = "Always false"]
@@ -27550,10 +28079,13 @@ pub struct ZooProductSubscription {
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
-    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit."]
+    #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
+             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
+             the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
-    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month."]
+    #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
+             the modeling app per month. This re-ups on the 1st of each month."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
@@ -27561,7 +28093,9 @@ pub struct ZooProductSubscription {
     #[doc = "The price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_as_you_go_api_credit_price: Option<f64>,
-    #[doc = "The price of the tier per month. If this is for an individual, this is the price they pay. If this is for an organization, this is the price the organization pays per member in the org. This is in USD."]
+    #[doc = "The price of the tier per month. If this is for an individual, this is the price \
+             they pay. If this is for an organization, this is the price the organization pays \
+             per member in the org. This is in USD."]
     pub price: SubscriptionTierPrice,
     #[doc = "The options for sharable links through the modeling app."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -27684,7 +28218,8 @@ impl tabled::Tabled for ZooProductSubscription {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscriptions {
-    #[doc = "Client secret to complete SCA/3DS for the current subscription change, when applicable."]
+    #[doc = "Client secret to complete SCA/3DS for the current subscription change, when \
+             applicable."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub action_client_secret: Option<String>,
     #[doc = "Type of intent associated with `action_client_secret`."]
@@ -27739,7 +28274,8 @@ impl tabled::Tabled for ZooProductSubscriptions {
 pub struct ZooProductSubscriptionsOrgRequest {
     #[doc = "Slug of the modeling app subscription tier requested."]
     pub modeling_app: String,
-    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription."]
+    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual \
+             discount will apply if there is a discount for the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_annually: Option<bool>,
 }
@@ -27780,7 +28316,8 @@ impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
 pub struct ZooProductSubscriptionsUserRequest {
     #[doc = "Slug of the modeling app subscription tier requested."]
     pub modeling_app: String,
-    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription."]
+    #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual \
+             discount will apply if there is a discount for the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pay_annually: Option<bool>,
 }

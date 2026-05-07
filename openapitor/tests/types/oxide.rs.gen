@@ -180,6 +180,7 @@ pub mod multipart {
 #[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
+    #![allow(clippy::result_large_err)]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
     pub trait Pagination {

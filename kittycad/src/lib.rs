@@ -6,16 +6,16 @@
 //!
 //! API server for Zoo
 //!
-//! 
+//!
 //!
 //! ### Contact
 //!
-//! 
+//!
 //! | url | email |
 //! |----|----|
 //! | <https://zoo.dev> | api@zoo.dev |
-//! 
-//! 
+//!
+//!
 //!
 //! ## Client Details
 //!
@@ -23,7 +23,7 @@
 //!
 //! The documentation for the crate is generated
 //! along with the code to make this library easy to use.
-//! 
+//!
 //!
 //! To install the library, add the following to your `Cargo.toml` file.
 //!
@@ -40,9 +40,7 @@
 //! ```rust,no_run
 //! use kittycad::Client;
 //!
-//! let client = Client::new(
-//!     String::from("api-key"),
-//! );
+//! let client = Client::new(String::from("api-key"));
 //! ```
 //!
 //! Alternatively, the library can search for most of the variables required for
@@ -58,7 +56,6 @@
 //!
 //! let client = Client::new_from_env();
 //! ```
-//!
 #![allow(mismatched_lifetime_syntaxes)]
 #![allow(missing_docs)]
 #![allow(unused_imports)]
@@ -67,107 +64,102 @@
 #![allow(clippy::too_many_arguments)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
-#[cfg(test)]
-mod tests;
-mod methods;
-pub mod types;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/api-calls>
 #[cfg(feature = "requests")]
 pub mod api_calls;
 /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/api-tokens>
 #[cfg(feature = "requests")]
 pub mod api_tokens;
 /// Endpoints for third party app grant flows.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/apps>
 #[cfg(feature = "requests")]
 pub mod apps;
 /// Endpoints that allow for code execution or creation of code execution environments.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/executor>
 #[cfg(feature = "requests")]
 pub mod executor;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/file>
 #[cfg(feature = "requests")]
 pub mod file;
 /// Hidden API endpoints that should not show up in the docs.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/hidden>
 #[cfg(feature = "requests")]
 pub mod hidden;
 /// Meta information about the API.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/meta>
 #[cfg(feature = "requests")]
 pub mod meta;
+mod methods;
 /// Machine learning to generate CAD models and other things.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/ml>
 #[cfg(feature = "requests")]
 pub mod ml;
 /// Modeling API for updating your 3D files using the Zoo engine.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/modeling>
 #[cfg(feature = "requests")]
 pub mod modeling;
 /// Endpoints that implement OAuth 2.0 grant flows.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/oauth2>
 #[cfg(feature = "requests")]
 pub mod oauth2;
 /// An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/orgs>
 #[cfg(feature = "requests")]
 pub mod orgs;
 /// Operations around payments and billing.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/payments>
 #[cfg(feature = "requests")]
 pub mod payments;
 /// Operations for user-owned projects, public project discovery, publishing, voting, and share links.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/projects>
 #[cfg(feature = "requests")]
 pub mod projects;
 /// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/service-accounts>
 #[cfg(feature = "requests")]
 pub mod service_accounts;
 /// Operations involving our swag store.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/store>
 #[cfg(feature = "requests")]
 pub mod store;
+#[cfg(test)]
+mod tests;
+pub mod types;
 /// Unit conversion operations.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/file>
 #[cfg(feature = "requests")]
 pub mod unit;
 /// A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
-/// 
+///
 /// FROM: <https://zoo.dev/docs/api/users>
 #[cfg(feature = "requests")]
 pub mod users;
-
 
 #[cfg(feature = "requests")]
 use std::env;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg(feature = "requests")]
-static APP_USER_AGENT: &str = concat!(
-    env!("CARGO_PKG_NAME"),
-    ".rs/",
-    env!("CARGO_PKG_VERSION"),
-);
+static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), ".rs/", env!("CARGO_PKG_VERSION"),);
 
 /// Entrypoint for interacting with the API client.
 #[derive(Clone, Debug)]
@@ -270,10 +262,7 @@ impl Client {
     /// Also takes reqwest client builders, for customizing the client's behaviour.
     #[tracing::instrument(skip(token))]
     #[cfg(target_arch = "wasm32")]
-    pub fn new_from_reqwest<T>(
-        token: T,
-        builder_http: reqwest::ClientBuilder,
-    ) -> Self
+    pub fn new_from_reqwest<T>(token: T, builder_http: reqwest::ClientBuilder) -> Self
     where
         T: ToString + std::fmt::Debug,
     {
@@ -357,30 +346,25 @@ impl Client {
 
     /// Create a new Client struct from the environment variable: `ENV_VARIABLE_PREFIX_API_TOKEN`.
     #[tracing::instrument]
-    pub fn new_from_env() -> Self
-    {
-       let token = if let Ok(token) = env::var("KITTYCAD_API_TOKEN") {
-        token
-    } else if let Ok(token) = env::var("ZOO_API_TOKEN") {
-        token
-    } else {
-        panic!("must set KITTYCAD_API_TOKEN or ZOO_API_TOKEN");
-    };
-    let base_url = if let Ok(base_url) = env::var("KITTYCAD_HOST") {
-        base_url
-    } else if let Ok(base_url) = env::var("ZOO_HOST") {
-        base_url
-    } else {
-        "https://api.zoo.dev".to_string()
-    };
+    pub fn new_from_env() -> Self {
+        let token = if let Ok(token) = env::var("KITTYCAD_API_TOKEN") {
+            token
+        } else if let Ok(token) = env::var("ZOO_API_TOKEN") {
+            token
+        } else {
+            panic!("must set KITTYCAD_API_TOKEN or ZOO_API_TOKEN");
+        };
+        let base_url = if let Ok(base_url) = env::var("KITTYCAD_HOST") {
+            base_url
+        } else if let Ok(base_url) = env::var("ZOO_HOST") {
+            base_url
+        } else {
+            "https://api.zoo.dev".to_string()
+        };
 
-
-    let mut c = Client::new(
-        token,
-    );
-    c.set_base_url(base_url);
-    c
-     
+        let mut c = Client::new(token);
+        c.set_base_url(base_url);
+        c
     }
 
     /// Create a raw request to our API.
@@ -390,18 +374,14 @@ impl Client {
         method: reqwest::Method,
         uri: &str,
         body: Option<reqwest::Body>,
-    ) -> anyhow::Result<RequestBuilder>
-    {
+    ) -> anyhow::Result<RequestBuilder> {
         let u = if uri.starts_with("https://") || uri.starts_with("http://") {
             uri.to_string()
         } else {
             format!("{}/{}", self.base_url, uri.trim_start_matches('/'))
         };
 
-        let mut req = self.client.request(
-            method,
-            &u,
-        );
+        let mut req = self.client.request(method, &u);
 
         // Add in our authentication.
         req = req.bearer_auth(&self.token);
@@ -423,124 +403,122 @@ impl Client {
         Ok(RequestBuilder(req))
     }
 
+    /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/api-calls>
+    pub fn api_calls(&self) -> api_calls::ApiCalls {
+        api_calls::ApiCalls::new(self.clone())
+    }
 
-/// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
-/// 
-/// FROM: <https://zoo.dev/docs/api/api-calls>
-               pub fn api_calls(&self) -> api_calls::ApiCalls {
-                    api_calls::ApiCalls::new(self.clone())
-               }
+    /// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/api-tokens>
+    pub fn api_tokens(&self) -> api_tokens::ApiTokens {
+        api_tokens::ApiTokens::new(self.clone())
+    }
 
-/// API tokens allow users to call the API outside of their session token that is used as a cookie in the user interface. Users can create, delete, and list their API tokens. But, of course, you need an API token to do this, so first be sure to generate one in the account UI.
-/// 
-/// FROM: <https://zoo.dev/docs/api/api-tokens>
-               pub fn api_tokens(&self) -> api_tokens::ApiTokens {
-                    api_tokens::ApiTokens::new(self.clone())
-               }
+    /// Endpoints for third party app grant flows.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/apps>
+    pub fn apps(&self) -> apps::Apps {
+        apps::Apps::new(self.clone())
+    }
 
-/// Endpoints for third party app grant flows.
-/// 
-/// FROM: <https://zoo.dev/docs/api/apps>
-               pub fn apps(&self) -> apps::Apps {
-                    apps::Apps::new(self.clone())
-               }
+    /// Endpoints that allow for code execution or creation of code execution environments.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/executor>
+    pub fn executor(&self) -> executor::Executor {
+        executor::Executor::new(self.clone())
+    }
 
-/// Endpoints that allow for code execution or creation of code execution environments.
-/// 
-/// FROM: <https://zoo.dev/docs/api/executor>
-               pub fn executor(&self) -> executor::Executor {
-                    executor::Executor::new(self.clone())
-               }
+    /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/file>
+    pub fn file(&self) -> file::File {
+        file::File::new(self.clone())
+    }
 
-/// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
-/// 
-/// FROM: <https://zoo.dev/docs/api/file>
-               pub fn file(&self) -> file::File {
-                    file::File::new(self.clone())
-               }
+    /// Hidden API endpoints that should not show up in the docs.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/hidden>
+    pub fn hidden(&self) -> hidden::Hidden {
+        hidden::Hidden::new(self.clone())
+    }
 
-/// Hidden API endpoints that should not show up in the docs.
-/// 
-/// FROM: <https://zoo.dev/docs/api/hidden>
-               pub fn hidden(&self) -> hidden::Hidden {
-                    hidden::Hidden::new(self.clone())
-               }
+    /// Meta information about the API.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/meta>
+    pub fn meta(&self) -> meta::Meta {
+        meta::Meta::new(self.clone())
+    }
 
-/// Meta information about the API.
-/// 
-/// FROM: <https://zoo.dev/docs/api/meta>
-               pub fn meta(&self) -> meta::Meta {
-                    meta::Meta::new(self.clone())
-               }
+    /// Machine learning to generate CAD models and other things.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/ml>
+    pub fn ml(&self) -> ml::Ml {
+        ml::Ml::new(self.clone())
+    }
 
-/// Machine learning to generate CAD models and other things.
-/// 
-/// FROM: <https://zoo.dev/docs/api/ml>
-               pub fn ml(&self) -> ml::Ml {
-                    ml::Ml::new(self.clone())
-               }
+    /// Modeling API for updating your 3D files using the Zoo engine.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/modeling>
+    pub fn modeling(&self) -> modeling::Modeling {
+        modeling::Modeling::new(self.clone())
+    }
 
-/// Modeling API for updating your 3D files using the Zoo engine.
-/// 
-/// FROM: <https://zoo.dev/docs/api/modeling>
-               pub fn modeling(&self) -> modeling::Modeling {
-                    modeling::Modeling::new(self.clone())
-               }
+    /// Endpoints that implement OAuth 2.0 grant flows.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/oauth2>
+    pub fn oauth2(&self) -> oauth2::Oauth2 {
+        oauth2::Oauth2::new(self.clone())
+    }
 
-/// Endpoints that implement OAuth 2.0 grant flows.
-/// 
-/// FROM: <https://zoo.dev/docs/api/oauth2>
-               pub fn oauth2(&self) -> oauth2::Oauth2 {
-                    oauth2::Oauth2::new(self.clone())
-               }
+    /// An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/orgs>
+    pub fn orgs(&self) -> orgs::Orgs {
+        orgs::Orgs::new(self.clone())
+    }
 
-/// An organization is a group of users of the Zoo API. Here, we can add users to an org and perform operations on orgs.
-/// 
-/// FROM: <https://zoo.dev/docs/api/orgs>
-               pub fn orgs(&self) -> orgs::Orgs {
-                    orgs::Orgs::new(self.clone())
-               }
+    /// Operations around payments and billing.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/payments>
+    pub fn payments(&self) -> payments::Payments {
+        payments::Payments::new(self.clone())
+    }
 
-/// Operations around payments and billing.
-/// 
-/// FROM: <https://zoo.dev/docs/api/payments>
-               pub fn payments(&self) -> payments::Payments {
-                    payments::Payments::new(self.clone())
-               }
+    /// Operations for user-owned projects, public project discovery, publishing, voting, and share links.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/projects>
+    pub fn projects(&self) -> projects::Projects {
+        projects::Projects::new(self.clone())
+    }
 
-/// Operations for user-owned projects, public project discovery, publishing, voting, and share links.
-/// 
-/// FROM: <https://zoo.dev/docs/api/projects>
-               pub fn projects(&self) -> projects::Projects {
-                    projects::Projects::new(self.clone())
-               }
+    /// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/service-accounts>
+    pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
+        service_accounts::ServiceAccounts::new(self.clone())
+    }
 
-/// Service accounts allow organizations to call the API. Organization admins can create, delete, and list the service accounts for their org. Service accounts are scoped to an organization not individual users, these are better to use for automations than individual API tokens, since they won't stop working when an individual leaves the company.
-/// 
-/// FROM: <https://zoo.dev/docs/api/service-accounts>
-               pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
-                    service_accounts::ServiceAccounts::new(self.clone())
-               }
+    /// Operations involving our swag store.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/store>
+    pub fn store(&self) -> store::Store {
+        store::Store::new(self.clone())
+    }
 
-/// Operations involving our swag store.
-/// 
-/// FROM: <https://zoo.dev/docs/api/store>
-               pub fn store(&self) -> store::Store {
-                    store::Store::new(self.clone())
-               }
+    /// Unit conversion operations.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/file>
+    pub fn unit(&self) -> unit::Unit {
+        unit::Unit::new(self.clone())
+    }
 
-/// Unit conversion operations.
-/// 
-/// FROM: <https://zoo.dev/docs/api/file>
-               pub fn unit(&self) -> unit::Unit {
-                    unit::Unit::new(self.clone())
-               }
-
-/// A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
-/// 
-/// FROM: <https://zoo.dev/docs/api/users>
-               pub fn users(&self) -> users::Users {
-                    users::Users::new(self.clone())
-               }
-
+    /// A user is someone who uses the Zoo API. Here, we can create, delete, and list users. We can also get information about a user. Operations will only be authorized if the user is requesting information about themselves.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/users>
+    pub fn users(&self) -> users::Users {
+        users::Users::new(self.clone())
+    }
 }
