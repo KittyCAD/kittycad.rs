@@ -10,12 +10,12 @@ Inflector = "^0.11.4"
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde", "std"], default-features = false }
 clap = { version = "4.6.1", features = ["cargo", "derive", "env", "unicode", "wrap_help"] }
-data-encoding = "^2.10.0"
+data-encoding = "^2.11.0"
 format_serde_error = "^0.3.0"
 futures-util = "^0.3.31"
 http = "1"
-indexmap = { version = "2.13.1", features = ["serde"] }
-json-patch = "4.1.0"
+indexmap = { version = "2.14.0", features = ["serde"] }
+json-patch = "4.2.0"
 log = { version = "0.4", features = ["serde"] }
 mime_guess = "2.0.5"
 numeral = "1"
