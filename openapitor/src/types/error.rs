@@ -42,7 +42,16 @@ pub enum Error {
 
     /// A response not listed in the API description. This may represent a
     /// success or failure response; check `status().is_success()`.
-    UnexpectedResponse(reqwest::Response),
+    UnexpectedResponse {
+        /// HTTP status response code from server
+        status: reqwest::StatusCode,
+        /// URL that caused the error.
+        url: String,
+        /// HTTP response body from the server, rendered as text.
+        body: String,
+        /// HTTP headers
+        headers: reqwest::header::HeaderMap,
+    },
 }
 
 impl Error {
@@ -58,7 +67,7 @@ impl Error {
             Error::SerdeError { error: _, status } => Some(*status),
             Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
             Error::Server { body: _, status } => Some(*status),
-            Error::UnexpectedResponse(r) => Some(r.status()),
+            Error::UnexpectedResponse { status, .. } => Some(*status),
         }
     }
 
@@ -115,8 +124,17 @@ impl std::fmt::Display for Error {
             Error::Server { body, status } => {
                 write!(f, "Server Error: {} {}", status, body)
             }
-            Error::UnexpectedResponse(r) => {
-                write!(f, "Unexpected Response: {:?}", r)
+            Error::UnexpectedResponse {
+                headers,
+                status,
+                body,
+                url,
+            } => {
+                write!(
+                    f,
+                    "Unexpected Response for {url} (HTTP {}). Headers: {:?}, body: {}",
+                    status, headers, body
+                )
             }
         }
     }

@@ -396,7 +396,16 @@ pub mod error {
         },
         #[doc = " A response not listed in the API description. This may represent a"]
         #[doc = " success or failure response; check `status().is_success()`."]
-        UnexpectedResponse(reqwest::Response),
+        UnexpectedResponse {
+            #[doc = " HTTP status response code from server"]
+            status: reqwest::StatusCode,
+            #[doc = " URL that caused the error."]
+            url: String,
+            #[doc = " HTTP response body from the server, rendered as text."]
+            body: String,
+            #[doc = " HTTP headers"]
+            headers: reqwest::header::HeaderMap,
+        },
     }
 
     impl Error {
@@ -412,7 +421,7 @@ pub mod error {
                 Error::SerdeError { error: _, status } => Some(*status),
                 Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
                 Error::Server { body: _, status } => Some(*status),
-                Error::UnexpectedResponse(r) => Some(r.status()),
+                Error::UnexpectedResponse { status, .. } => Some(*status),
             }
         }
 
@@ -469,8 +478,17 @@ pub mod error {
                 Error::Server { body, status } => {
                     write!(f, "Server Error: {} {}", status, body)
                 }
-                Error::UnexpectedResponse(r) => {
-                    write!(f, "Unexpected Response: {:?}", r)
+                Error::UnexpectedResponse {
+                    headers,
+                    status,
+                    body,
+                    url,
+                } => {
+                    write!(
+                        f,
+                        "Unexpected Response for {url} (HTTP {}). Headers: {:?}, body: {}",
+                        status, headers, body
+                    )
                 }
             }
         }
