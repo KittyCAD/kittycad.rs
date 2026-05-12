@@ -560,9 +560,8 @@ async fn test_modeling_websocket() {
         .await
     {
         Ok((ws, _headers)) => ws,
-        Err(crate::types::error::Error::UnexpectedResponse(resp)) => {
-            let txt = resp.text().await.unwrap();
-            panic!("Failed to connect to modeling websocket: {txt}");
+        Err(crate::types::error::Error::UnexpectedResponse { body, .. }) => {
+            panic!("Failed to connect to modeling websocket: {body}");
         }
         err => panic!("Failed to connect to modeling websocket: {err:?}"),
     };

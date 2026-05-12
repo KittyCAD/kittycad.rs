@@ -857,11 +857,22 @@ impl Ml {
                 ),
             );
         let resp = req.send().await?;
+        let headers = resp.headers().clone();
         if resp.status().is_client_error() || resp.status().is_server_error() {
-            return Err(crate::types::error::Error::UnexpectedResponse(resp));
+            let status = resp.status();
+            let url = resp.url().to_string();
+            let body = resp
+                .text()
+                .await
+                .unwrap_or_else(|_| "<error reading body>".to_owned());
+            return Err(crate::types::error::Error::UnexpectedResponse {
+                url,
+                status,
+                body,
+                headers,
+            });
         }
 
-        let headers = resp.headers().clone();
         let upgraded = resp
             .upgrade()
             .await
@@ -898,11 +909,22 @@ impl Ml {
                 ),
             );
         let resp = req.send().await?;
+        let headers = resp.headers().clone();
         if resp.status().is_client_error() || resp.status().is_server_error() {
-            return Err(crate::types::error::Error::UnexpectedResponse(resp));
+            let status = resp.status();
+            let url = resp.url().to_string();
+            let body = resp
+                .text()
+                .await
+                .unwrap_or_else(|_| "<error reading body>".to_owned());
+            return Err(crate::types::error::Error::UnexpectedResponse {
+                url,
+                status,
+                body,
+                headers,
+            });
         }
 
-        let headers = resp.headers().clone();
         let upgraded = resp
             .upgrade()
             .await
