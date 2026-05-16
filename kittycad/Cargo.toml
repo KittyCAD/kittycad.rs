@@ -23,7 +23,7 @@ http = { version = "1", optional = true }
 itertools = "0.14"
 log = { version = "^0.4", features = ["serde"], optional = true }
 mime_guess = "2"
-parse-display = "0.10"
+parse-display = "0.11"
 phonenumber = "0.3"
 rand = { version = "0.9", optional = true }
 getrandom = { version = "0.3" }
