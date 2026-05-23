@@ -1103,16 +1103,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ddc24109865250148c2e0f3d25d4f0f479571723792d3802153c60922a4fb708"
 
 [[package]]
-name = "iri-string"
-version = "0.7.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dbc5ebe9c3a1a7a5127f920a418f7585e9e758e911d0466ed004f393b0e380b2"
-dependencies = [
- "memchr",
- "serde",
-]
-
-[[package]]
 name = "is-terminal"
 version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1202,9 +1192,9 @@ dependencies = [
  "phonenumber",
  "pretty_assertions",
  "rand 0.9.3",
- "reqwest",
+ "reqwest 0.12.23",
  "reqwest-conditional-middleware",
- "reqwest-middleware",
+ "reqwest-middleware 0.4.2",
  "reqwest-retry",
  "reqwest-tracing",
  "schemars",
@@ -1456,8 +1446,8 @@ dependencies = [
  "quote",
  "rand 0.9.3",
  "regex",
- "reqwest",
- "reqwest-middleware",
+ "reqwest 0.12.23",
+ "reqwest-middleware 0.4.2",
  "rustfmt-wrapper",
  "schemars",
  "serde",
@@ -1933,15 +1923,44 @@ dependencies = [
 ]
 
 [[package]]
-name = "reqwest-conditional-middleware"
-version = "0.4.0"
+name = "reqwest"
+version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f67ad7fdf5c0a015763fcd164bee294b13fb7b6f89f1b55961d40f00c3e32d6b"
+checksum = "62e0021ea2c22aed41653bc7e1419abb2c97e038ff2c33d0e1309e49a97deec0"
+dependencies = [
+ "base64",
+ "bytes",
+ "futures-core",
+ "http",
+ "http-body",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "js-sys",
+ "log",
+ "percent-encoding",
+ "pin-project-lite",
+ "sync_wrapper",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tower-service",
+ "url",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "reqwest-conditional-middleware"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51b1fc1521b1ec6eeebcf412357bfe28db3eb23008c91852bb69120a1d7ab6d0"
 dependencies = [
  "async-trait",
  "http",
- "reqwest",
- "reqwest-middleware",
+ "reqwest 0.13.3",
+ "reqwest-middleware 0.5.2",
 ]
 
 [[package]]
@@ -1953,9 +1972,23 @@ dependencies = [
  "anyhow",
  "async-trait",
  "http",
- "reqwest",
+ "reqwest 0.12.23",
  "serde",
  "thiserror 1.0.69",
+ "tower-service",
+]
+
+[[package]]
+name = "reqwest-middleware"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "07bc3f1384cffa4f274dad2d4ddd73aed32fed8f786d96c6be8aa4e5fd3c3b58"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "http",
+ "reqwest 0.13.3",
+ "thiserror 2.0.18",
  "tower-service",
 ]
 
@@ -1972,8 +2005,8 @@ dependencies = [
  "http",
  "hyper",
  "parking_lot",
- "reqwest",
- "reqwest-middleware",
+ "reqwest 0.12.23",
+ "reqwest-middleware 0.4.2",
  "retry-policies",
  "thiserror 1.0.69",
  "tokio",
@@ -1992,8 +2025,8 @@ dependencies = [
  "getrandom 0.2.15",
  "http",
  "matchit",
- "reqwest",
- "reqwest-middleware",
+ "reqwest 0.12.23",
+ "reqwest-middleware 0.4.2",
  "tracing",
 ]
 
@@ -2874,20 +2907,20 @@ dependencies = [
 
 [[package]]
 name = "tower-http"
-version = "0.6.6"
+version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adc82fd73de2a9722ac5da747f12383d2bfdb93591ee6c58486e0097890f05f2"
+checksum = "4cfcf7e2740e6fc6d4d688b4ef00650406bb94adf4731e43c096c3a19fe40840"
 dependencies = [
  "bitflags 2.6.0",
  "bytes",
  "futures-util",
  "http",
  "http-body",
- "iri-string",
  "pin-project-lite",
  "tower",
  "tower-layer",
  "tower-service",
+ "url",
 ]
 
 [[package]]
