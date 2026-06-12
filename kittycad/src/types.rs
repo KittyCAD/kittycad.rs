@@ -13788,7 +13788,13 @@ pub enum ModelingCmd {
         #[doc = "Should this sweep create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "What is this sweep relative to?"]
+        #[doc = "If true, before the sweep starts, the profile will be re-oriented so that it is \
+                 perpendicular to the path being swept along. If false, the profile is left in \
+                 its current orientation. Defaults to false."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        orient_profile_perpendicular: Option<bool>,
+        #[doc = "What is this sweep relative to? Deprecated; please use \
+                 `translate_profile_to_path` and `orient_profile_perpendicular` instead."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         relative_to: Option<RelativeTo>,
         #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, \
@@ -13801,6 +13807,11 @@ pub enum ModelingCmd {
         tolerance: f64,
         #[doc = "Path along which to sweep."]
         trajectory: uuid::Uuid,
+        #[doc = "If true, the profile being swept will be moved to the path being swept along, \
+                 before the sweep starts. If false, the profile stays where it is, and the sweep \
+                 starts from there. Defaults to false."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        translate_profile_to_path: Option<bool>,
         #[doc = "What version of the sweeping algorithm to use. If None, or zero, the engine's \
                  default algorithm will be used"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
