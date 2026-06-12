@@ -239,10 +239,12 @@ impl ServiceAccounts {
              an org member. It deletes the requested service account for the organization.\n\nThis \
              endpoint does not actually delete the service account from the database. It merely \
              marks the token as invalid. We still want to keep the service account in the database \
-             for historical purposes.\n\n**Parameters:**\n\n- `token: &'astr`: The service \
-             account. (required)\n\n```rust,no_run\nasync fn \
-             example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        \
+             for historical purposes.\n\nThe token path parameter can be either the full service \
+             account token (prefixed with `svc-`) or the token's unique ID (a \
+             UUID).\n\n**Parameters:**\n\n- `token: &'astr`: The service account token (prefixed \
+             with `svc-`) or the token's unique ID (a UUID). (required)\n\n```rust,no_run\nasync \
+             fn example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client \
+             = kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        \
              .delete_for_org(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_for_org<'a>(

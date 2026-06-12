@@ -150,19 +150,12 @@ impl ApiTokens {
             .boxed()
     }
 
-    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any \
-             Zoo user. It creates a new API token for the authenticated \
-             user.\n\n**Parameters:**\n\n- `label: Option<String>`: An optional label for the API \
-             token.\n\n```rust,no_run\nasync fn example_api_tokens_create_for_user() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::ApiToken = client\n        .api_tokens()\n        \
-             .create_for_user(Some(\"some-string\".to_string()))\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a new API token for your user.\n\nThis endpoint requires authentication by any Zoo user. It creates a new API token for the authenticated user.\n\n**Parameters:**\n\n- `label: Option<String>`: An optional label for the API token.\n\n```rust,no_run\nasync fn example_api_tokens_create_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiTokenWithFullToken = client\n        .api_tokens()\n        .create_for_user(Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_for_user<'a>(
         &'a self,
         label: Option<String>,
-    ) -> Result<crate::types::ApiToken, crate::types::error::Error> {
+    ) -> Result<crate::types::ApiTokenWithFullToken, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::POST,
             format!("{}/{}", self.client.base_url, "user/api-tokens"),
@@ -238,7 +231,9 @@ impl ApiTokens {
              Zoo user. It deletes the requested API token for the user.\n\nThis endpoint does not \
              actually delete the API token from the database. It merely marks the token as \
              invalid. We still want to keep the token in the database for historical \
-             purposes.\n\n**Parameters:**\n\n- `token: &'astr`: The API token. \
+             purposes.\n\nThe token path parameter can be either the full API token (prefixed with \
+             `api-`) or the token's unique ID (a UUID).\n\n**Parameters:**\n\n- `token: &'astr`: \
+             The API token (prefixed with `api-`) or the token's unique ID (a UUID). \
              (required)\n\n```rust,no_run\nasync fn example_api_tokens_delete_for_user() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.api_tokens().delete_for_user(\"some-string\").await?;\n    Ok(())\n}\n```"]

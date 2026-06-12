@@ -2159,11 +2159,18 @@ pub fn proper_name(s: &str) -> String {
         s
     };
 
-    inflector::cases::pascalcase::to_pascal_case(&s)
+    let pascal = inflector::cases::pascalcase::to_pascal_case(&s);
+    let stripped = pascal
         .trim_start_matches("CrateTypes")
         .trim_start_matches("VecCrateTypes")
         .trim_start_matches("OptionCrateTypes")
-        .replace("V1", "")
+        .replace("V1", "");
+
+    if stripped.is_empty() {
+        pascal
+    } else {
+        stripped
+    }
 }
 
 /// Return the name for a type based on a name if passed or the title of the schema data.
@@ -2577,6 +2584,8 @@ mod tests {
         assert_eq!(crate::types::proper_name("2"), "Two");
         assert_eq!(crate::types::proper_name("100"), "OneHundred");
         assert_eq!(crate::types::proper_name("2FaDisabled"), "TwoFaDisabled");
+        assert_eq!(crate::types::proper_name("v1"), "V1");
+        assert_eq!(crate::types::proper_name("V1"), "V1");
     }
 
     #[test]

@@ -74,6 +74,40 @@ impl Meta {
         }
     }
 
+    #[doc = "List all active announcements.\n\nNo authentication is \
+             required.\n\n```rust,no_run\nasync fn example_meta_get_announcements() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::AnnouncementList = \
+             client.meta().get_announcements().await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_announcements<'a>(
+        &'a self,
+    ) -> Result<crate::types::AnnouncementList, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "announcements"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Authorize an inbound auth request from our Community page.\n\n**Parameters:**\n\n- \
              `sig: &'astr`: The signature for the given payload (required)\n- `sso: &'astr`: The \
              nonce and redirect URL sent to us by Discourse (required)\n\n```rust,no_run\nasync fn \
