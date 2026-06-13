@@ -11,7 +11,7 @@ jobs:
     name: cargo doc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.3
       - name: Cache cargo registry
         uses: actions/cache@v5.0.5
         with:
