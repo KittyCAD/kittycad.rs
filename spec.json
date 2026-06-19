@@ -31379,7 +31379,17 @@
             "type": "number",
             "format": "float"
           },
+          "from_edge_reference": {
+            "nullable": true,
+            "description": "Edge reference to use to measure the dimension from If both `from_entity_id` and `from_edge_reference` are provided, `from_edge_reference` takes precedence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeSpecifier"
+              }
+            ]
+          },
           "from_entity_id": {
+            "nullable": true,
             "description": "Entity to measure the dimension from",
             "type": "string",
             "format": "uuid"
@@ -31411,7 +31421,17 @@
             "format": "uint32",
             "minimum": 0
           },
+          "to_edge_reference": {
+            "nullable": true,
+            "description": "Edge reference to use to measure the dimension from If both `to_entity_id` and `to_edge_reference` are provided, `to_edge_reference` takes precedence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeSpecifier"
+              }
+            ]
+          },
           "to_entity_id": {
+            "nullable": true,
             "description": "Entity to measure the dimension to",
             "type": "string",
             "format": "uuid"
@@ -31429,12 +31449,10 @@
           "dimension",
           "font_point_size",
           "font_scale",
-          "from_entity_id",
           "from_entity_pos",
           "offset",
           "plane_id",
           "precision",
-          "to_entity_id",
           "to_entity_pos"
         ]
       },
@@ -31467,7 +31485,17 @@
               }
             ]
           },
+          "edge_reference": {
+            "nullable": true,
+            "description": "Edge reference to use to place the annotation leader from If both `entity_id` and `edge_reference` are provided, `edge_reference` takes precedence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeSpecifier"
+              }
+            ]
+          },
           "entity_id": {
+            "nullable": true,
             "description": "Entity to place the annotation leader from",
             "type": "string",
             "format": "uuid"
@@ -31536,7 +31564,6 @@
           }
         },
         "required": [
-          "entity_id",
           "entity_pos",
           "font_point_size",
           "font_scale",
@@ -31550,7 +31577,17 @@
         "description": "Parameters for defining an MBD Feature Tag Annotation state",
         "type": "object",
         "properties": {
+          "edge_reference": {
+            "nullable": true,
+            "description": "Edge reference to use to place the annotation leader from If both `entity_id` and `edge_reference` are provided, `edge_reference` takes precedence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeSpecifier"
+              }
+            ]
+          },
           "entity_id": {
+            "nullable": true,
             "description": "Entity to place the annotation leader from",
             "type": "string",
             "format": "uuid"
@@ -31615,7 +31652,6 @@
           }
         },
         "required": [
-          "entity_id",
           "entity_pos",
           "font_point_size",
           "font_scale",
@@ -59825,7 +59861,6 @@
       "UserFeature": {
         "type": "string",
         "enum": [
-          "aquarium",
           "bodies_pane",
           "enable_z0006_lint",
           "modeling_dialogs",
