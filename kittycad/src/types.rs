@@ -916,8 +916,13 @@ pub struct AnnotationBasicDimension {
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
+    #[doc = "Edge reference to use to measure the dimension from If both `from_entity_id` and \
+             `from_edge_reference` are provided, `from_edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to measure the dimension from"]
-    pub from_entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the dimension from"]
     pub from_entity_pos: Point2D,
     #[doc = "2D Position offset of the annotation within the plane."]
@@ -927,8 +932,13 @@ pub struct AnnotationBasicDimension {
     pub plane_id: uuid::Uuid,
     #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
     pub precision: u32,
+    #[doc = "Edge reference to use to measure the dimension from If both `to_entity_id` and \
+             `to_edge_reference` are provided, `to_edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to measure the dimension to"]
-    pub to_entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the dimension to"]
     pub to_entity_pos: Point2D,
 }
@@ -945,7 +955,7 @@ impl std::fmt::Display for AnnotationBasicDimension {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationBasicDimension {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(arrow_scale) = &self.arrow_scale {
@@ -956,12 +966,30 @@ impl tabled::Tabled for AnnotationBasicDimension {
             format!("{:?}", self.dimension).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
-            format!("{:?}", self.from_entity_id).into(),
+            if let Some(from_edge_reference) = &self.from_edge_reference {
+                format!("{:?}", from_edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(from_entity_id) = &self.from_entity_id {
+                format!("{:?}", from_entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.from_entity_pos).into(),
             format!("{:?}", self.offset).into(),
             format!("{:?}", self.plane_id).into(),
             format!("{:?}", self.precision).into(),
-            format!("{:?}", self.to_entity_id).into(),
+            if let Some(to_edge_reference) = &self.to_edge_reference {
+                format!("{:?}", to_edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(to_entity_id) = &self.to_entity_id {
+                format!("{:?}", to_entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.to_entity_pos).into(),
         ]
     }
@@ -972,11 +1000,13 @@ impl tabled::Tabled for AnnotationBasicDimension {
             "dimension".into(),
             "font_point_size".into(),
             "font_scale".into(),
+            "from_edge_reference".into(),
             "from_entity_id".into(),
             "from_entity_pos".into(),
             "offset".into(),
             "plane_id".into(),
             "precision".into(),
+            "to_edge_reference".into(),
             "to_entity_id".into(),
             "to_entity_pos".into(),
         ]
@@ -997,8 +1027,13 @@ pub struct AnnotationFeatureControl {
     #[doc = "Basic dimensions"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dimension: Option<AnnotationMbdBasicDimension>,
+    #[doc = "Edge reference to use to place the annotation leader from If both `entity_id` and \
+             `edge_reference` are provided, `edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to place the annotation leader from"]
-    pub entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
@@ -1038,7 +1073,7 @@ impl std::fmt::Display for AnnotationFeatureControl {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureControl {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(control_frame) = &self.control_frame {
@@ -1056,7 +1091,16 @@ impl tabled::Tabled for AnnotationFeatureControl {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.entity_id).into(),
+            if let Some(edge_reference) = &self.edge_reference {
+                format!("{:?}", edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_id) = &self.entity_id {
+                format!("{:?}", entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.entity_pos).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
@@ -1087,6 +1131,7 @@ impl tabled::Tabled for AnnotationFeatureControl {
             "control_frame".into(),
             "defined_datum".into(),
             "dimension".into(),
+            "edge_reference".into(),
             "entity_id".into(),
             "entity_pos".into(),
             "font_point_size".into(),
@@ -1107,8 +1152,13 @@ impl tabled::Tabled for AnnotationFeatureControl {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationFeatureTag {
+    #[doc = "Edge reference to use to place the annotation leader from If both `entity_id` and \
+             `edge_reference` are provided, `edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to place the annotation leader from"]
-    pub entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
@@ -1146,10 +1196,19 @@ impl std::fmt::Display for AnnotationFeatureTag {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureTag {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.entity_id).into(),
+            if let Some(edge_reference) = &self.edge_reference {
+                format!("{:?}", edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_id) = &self.entity_id {
+                format!("{:?}", entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.entity_pos).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
@@ -1169,6 +1228,7 @@ impl tabled::Tabled for AnnotationFeatureTag {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "edge_reference".into(),
             "entity_id".into(),
             "entity_pos".into(),
             "font_point_size".into(),
@@ -28109,9 +28169,6 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UserFeature {
-    #[serde(rename = "aquarium")]
-    #[display("aquarium")]
-    Aquarium,
     #[serde(rename = "bodies_pane")]
     #[display("bodies_pane")]
     BodiesPane,
