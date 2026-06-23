@@ -865,6 +865,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1skills/get/x-rust",
+    "value": {
+      "example": "/// List every skill that belongs to the caller's organization.\nasync fn example_orgs_list_skills() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgSkillResponse> = client.orgs().list_skills().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list_skills"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1orgs~1{id}~1billing~1contract/get/x-rust",
     "value": {
       "example": "/// Get the billing contract for an organization.\n/// \n/// This endpoint requires Zoo admin authentication. It returns the active contract for the organization, or the latest draft when no active contract exists.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The organization ID. (required)\nuse std::str::FromStr;\nasync fn example_orgs_get_billing_contract_for_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::BillingContractView = client\n        .orgs()\n        .get_billing_contract_for_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",

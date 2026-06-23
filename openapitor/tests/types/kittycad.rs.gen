@@ -18215,6 +18215,53 @@ pub enum OrgRole {
     ServiceAccount,
 }
 
+#[doc = "Public skill context available to the caller's organization."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgSkillResponse {
+    #[doc = "Short description injected into Zookeeper's initial prompt."]
+    pub description: String,
+    #[doc = "Stable skill identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Full markdown context loaded when the skill is activated."]
+    pub markdown: String,
+    #[doc = "Human-readable activation name."]
+    pub name: String,
+}
+
+impl std::fmt::Display for OrgSkillResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgSkillResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.markdown.clone().into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "id".into(),
+            "markdown".into(),
+            "name".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `OrientToFace` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
