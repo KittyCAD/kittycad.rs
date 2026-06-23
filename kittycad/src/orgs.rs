@@ -1613,6 +1613,39 @@ impl Orgs {
             .boxed()
     }
 
+    #[doc = "List every skill that belongs to the caller's organization.\n\n```rust,no_run\nasync \
+             fn example_orgs_list_skills() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             Vec<kittycad::types::OrgSkillResponse> = client.orgs().list_skills().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_skills<'a>(
+        &'a self,
+    ) -> Result<Vec<crate::types::OrgSkillResponse>, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "org/skills"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get the billing contract for an organization.\n\nThis endpoint requires Zoo admin \
              authentication. It returns the active contract for the organization, or the latest \
              draft when no active contract exists.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The \
