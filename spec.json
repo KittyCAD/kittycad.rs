@@ -47372,6 +47372,27 @@
             ]
           },
           {
+            "description": "Finds a suitable set of arguments that can be passed to CreateRegion to resolve this very region.",
+            "type": "object",
+            "properties": {
+              "region_id": {
+                "description": "Which region to resolve",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "region_get_resolvable_intersection_info"
+                ]
+              }
+            },
+            "required": [
+              "region_id",
+              "type"
+            ]
+          },
+          {
             "description": "Create a region with a query point. The region should have an ID taken from the ID of the 'CreateRegionFromQueryPoint' modeling command.",
             "type": "object",
             "properties": {
@@ -50999,6 +51020,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/RegionGetResolvableIntersectionInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "region_get_resolvable_intersection_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/CreateRegionFromQueryPoint"
               },
               "type": {
@@ -54603,6 +54642,45 @@
         },
         "required": [
           "query_point"
+        ]
+      },
+      "RegionGetResolvableIntersectionInfo": {
+        "description": "The response from the 'RegionGetResolvableIntersectionInfo'.",
+        "type": "object",
+        "properties": {
+          "curve_clockwise": {
+            "description": "True if the region lies within the clockwise interior of the two intersections (inside a \"right\" turn from the segment to the intersection segment)",
+            "type": "boolean"
+          },
+          "intersection_count": {
+            "description": "The total number of intersections between the two curves.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "intersection_index": {
+            "description": "Disambiguator providing the index of the intersection.  Can be non-zero if the two curves intersect multiple times",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "intersection_segment": {
+            "description": "The UUID of the curve that intersects the walking curve that also borders the queried region",
+            "type": "string",
+            "format": "uuid"
+          },
+          "segment": {
+            "description": "The UUID of the walking curve that borders the queried region",
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "curve_clockwise",
+          "intersection_count",
+          "intersection_index",
+          "intersection_segment",
+          "segment"
         ]
       },
       "RegionVersion": {

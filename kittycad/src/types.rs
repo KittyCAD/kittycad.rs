@@ -15373,6 +15373,13 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         version: Option<RegionVersion>,
     },
+    #[doc = "Finds a suitable set of arguments that can be passed to CreateRegion to resolve this \
+             very region."]
+    #[serde(rename = "region_get_resolvable_intersection_info")]
+    RegionGetResolvableIntersectionInfo {
+        #[doc = "Which region to resolve"]
+        region_id: uuid::Uuid,
+    },
     #[doc = "Create a region with a query point. The region should have an ID taken from the ID \
              of the 'CreateRegionFromQueryPoint' modeling command."]
     #[serde(rename = "create_region_from_query_point")]
@@ -17184,6 +17191,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from \
                  the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
+    },
+    #[serde(rename = "region_get_resolvable_intersection_info")]
+    RegionGetResolvableIntersectionInfo {
+        #[doc = "The response from the 'RegionGetResolvableIntersectionInfo'."]
+        data: RegionGetResolvableIntersectionInfo,
     },
     #[serde(rename = "create_region_from_query_point")]
     CreateRegionFromQueryPoint {
@@ -21020,6 +21032,60 @@ impl tabled::Tabled for RegionGetQueryPoint {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["query_point".into()]
+    }
+}
+
+#[doc = "The response from the 'RegionGetResolvableIntersectionInfo'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RegionGetResolvableIntersectionInfo {
+    #[doc = "True if the region lies within the clockwise interior of the two intersections \
+             (inside a \"right\" turn from the segment to the intersection segment)"]
+    pub curve_clockwise: bool,
+    #[doc = "The total number of intersections between the two curves."]
+    pub intersection_count: u32,
+    #[doc = "Disambiguator providing the index of the intersection.  Can be non-zero if the two \
+             curves intersect multiple times"]
+    pub intersection_index: u32,
+    #[doc = "The UUID of the curve that intersects the walking curve that also borders the \
+             queried region"]
+    pub intersection_segment: uuid::Uuid,
+    #[doc = "The UUID of the walking curve that borders the queried region"]
+    pub segment: uuid::Uuid,
+}
+
+impl std::fmt::Display for RegionGetResolvableIntersectionInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RegionGetResolvableIntersectionInfo {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.curve_clockwise).into(),
+            format!("{:?}", self.intersection_count).into(),
+            format!("{:?}", self.intersection_index).into(),
+            format!("{:?}", self.intersection_segment).into(),
+            format!("{:?}", self.segment).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "curve_clockwise".into(),
+            "intersection_count".into(),
+            "intersection_index".into(),
+            "intersection_segment".into(),
+            "segment".into(),
+        ]
     }
 }
 
