@@ -27712,6 +27712,9 @@ pub enum UserFeature {
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
+    #[serde(rename = "segments_based_regions")]
+    #[display("segments_based_regions")]
+    SegmentsBasedRegions,
     #[serde(rename = "sketch_experimental_features")]
     #[display("sketch_experimental_features")]
     SketchExperimentalFeatures,
