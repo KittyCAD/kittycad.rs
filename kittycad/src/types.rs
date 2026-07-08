@@ -182,6 +182,7 @@ pub mod multipart {
 #[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
+    #![allow(clippy::result_large_err)]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
     pub trait Pagination {
@@ -196,6 +197,15 @@ pub mod paginate {
             &self,
             req: reqwest::Request,
         ) -> Result<reqwest::Request, crate::types::error::Error>;
+        #[doc = " Modify a request to get the next page using the operation's page parameter."]
+        fn next_page_with_param(
+            &self,
+            req: reqwest::Request,
+            _page_param: &str,
+        ) -> Result<reqwest::Request, crate::types::error::Error> {
+            self.next_page(req)
+        }
+
         #[doc = " Get the items from a page."]
         fn items(&self) -> Vec<Self::Item>;
     }
@@ -386,7 +396,16 @@ pub mod error {
         },
         #[doc = " A response not listed in the API description. This may represent a"]
         #[doc = " success or failure response; check `status().is_success()`."]
-        UnexpectedResponse(reqwest::Response),
+        UnexpectedResponse {
+            #[doc = " HTTP status response code from server"]
+            status: reqwest::StatusCode,
+            #[doc = " URL that caused the error."]
+            url: String,
+            #[doc = " HTTP response body from the server, rendered as text."]
+            body: String,
+            #[doc = " HTTP headers"]
+            headers: reqwest::header::HeaderMap,
+        },
     }
 
     impl Error {
@@ -402,7 +421,7 @@ pub mod error {
                 Error::SerdeError { error: _, status } => Some(*status),
                 Error::InvalidResponsePayload { error: _, response } => Some(response.status()),
                 Error::Server { body: _, status } => Some(*status),
-                Error::UnexpectedResponse(r) => Some(r.status()),
+                Error::UnexpectedResponse { status, .. } => Some(*status),
             }
         }
 
@@ -459,8 +478,17 @@ pub mod error {
                 Error::Server { body, status } => {
                     write!(f, "Server Error: {} {}", status, body)
                 }
-                Error::UnexpectedResponse(r) => {
-                    write!(f, "Unexpected Response: {:?}", r)
+                Error::UnexpectedResponse {
+                    headers,
+                    status,
+                    body,
+                    url,
+                } => {
+                    write!(
+                        f,
+                        "Unexpected Response for {url} (HTTP {}). Headers: {:?}, body: {}",
+                        status, headers, body
+                    )
                 }
             }
         }
@@ -512,6 +540,10 @@ pub enum AccountProvider {
     #[serde(rename = "google")]
     #[display("google")]
     Google,
+    #[doc = "The ZooCorp account provider (aka https://auth.corp.zoo.dev)."]
+    #[serde(rename = "zoo_corp")]
+    #[display("zoo_corp")]
+    ZooCorp,
     #[doc = "The GitHub account provider."]
     #[serde(rename = "github")]
     #[display("github")]
@@ -524,10 +556,6 @@ pub enum AccountProvider {
     #[serde(rename = "saml")]
     #[display("saml")]
     Saml,
-    #[doc = "The Tencent QQ account provider."]
-    #[serde(rename = "tencent")]
-    #[display("tencent")]
-    Tencent,
     #[doc = "Test provider for integration tests (only available during testing)."]
     #[serde(rename = "test_provider")]
     #[display("test_provider")]
@@ -888,8 +916,13 @@ pub struct AnnotationBasicDimension {
     pub font_point_size: u32,
     #[doc = "The scale of the font label in 3D space"]
     pub font_scale: f64,
+    #[doc = "Edge reference to use to measure the dimension from If both `from_entity_id` and \
+             `from_edge_reference` are provided, `from_edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to measure the dimension from"]
-    pub from_entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the dimension from"]
     pub from_entity_pos: Point2D,
     #[doc = "2D Position offset of the annotation within the plane."]
@@ -899,8 +932,13 @@ pub struct AnnotationBasicDimension {
     pub plane_id: uuid::Uuid,
     #[doc = "Number of decimal places to use when displaying tolerance and dimension values"]
     pub precision: u32,
+    #[doc = "Edge reference to use to measure the dimension from If both `to_entity_id` and \
+             `to_edge_reference` are provided, `to_edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to measure the dimension to"]
-    pub to_entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the dimension to"]
     pub to_entity_pos: Point2D,
 }
@@ -917,7 +955,7 @@ impl std::fmt::Display for AnnotationBasicDimension {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationBasicDimension {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(arrow_scale) = &self.arrow_scale {
@@ -928,12 +966,30 @@ impl tabled::Tabled for AnnotationBasicDimension {
             format!("{:?}", self.dimension).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
-            format!("{:?}", self.from_entity_id).into(),
+            if let Some(from_edge_reference) = &self.from_edge_reference {
+                format!("{:?}", from_edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(from_entity_id) = &self.from_entity_id {
+                format!("{:?}", from_entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.from_entity_pos).into(),
             format!("{:?}", self.offset).into(),
             format!("{:?}", self.plane_id).into(),
             format!("{:?}", self.precision).into(),
-            format!("{:?}", self.to_entity_id).into(),
+            if let Some(to_edge_reference) = &self.to_edge_reference {
+                format!("{:?}", to_edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(to_entity_id) = &self.to_entity_id {
+                format!("{:?}", to_entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.to_entity_pos).into(),
         ]
     }
@@ -944,11 +1000,13 @@ impl tabled::Tabled for AnnotationBasicDimension {
             "dimension".into(),
             "font_point_size".into(),
             "font_scale".into(),
+            "from_edge_reference".into(),
             "from_entity_id".into(),
             "from_entity_pos".into(),
             "offset".into(),
             "plane_id".into(),
             "precision".into(),
+            "to_edge_reference".into(),
             "to_entity_id".into(),
             "to_entity_pos".into(),
         ]
@@ -969,8 +1027,13 @@ pub struct AnnotationFeatureControl {
     #[doc = "Basic dimensions"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dimension: Option<AnnotationMbdBasicDimension>,
+    #[doc = "Edge reference to use to place the annotation leader from If both `entity_id` and \
+             `edge_reference` are provided, `edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to place the annotation leader from"]
-    pub entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
@@ -1010,7 +1073,7 @@ impl std::fmt::Display for AnnotationFeatureControl {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureControl {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(control_frame) = &self.control_frame {
@@ -1028,7 +1091,16 @@ impl tabled::Tabled for AnnotationFeatureControl {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.entity_id).into(),
+            if let Some(edge_reference) = &self.edge_reference {
+                format!("{:?}", edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_id) = &self.entity_id {
+                format!("{:?}", entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.entity_pos).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
@@ -1059,6 +1131,7 @@ impl tabled::Tabled for AnnotationFeatureControl {
             "control_frame".into(),
             "defined_datum".into(),
             "dimension".into(),
+            "edge_reference".into(),
             "entity_id".into(),
             "entity_pos".into(),
             "font_point_size".into(),
@@ -1079,8 +1152,13 @@ impl tabled::Tabled for AnnotationFeatureControl {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationFeatureTag {
+    #[doc = "Edge reference to use to place the annotation leader from If both `entity_id` and \
+             `edge_reference` are provided, `edge_reference` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_reference: Option<EdgeSpecifier>,
     #[doc = "Entity to place the annotation leader from"]
-    pub entity_id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_id: Option<uuid::Uuid>,
     #[doc = "Normalized position within the entity to position the annotation leader from"]
     pub entity_pos: Point2D,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
@@ -1118,10 +1196,19 @@ impl std::fmt::Display for AnnotationFeatureTag {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureTag {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 12;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.entity_id).into(),
+            if let Some(edge_reference) = &self.edge_reference {
+                format!("{:?}", edge_reference).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_id) = &self.entity_id {
+                format!("{:?}", entity_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.entity_pos).into(),
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
@@ -1141,6 +1228,7 @@ impl tabled::Tabled for AnnotationFeatureTag {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "edge_reference".into(),
             "entity_id".into(),
             "entity_pos".into(),
             "font_point_size".into(),
@@ -1383,6 +1471,10 @@ pub struct AnnotationOptions {
     #[doc = "Text displayed on the annotation"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub text: Option<AnnotationTextOptions>,
+    #[doc = "Length Units to use for this individual annotation.  If not provided, the units set \
+             by SetSceneUnits will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub units: Option<UnitLength>,
 }
 
 impl std::fmt::Display for AnnotationOptions {
@@ -1397,7 +1489,7 @@ impl std::fmt::Display for AnnotationOptions {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationOptions {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(color) = &self.color {
@@ -1440,6 +1532,11 @@ impl tabled::Tabled for AnnotationOptions {
             } else {
                 String::new().into()
             },
+            if let Some(units) = &self.units {
+                format!("{:?}", units).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -1453,6 +1550,7 @@ impl tabled::Tabled for AnnotationOptions {
             "line_width".into(),
             "position".into(),
             "text".into(),
+            "units".into(),
         ]
     }
 }
@@ -1576,16 +1674,24 @@ pub enum AnnotationType {
     T3D,
 }
 
-#[doc = "A response for a query on the API call table that is grouped by something."]
+#[doc = "An announcement broadcast to all clients."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct ApiCallQueryGroup {
-    pub count: i64,
-    pub query: String,
+pub struct Announcement {
+    pub active: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub body: Option<String>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "A UUID usually v4 or v7"]
+    pub id: uuid::Uuid,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tag: Option<String>,
+    pub title: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
-impl std::fmt::Display for ApiCallQueryGroup {
+impl std::fmt::Display for Announcement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -1596,59 +1702,70 @@ impl std::fmt::Display for ApiCallQueryGroup {
 }
 
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for ApiCallQueryGroup {
-    const LENGTH: usize = 2;
+impl tabled::Tabled for Announcement {
+    const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.count).into(),
-            self.query.clone().into(),
+            format!("{:?}", self.active).into(),
+            if let Some(body) = &self.body {
+                format!("{:?}", body).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            if let Some(tag) = &self.tag {
+                format!("{:?}", tag).into()
+            } else {
+                String::new().into()
+            },
+            self.title.clone().into(),
+            format!("{:?}", self.updated_at).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["count".into(), "query".into()]
+        vec![
+            "active".into(),
+            "body".into(),
+            "created_at".into(),
+            "id".into(),
+            "tag".into(),
+            "title".into(),
+            "updated_at".into(),
+        ]
     }
 }
 
-#[doc = "The field of an API call to group by."]
+#[doc = "Response containing active announcements."]
 #[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum ApiCallQueryGroupBy {
-    #[doc = "The email of the user that requested the API call."]
-    #[serde(rename = "email")]
-    #[display("email")]
-    Email,
-    #[doc = "The HTTP method of the API call."]
-    #[serde(rename = "method")]
-    #[display("method")]
-    Method,
-    #[doc = "The endpoint of the API call."]
-    #[serde(rename = "endpoint")]
-    #[display("endpoint")]
-    Endpoint,
-    #[doc = "The user ID of the user that requested the API call."]
-    #[serde(rename = "user_id")]
-    #[display("user_id")]
-    UserId,
-    #[doc = "The origin of the API call. This is parsed from the `Origin` header."]
-    #[serde(rename = "origin")]
-    #[display("origin")]
-    Origin,
-    #[doc = "The IP address of the user making the API call."]
-    #[serde(rename = "ip_address")]
-    #[display("ip_address")]
-    IpAddress,
+pub struct AnnouncementList {
+    #[doc = "The list of active announcements."]
+    pub announcements: Vec<Announcement>,
+}
+
+impl std::fmt::Display for AnnouncementList {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AnnouncementList {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.announcements).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["announcements".into()]
+    }
 }
 
 #[doc = "The status of an async API call."]
@@ -1910,6 +2027,14 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -1918,7 +2043,7 @@ impl crate::types::paginate::Pagination for ApiCallWithPriceResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2026,7 +2151,9 @@ pub struct ApiToken {
     #[doc = "An optional label for the API token."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
-    #[doc = "The API token itself."]
+    #[doc = "The API token itself. Note: This is partially obfuscated when serialized to JSON \
+             responses, as API tokens are too sensitive to return in full. Only the last 4 \
+             characters are shown to allow users to identify their tokens."]
     pub token: String,
     #[doc = "The date and time the API token was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -2113,6 +2240,14 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -2121,7 +2256,7 @@ impl crate::types::paginate::Pagination for ApiTokenResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -2146,6 +2281,72 @@ impl tabled::Tabled for ApiTokenResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "An API token with the full, unobfuscated token value.\n\nThis is used specifically for \
+         the creation endpoint response, where the user needs to see the full token exactly once. \
+         All other endpoints return the obfuscated version via the `ApiToken` struct."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ApiTokenWithFullToken {
+    #[doc = "The date and time the API token was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The unique identifier for the API token."]
+    pub id: uuid::Uuid,
+    #[doc = "If the token is valid."]
+    pub is_valid: bool,
+    #[doc = "An optional label for the API token."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    #[doc = "The API token itself - unobfuscated."]
+    pub token: String,
+    #[doc = "The date and time the API token was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The ID of the user that owns the API token."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ApiTokenWithFullToken {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ApiTokenWithFullToken {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_valid).into(),
+            if let Some(label) = &self.label {
+                format!("{:?}", label).into()
+            } else {
+                String::new().into()
+            },
+            self.token.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "id".into(),
+            "is_valid".into(),
+            "label".into(),
+            "token".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
     }
 }
 
@@ -2182,125 +2383,6 @@ impl tabled::Tabled for AppClientInfo {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["url".into()]
-    }
-}
-
-#[doc = "An async API call."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AsyncApiCall {
-    #[doc = "The number of times we've attempted to process this job."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub attempts: Option<i16>,
-    #[doc = "The time and date the async API call was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The time and date the async API call was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error the function returned, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "The unique identifier of the async API call.\n\nThis is the same as the API call ID."]
-    pub id: uuid::Uuid,
-    #[doc = "The JSON input for the API call. These are determined by the endpoint that is run."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub input: Option<serde_json::Value>,
-    #[doc = "The JSON output for the API call. These are determined by the endpoint that is run."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output: Option<serde_json::Value>,
-    #[doc = "The time and date the async API call was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the async API call."]
-    pub status: ApiCallStatus,
-    #[doc = "The type of async API call."]
-    #[serde(rename = "type")]
-    pub type_: AsyncApiCallType,
-    #[doc = "The time and date the async API call was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the async API call."]
-    pub user_id: uuid::Uuid,
-    #[doc = "The worker node that is performing or performed the async API call."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub worker: Option<String>,
-}
-
-impl std::fmt::Display for AsyncApiCall {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AsyncApiCall {
-    const LENGTH: usize = 13;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(attempts) = &self.attempts {
-                format!("{:?}", attempts).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            if let Some(error) = &self.error {
-                format!("{:?}", error).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            if let Some(input) = &self.input {
-                format!("{:?}", input).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(output) = &self.output {
-                format!("{:?}", output).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.type_).into(),
-            format!("{:?}", self.updated_at).into(),
-            format!("{:?}", self.user_id).into(),
-            if let Some(worker) = &self.worker {
-                format!("{:?}", worker).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "attempts".into(),
-            "completed_at".into(),
-            "created_at".into(),
-            "error".into(),
-            "id".into(),
-            "input".into(),
-            "output".into(),
-            "started_at".into(),
-            "status".into(),
-            "type_".into(),
-            "updated_at".into(),
-            "user_id".into(),
-            "worker".into(),
-        ]
     }
 }
 
@@ -2646,132 +2728,6 @@ pub enum AsyncApiCallOutput {
         #[doc = "The user ID of the user who created the API call."]
         user_id: uuid::Uuid,
     },
-}
-
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AsyncApiCallResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<AsyncApiCall>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for AsyncApiCallResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for AsyncApiCallResultsPage {
-    type Item = AsyncApiCall;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AsyncApiCallResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
-#[doc = "The type of async API call."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum AsyncApiCallType {
-    #[doc = "File conversion."]
-    #[serde(rename = "file_conversion")]
-    #[display("file_conversion")]
-    FileConversion,
-    #[doc = "File volume."]
-    #[serde(rename = "file_volume")]
-    #[display("file_volume")]
-    FileVolume,
-    #[doc = "File center of mass."]
-    #[serde(rename = "file_center_of_mass")]
-    #[display("file_center_of_mass")]
-    FileCenterOfMass,
-    #[doc = "File mass."]
-    #[serde(rename = "file_mass")]
-    #[display("file_mass")]
-    FileMass,
-    #[doc = "File density."]
-    #[serde(rename = "file_density")]
-    #[display("file_density")]
-    FileDensity,
-    #[doc = "File surface area."]
-    #[serde(rename = "file_surface_area")]
-    #[display("file_surface_area")]
-    FileSurfaceArea,
-    #[doc = "Text to CAD."]
-    #[serde(rename = "text_to_cad")]
-    #[display("text_to_cad")]
-    TextToCad,
-    #[doc = "Text to CAD iteration."]
-    #[serde(rename = "text_to_cad_iteration")]
-    #[display("text_to_cad_iteration")]
-    TextToCadIteration,
-    #[doc = "Text to CAD multi-file iteration."]
-    #[serde(rename = "text_to_cad_multi_file_iteration")]
-    #[display("text_to_cad_multi_file_iteration")]
-    TextToCadMultiFileIteration,
 }
 
 #[doc = "The response from the `/auth/api-key` endpoint."]
@@ -3964,7 +3920,6 @@ pub enum BlendType {
     Tangent,
 }
 
-
 #[doc = "The reason for blocking a user."]
 #[derive(
     serde :: Serialize,
@@ -3995,6 +3950,104 @@ pub enum BlockReason {
     UpgradeDowngradeAbuse,
 }
 
+#[doc = "List of bodies that were created by an operation."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodiesCreated {
+    #[doc = "All bodies created by this operation."]
+    pub bodies: Vec<BodyCreated>,
+}
+
+impl std::fmt::Display for BodiesCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodiesCreated {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.bodies).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["bodies".into()]
+    }
+}
+
+#[doc = "List of bodies that were updated by an operation."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodiesUpdated {
+    #[doc = "All bodies created by this operation."]
+    pub bodies: Vec<BodyUpdated>,
+}
+
+impl std::fmt::Display for BodiesUpdated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodiesUpdated {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.bodies).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["bodies".into()]
+    }
+}
+
+#[doc = "Details of a body that was created."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodyCreated {
+    #[doc = "The body's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Surfaces this body contains."]
+    pub surfaces: Vec<SurfaceCreated>,
+}
+
+impl std::fmt::Display for BodyCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodyCreated {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.surfaces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "surfaces".into()]
+    }
+}
+
 #[doc = "Body type determining if the operation will create a manifold (solid) body or a \
          non-manifold collection of surfaces."]
 #[derive(
@@ -4021,11 +4074,50 @@ pub enum BodyType {
     Surface,
 }
 
+#[doc = "Details of a body that was updated."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BodyUpdated {
+    #[doc = "The body's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Surfaces added to this body."]
+    pub surfaces: Vec<SurfaceCreated>,
+}
+
+impl std::fmt::Display for BodyUpdated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BodyUpdated {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.surfaces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["id".into(), "surfaces".into()]
+    }
+}
+
 #[doc = "The response from the 'BooleanImprint'."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanImprint {
+    #[doc = "If the operation involved any intersecting solids."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub any_intersections: Option<bool>,
     #[doc = "If the operation produced just one body, then its ID will be the ID of the modeling \
              command request. But if any extra bodies are produced, then their IDs will be \
              included here."]
@@ -4045,17 +4137,24 @@ impl std::fmt::Display for BooleanImprint {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for BooleanImprint {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(any_intersections) = &self.any_intersections {
+                format!("{:?}", any_intersections).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(extra_solid_ids) = &self.extra_solid_ids {
+                format!("{:?}", extra_solid_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extra_solid_ids".into()]
+        vec!["any_intersections".into(), "extra_solid_ids".into()]
     }
 }
 
@@ -4064,6 +4163,9 @@ impl tabled::Tabled for BooleanImprint {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanIntersection {
+    #[doc = "If the operation involved any intersecting solids."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub any_intersections: Option<bool>,
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
@@ -4083,17 +4185,24 @@ impl std::fmt::Display for BooleanIntersection {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for BooleanIntersection {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(any_intersections) = &self.any_intersections {
+                format!("{:?}", any_intersections).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(extra_solid_ids) = &self.extra_solid_ids {
+                format!("{:?}", extra_solid_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extra_solid_ids".into()]
+        vec!["any_intersections".into(), "extra_solid_ids".into()]
     }
 }
 
@@ -4102,6 +4211,9 @@ impl tabled::Tabled for BooleanIntersection {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanSubtract {
+    #[doc = "If the operation involved any intersecting solids."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub any_intersections: Option<bool>,
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
@@ -4121,17 +4233,24 @@ impl std::fmt::Display for BooleanSubtract {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for BooleanSubtract {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(any_intersections) = &self.any_intersections {
+                format!("{:?}", any_intersections).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(extra_solid_ids) = &self.extra_solid_ids {
+                format!("{:?}", extra_solid_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extra_solid_ids".into()]
+        vec!["any_intersections".into(), "extra_solid_ids".into()]
     }
 }
 
@@ -4140,6 +4259,9 @@ impl tabled::Tabled for BooleanSubtract {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct BooleanUnion {
+    #[doc = "If the operation involved any intersecting solids."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub any_intersections: Option<bool>,
     #[doc = "If the operation produced just one solid, then its ID will be the ID of the modeling \
              command request. But if any extra solids are produced, then their IDs will be \
              included here."]
@@ -4159,17 +4281,24 @@ impl std::fmt::Display for BooleanUnion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for BooleanUnion {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(extra_solid_ids) = &self.extra_solid_ids {
-            format!("{:?}", extra_solid_ids).into()
-        } else {
-            String::new().into()
-        }]
+        vec![
+            if let Some(any_intersections) = &self.any_intersections {
+                format!("{:?}", any_intersections).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(extra_solid_ids) = &self.extra_solid_ids {
+                format!("{:?}", extra_solid_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["extra_solid_ids".into()]
+        vec!["any_intersections".into(), "extra_solid_ids".into()]
     }
 }
 
@@ -4207,6 +4336,39 @@ impl tabled::Tabled for BoundingBox {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["center".into(), "dimensions".into()]
     }
+}
+
+#[doc = "Strict design-workflow enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadDesignWorkflow {
+    #[doc = "Sketch-first workflow."]
+    #[serde(rename = "sketching")]
+    #[display("sketching")]
+    Sketching,
+    #[doc = "Code-first workflow."]
+    #[serde(rename = "coding")]
+    #[display("coding")]
+    Coding,
+    #[doc = "AI-first workflow."]
+    #[serde(rename = "ai")]
+    #[display("ai")]
+    Ai,
+    #[doc = "Hybrid workflow spanning multiple approaches."]
+    #[serde(rename = "hybrid_approach")]
+    #[display("hybrid_approach")]
+    HybridApproach,
 }
 
 #[doc = "Strict acquisition-source enum used by the website CAD user info form."]
@@ -4264,6 +4426,35 @@ pub enum CadDiscoverySource {
     #[serde(rename = "other")]
     #[display("other")]
     Other,
+}
+
+#[doc = "Strict CAD/API experience-level enum for onboarding/CRM form submissions."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CadExperienceLevel {
+    #[doc = "Beginner experience level."]
+    #[serde(rename = "beginner")]
+    #[display("beginner")]
+    Beginner,
+    #[doc = "Intermediate experience level."]
+    #[serde(rename = "intermediate")]
+    #[display("intermediate")]
+    Intermediate,
+    #[doc = "Advanced experience level."]
+    #[serde(rename = "advanced")]
+    #[display("advanced")]
+    Advanced,
 }
 
 #[doc = "Strict CAD industry enum for onboarding/CRM form submissions."]
@@ -5517,6 +5708,14 @@ impl crate::types::paginate::Pagination for ConversationResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -5525,7 +5724,7 @@ impl crate::types::paginate::Pagination for ConversationResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -5755,13 +5954,22 @@ impl tabled::Tabled for CreateCustomModel {
     }
 }
 
-#[doc = "Request body for creating a public device-flow app."]
+#[doc = "Request body for creating a public OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateOAuth2AppRequest {
+    #[doc = "The OAuth grant types this app can use."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub grant_types: Option<Vec<Oauth2AppGrantType>>,
+    #[doc = "The deployment mode for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<Oauth2AppMode>,
     #[doc = "The display name of the app."]
     pub name: String,
+    #[doc = "The redirect URIs registered for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uris: Option<Vec<String>>,
 }
 
 impl std::fmt::Display for CreateOAuth2AppRequest {
@@ -5776,13 +5984,35 @@ impl std::fmt::Display for CreateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateOAuth2AppRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.name.clone().into()]
+        vec![
+            if let Some(grant_types) = &self.grant_types {
+                format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(mode) = &self.mode {
+                format!("{:?}", mode).into()
+            } else {
+                String::new().into()
+            },
+            self.name.clone().into(),
+            if let Some(redirect_uris) = &self.redirect_uris {
+                format!("{:?}", redirect_uris).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into()]
+        vec![
+            "grant_types".into(),
+            "mode".into(),
+            "name".into(),
+            "redirect_uris".into(),
+        ]
     }
 }
 
@@ -5791,8 +6021,14 @@ impl tabled::Tabled for CreateOAuth2AppRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CreateOrgDataset {
+    #[doc = "Optional human-readable notes about the dataset."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     #[doc = "The dataset's display name."]
     pub name: String,
+    #[doc = "Whether a low raw-KCL similarity score should block conversion success."]
+    #[serde(default)]
+    pub require_raw_kcl_similarity_score_for_success: bool,
     #[doc = "Details for accessing the dataset."]
     pub source: OrgDatasetSource,
 }
@@ -5809,16 +6045,63 @@ impl std::fmt::Display for CreateOrgDataset {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateOrgDataset {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(description) = &self.description {
+                format!("{:?}", description).into()
+            } else {
+                String::new().into()
+            },
             self.name.clone().into(),
+            format!("{:?}", self.require_raw_kcl_similarity_score_for_success).into(),
             format!("{:?}", self.source).into(),
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into(), "source".into()]
+        vec![
+            "description".into(),
+            "name".into(),
+            "require_raw_kcl_similarity_score_for_success".into(),
+            "source".into(),
+        ]
+    }
+}
+
+#[doc = "Request payload for creating a new project share link."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateProjectShareLinkRequest {
+    #[doc = "Access policy for the generated share link."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub access_mode: Option<KclProjectShareLinkAccessMode>,
+}
+
+impl std::fmt::Display for CreateProjectShareLinkRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateProjectShareLinkRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(access_mode) = &self.access_mode {
+            format!("{:?}", access_mode).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["access_mode".into()]
     }
 }
 
@@ -7079,6 +7362,25 @@ pub enum Direction {
     Negative,
 }
 
+#[doc = "What to use as a direction when one is needed (e.g. for an extrusion)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum DirectionType {
+    #[doc = "Uses the direction of an edge, if linear"]
+    #[serde(rename = "edge")]
+    Edge {
+        #[doc = "Edge ID."]
+        id: uuid::Uuid,
+    },
+    #[doc = "Uses the provided vector as the direction."]
+    #[serde(rename = "axis")]
+    Axis {
+        #[doc = "Direction."]
+        direction: Point3D,
+    },
+}
+
 #[doc = "The response from the `DisableDryRun` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7225,6 +7527,67 @@ pub enum DxfStorage {
     Binary,
 }
 
+#[doc = "Edge cut algorithm version."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum EdgeCutVersion {
+    #[doc = "Let the engine choose whichever version it wants."]
+    #[serde(rename = "v0")]
+    #[display("v0")]
+    V0,
+    #[doc = "The original fillet algorithm Zoo 1.0 shipped with. Limitations: doesn't support \
+             rolling ball fillets, has several bugs that will not be fixed."]
+    #[serde(rename = "v1")]
+    #[display("v1")]
+    V1,
+    #[doc = "Adds support for rolling ball fillets. Fixes bugs from V1. Still experimental."]
+    #[serde(rename = "v2")]
+    #[display("v2")]
+    V2,
+}
+
+#[doc = "The response from the `EdgeGetLength` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EdgeGetLength {
+    #[doc = "The length of the edge."]
+    pub length: f64,
+}
+
+impl std::fmt::Display for EdgeGetLength {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EdgeGetLength {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.length).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["length".into()]
+    }
+}
+
 #[doc = "A list of faces for a specific edge."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7286,6 +7649,57 @@ impl tabled::Tabled for EdgeLinesVisible {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "An edge can be referenced by its uuid or by the faces that uniquely define it."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EdgeSpecifier {
+    #[doc = "Optional end face ids for ambiguous edge matches."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub end_faces: Option<Vec<uuid::Uuid>>,
+    #[doc = "Optional index for disambiguation when multiple edges share the same faces. If not \
+             provided (None), all matching edges will be used. If provided (Some(n)), only the \
+             edge at index n will be used."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub index: Option<u32>,
+    #[doc = "Side face ids that uniquely identify the edge."]
+    pub side_faces: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for EdgeSpecifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EdgeSpecifier {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(end_faces) = &self.end_faces {
+                format!("{:?}", end_faces).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(index) = &self.index {
+                format!("{:?}", index).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.side_faces).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["end_faces".into(), "index".into(), "side_faces".into()]
     }
 }
 
@@ -7462,6 +7876,10 @@ pub enum EmailMarketingConsentStatus {
     #[serde(rename = "confirmed")]
     #[display("confirmed")]
     Confirmed,
+    #[doc = "Recipient later unsubscribed through an email unsubscribe flow."]
+    #[serde(rename = "unsubscribed")]
+    #[display("unsubscribed")]
+    Unsubscribed,
     #[doc = "User explicitly declined."]
     #[serde(rename = "declined")]
     #[display("declined")]
@@ -8141,6 +8559,44 @@ impl tabled::Tabled for EntityMirror {
     }
 }
 
+#[doc = "The response from the `EntityMirrorAcross` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EntityMirrorAcross {
+    #[doc = "The Face, edge, and entity ids of the patterned entities."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_face_edge_ids: Option<Vec<FaceEdgeInfo>>,
+}
+
+impl std::fmt::Display for EntityMirrorAcross {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EntityMirrorAcross {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(entity_face_edge_ids) = &self.entity_face_edge_ids {
+                format!("{:?}", entity_face_edge_ids).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entity_face_edge_ids".into()]
+    }
+}
+
 #[doc = "The response from the `EntityMirrorAcrossEdge` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8177,6 +8633,117 @@ impl tabled::Tabled for EntityMirrorAcrossEdge {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["entity_face_edge_ids".into()]
     }
+}
+
+#[doc = "An edge/vertex can be defined by the faces that it is connected to."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum EntityReference {
+    #[doc = "A uuid referencing a plane."]
+    #[serde(rename = "plane")]
+    Plane {
+        #[doc = "Id of the plane being referenced."]
+        plane_id: uuid::Uuid,
+        #[doc = "Optional primitive topology on a parent (not used for planes today)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A uuid referencing a face."]
+    #[serde(rename = "face")]
+    Face {
+        #[doc = "Id of the face being referenced."]
+        face_id: uuid::Uuid,
+        #[doc = "Fallback: solid3d UUID + face index on that body when `face_id` cannot be \
+                 resolved client-side."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A collection of ids that uniquely identify an edge."]
+    #[serde(rename = "edge")]
+    Edge {
+        #[doc = "Optional end face ids for ambiguous edge matches."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        end_faces: Option<Vec<uuid::Uuid>>,
+        #[doc = "Optional index for disambiguation when multiple edges share the same faces. If \
+                 not provided (None), all matching edges will be used. If provided (Some(n)), \
+                 only the edge at index n will be used."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        index: Option<u32>,
+        #[doc = "Side face ids that uniquely identify the edge."]
+        side_faces: Vec<uuid::Uuid>,
+        #[doc = "Fallback: solid3d UUID + edge index on that body for 3D BREP edges (distinct \
+                 from `inner.index`)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A collection of ids that uniquely identify an vertex."]
+    #[serde(rename = "vertex")]
+    Vertex {
+        #[doc = "Optional index among the filtered candidates."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        index: Option<u32>,
+        #[doc = "Side face ids that identify the vertex."]
+        side_faces: Vec<uuid::Uuid>,
+        #[doc = "Fallback: solid3d UUID + vertex index on that body."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A uuid referencing a solid2d (profile)."]
+    #[serde(rename = "solid2d")]
+    Solid2D {
+        #[doc = "Id of the solid2d being referenced."]
+        #[serde(rename = "solid2d_id")]
+        solid_2d_id: uuid::Uuid,
+        #[doc = "Typically omitted: `solid2d_id` is already the owning profile. Present for \
+                 schema parity with other variants."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A uuid referencing a solid3d (body)."]
+    #[serde(rename = "solid3d")]
+    Solid3D {
+        #[doc = "Id of the solid3d being referenced."]
+        #[serde(rename = "solid3d_id")]
+        solid_3d_id: uuid::Uuid,
+        #[doc = "Typically omitted: `solid3d_id` is already the owning body. Present for schema \
+                 parity with other variants."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A uuid referencing an edge on a solid2d (profile) - used for raw sketch/profile \
+             edges. This is distinct from the face-based Edge reference which is used for \
+             BRep/swept body edges."]
+    #[serde(rename = "solid2d_edge")]
+    Solid2DEdge {
+        #[doc = "Id of the edge being referenced."]
+        edge_id: uuid::Uuid,
+        #[doc = "Fallback: solid2d UUID + curve index in that profile."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A single segment (curve) within a path."]
+    #[serde(rename = "segment")]
+    Segment {
+        #[doc = "Id of the path containing the segment."]
+        path_id: uuid::Uuid,
+        #[doc = "Id of the segment (curve) being referenced."]
+        segment_id: uuid::Uuid,
+        #[doc = "Fallback: path UUID + segment curve index."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
+    #[doc = "A closed sketch region/profile area."]
+    #[serde(rename = "region")]
+    Region {
+        #[doc = "Id of the region being referenced."]
+        region_id: uuid::Uuid,
+        #[doc = "Fallback: path UUID + region index on that path."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        topology_fallback: Option<PrimitiveTopologyFallback>,
+    },
 }
 
 #[doc = "The response from the `EntitySetOpacity` endpoint."]
@@ -8231,6 +8798,9 @@ pub enum EntityType {
     #[serde(rename = "path")]
     #[display("path")]
     Path,
+    #[serde(rename = "segment")]
+    #[display("segment")]
+    Segment,
     #[serde(rename = "curve")]
     #[display("curve")]
     Curve,
@@ -8252,6 +8822,9 @@ pub enum EntityType {
     #[serde(rename = "vertex")]
     #[display("vertex")]
     Vertex,
+    #[serde(rename = "region")]
+    #[display("region")]
+    Region,
 }
 
 #[doc = "Error information from a response."]
@@ -8357,110 +8930,6 @@ pub enum ErrorCode {
     #[serde(rename = "message_type_not_accepted_for_web_r_t_c")]
     #[display("message_type_not_accepted_for_web_r_t_c")]
     MessageTypeNotAcceptedForWebRTC,
-}
-
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
-pub enum Type {
-    #[serde(rename = "modeling_app_event")]
-    #[display("modeling_app_event")]
-    #[default]
-    ModelingAppEvent,
-}
-
-
-#[doc = "An event related to modeling app files"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Event {
-    #[doc = "Attachment URI for where the attachment is stored."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub attachment_uri: Option<String>,
-    #[doc = "Time this event was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The specific event type from the modeling app."]
-    pub event_type: ModelingAppEventType,
-    #[doc = "Time the associated attachment was last compiled."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub last_compiled_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "Project descriptino as given by the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub project_description: Option<String>,
-    #[doc = "Project name as given by the user."]
-    pub project_name: String,
-    #[doc = "The source app for this event, uuid that is unique to the app."]
-    pub source_id: uuid::Uuid,
-    #[serde(rename = "type")]
-    pub type_: Type,
-    #[doc = "An anonymous user id generated client-side."]
-    pub user_id: String,
-}
-
-impl std::fmt::Display for Event {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Event {
-    const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(attachment_uri) = &self.attachment_uri {
-                format!("{:?}", attachment_uri).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.event_type).into(),
-            if let Some(last_compiled_at) = &self.last_compiled_at {
-                format!("{:?}", last_compiled_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(project_description) = &self.project_description {
-                format!("{:?}", project_description).into()
-            } else {
-                String::new().into()
-            },
-            self.project_name.clone().into(),
-            format!("{:?}", self.source_id).into(),
-            format!("{:?}", self.type_).into(),
-            self.user_id.clone().into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "attachment_uri".into(),
-            "created_at".into(),
-            "event_type".into(),
-            "last_compiled_at".into(),
-            "project_description".into(),
-            "project_name".into(),
-            "source_id".into(),
-            "type_".into(),
-            "user_id".into(),
-        ]
-    }
 }
 
 #[doc = "The response from the `Export` endpoint."]
@@ -8796,84 +9265,18 @@ impl tabled::Tabled for ExtendedUser {
     }
 }
 
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ExtendedUserResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<ExtendedUser>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for ExtendedUserResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for ExtendedUserResultsPage {
-    type Item = ExtendedUser;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ExtendedUserResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
 #[doc = "The response from the `Extrude` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Extrude {}
+pub struct Extrude {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Extrude {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -8887,13 +9290,24 @@ impl std::fmt::Display for Extrude {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Extrude {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -8931,11 +9345,18 @@ pub enum ExtrudeMethod {
 )]
 pub enum ExtrudeReference {
     #[doc = "Extrudes along the normal of the top face until it is as close to the entity as \
-             possible. An entity can be a solid, a path, a face, etc."]
+             possible. An entity can be a solid, a path, a face, an edge (via \
+             `entity_reference`), etc."]
     #[serde(rename = "entity_reference")]
     EntityReference {
-        #[doc = "The UUID of the entity to extrude to."]
-        entity_id: uuid::Uuid,
+        #[doc = "Legacy UUID of the entity to extrude to. If both `entity_id` and \
+                 `entity_reference` are provided, `entity_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        entity_id: Option<uuid::Uuid>,
+        #[doc = "Entity reference (e.g. edge by side_faces). If both `entity_id` and \
+                 `entity_reference` are provided, `entity_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        entity_reference: Option<EntityReference>,
     },
     #[doc = "Extrudes until the top face is as close as possible to this given axis."]
     #[serde(rename = "axis")]
@@ -8958,7 +9379,14 @@ pub enum ExtrudeReference {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct ExtrudeToReference {}
+pub struct ExtrudeToReference {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for ExtrudeToReference {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -8972,13 +9400,24 @@ impl std::fmt::Display for ExtrudeToReference {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtrudeToReference {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -9775,6 +10214,18 @@ pub enum FileExportFormat {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum FileImportFormat {
+    #[doc = "ACIS part format."]
+    #[serde(rename = "acis")]
+    #[display("acis")]
+    Acis,
+    #[doc = "CATIA part format."]
+    #[serde(rename = "catia")]
+    #[display("catia")]
+    Catia,
+    #[doc = "PTC Creo part format."]
+    #[serde(rename = "creo")]
+    #[display("creo")]
+    Creo,
     #[doc = "Autodesk Filmbox (FBX) format. <https://en.wikipedia.org/wiki/FBX>"]
     #[serde(rename = "fbx")]
     #[display("fbx")]
@@ -9783,12 +10234,24 @@ pub enum FileImportFormat {
     #[serde(rename = "gltf")]
     #[display("gltf")]
     Gltf,
+    #[doc = "Autodesk Inventor part format."]
+    #[serde(rename = "inventor")]
+    #[display("inventor")]
+    Inventor,
+    #[doc = "Siemens NX part format."]
+    #[serde(rename = "nx")]
+    #[display("nx")]
+    Nx,
     #[doc = "The OBJ file format. <https://en.wikipedia.org/wiki/Wavefront_.obj_file> It may or \
              may not have an an attached material (mtl // mtllib) within the file, but we \
              interact with it as if it does not."]
     #[serde(rename = "obj")]
     #[display("obj")]
     Obj,
+    #[doc = "Parasolid part format."]
+    #[serde(rename = "parasolid")]
+    #[display("parasolid")]
+    Parasolid,
     #[doc = "The PLY file format. <https://en.wikipedia.org/wiki/PLY_(file_format)>"]
     #[serde(rename = "ply")]
     #[display("ply")]
@@ -10110,8 +10573,14 @@ impl tabled::Tabled for FileVolume {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FractionOfEdge {
-    #[doc = "The id of the edge"]
-    pub edge_id: uuid::Uuid,
+    #[doc = "The id of the edge (legacy). If both `edge_id` and `edge_specifier` are provided, \
+             `edge_specifier` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_id: Option<uuid::Uuid>,
+    #[doc = "Edge specifier (side_faces, end_faces, index) identifying the edge. If both \
+             `edge_id` and `edge_specifier` are provided, `edge_specifier` takes precedence."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub edge_specifier: Option<EdgeSpecifier>,
     #[doc = "A value between [0.0, 1.0] (default 0.0) that is a percentage along the edge. This \
              bound will control how much of the edge is used during the blend. If lower_bound is \
              larger than upper_bound, the edge is effectively \"flipped\"."]
@@ -10136,10 +10605,19 @@ impl std::fmt::Display for FractionOfEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FractionOfEdge {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
-            format!("{:?}", self.edge_id).into(),
+            if let Some(edge_id) = &self.edge_id {
+                format!("{:?}", edge_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(edge_specifier) = &self.edge_specifier {
+                format!("{:?}", edge_specifier).into()
+            } else {
+                String::new().into()
+            },
             if let Some(lower_bound) = &self.lower_bound {
                 format!("{:?}", lower_bound).into()
             } else {
@@ -10154,7 +10632,12 @@ impl tabled::Tabled for FractionOfEdge {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["edge_id".into(), "lower_bound".into(), "upper_bound".into()]
+        vec![
+            "edge_id".into(),
+            "edge_specifier".into(),
+            "lower_bound".into(),
+            "upper_bound".into(),
+        ]
     }
 }
 
@@ -10719,6 +11202,39 @@ impl tabled::Tabled for ImportedGeometry {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum InputFormat3D {
+    #[doc = "ACIS part format."]
+    #[serde(rename = "acis")]
+    Acis {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
+    #[doc = "CATIA part format."]
+    #[serde(rename = "catia")]
+    Catia {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
+    #[doc = "PTC Creo part format."]
+    #[serde(rename = "creo")]
+    Creo {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
     #[doc = "Autodesk Filmbox (FBX) format."]
     #[serde(rename = "fbx")]
     Fbx {},
@@ -10726,6 +11242,28 @@ pub enum InputFormat3D {
              it, but this can also import binary glTF (glb)."]
     #[serde(rename = "gltf")]
     Gltf {},
+    #[doc = "Autodesk Inventor part format."]
+    #[serde(rename = "inventor")]
+    Inventor {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
+    #[doc = "Siemens NX part format."]
+    #[serde(rename = "nx")]
+    Nx {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
+    },
     #[doc = "Wavefront OBJ format."]
     #[serde(rename = "obj")]
     Obj {
@@ -10735,6 +11273,17 @@ pub enum InputFormat3D {
         #[doc = "The units of the input data.\n\nThis is very important for correct scaling and \
                  when calculating physics properties like mass, etc.\n\nDefaults to millimeters."]
         units: UnitLength,
+    },
+    #[doc = "Parasolid part format."]
+    #[serde(rename = "parasolid")]
+    Parasolid {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
+        #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
+                 implicitly `true` when importing into the engine."]
+        #[serde(default)]
+        split_closed_faces: bool,
     },
     #[doc = "The PLY Polygon File Format."]
     #[serde(rename = "ply")]
@@ -10749,6 +11298,9 @@ pub enum InputFormat3D {
     #[doc = "SolidWorks part (SLDPRT) format."]
     #[serde(rename = "sldprt")]
     Sldprt {
+        #[doc = "Co-ordinate system of input data."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        coords: Option<System>,
         #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is \
                  implicitly `true` when importing into the engine."]
         #[serde(default)]
@@ -11195,6 +11747,87 @@ pub enum InvoiceRefundStatus {
     #[serde(rename = "refunded")]
     #[display("refunded")]
     Refunded,
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct InvoiceResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Invoice>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for InvoiceResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for InvoiceResultsPage {
+    type Item = Invoice;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for InvoiceResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
 }
 
 #[doc = "An enum representing the possible values of an `Invoice`'s `status` field."]
@@ -11778,6 +12411,35 @@ pub enum KclProjectPublicationStatus {
     #[serde(rename = "deleted")]
     #[display("deleted")]
     Deleted,
+    #[doc = "The project was reviewed and changes were requested before it can be published."]
+    #[serde(rename = "changes_requested")]
+    #[display("changes_requested")]
+    ChangesRequested,
+}
+
+#[doc = "Access policy for a shared project download link."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectShareLinkAccessMode {
+    #[doc = "Anyone holding the URL can download the project."]
+    #[serde(rename = "anyone_with_link")]
+    #[display("anyone_with_link")]
+    AnyoneWithLink,
+    #[doc = "Only members of the owner's organization can use the URL."]
+    #[serde(rename = "organization_only")]
+    #[display("organization_only")]
+    OrganizationOnly,
 }
 
 #[doc = "The response from the `Loft` command."]
@@ -12199,6 +12861,35 @@ pub enum Method {
     Extension,
 }
 
+#[doc = "What to reflect mirrored geometry across"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum MirrorAcross {
+    #[doc = "Reflect across an edge If used with a 3D mirror, the edge will define the normal of \
+             the mirror plane."]
+    #[serde(rename = "edge")]
+    Edge {
+        #[doc = "Edge ID."]
+        id: uuid::Uuid,
+    },
+    #[doc = "Reflect across an axis (that goes through a point) If used with a 3D mirror, the \
+             axis will define the normal of the mirror plane."]
+    #[serde(rename = "axis")]
+    Axis {
+        #[doc = "Axis to use as mirror."]
+        axis: Point3D,
+        #[doc = "Point through which the mirror axis passes."]
+        point: Point3D,
+    },
+    #[doc = "Reflect across a plane (which gives two axes) Cannot be used with 2D mirrors."]
+    #[serde(rename = "plane")]
+    Plane {
+        #[doc = "Plane ID."]
+        id: uuid::Uuid,
+    },
+}
+
 #[doc = "The types of messages that can be sent by the client to the server."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12209,6 +12900,9 @@ pub enum MlCopilotClientMessage {
     #[doc = "The client-to-server Ping to ensure the copilot protocol stays alive."]
     #[serde(rename = "ping")]
     Ping {},
+    #[doc = "Request available mode metadata for the copilot session."]
+    #[serde(rename = "list_modes")]
+    ListModes {},
     #[doc = "Authentication header request."]
     #[serde(rename = "headers")]
     Headers {
@@ -12256,10 +12950,6 @@ pub enum MlCopilotClientMessage {
         #[doc = "Change the default or mode reasoning effort."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reasoning_effort: Option<MlReasoningEffort>,
-        #[doc = "To handle the transition period between sketch 1 and sketch_solve, set a flag \
-                 for sketch_solve, True for sketch_solve, false for sketch 1. Defaults to false"]
-        #[serde(default)]
-        sketch_solve: bool,
         #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) \
                  will be used and is required."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -12270,6 +12960,25 @@ pub enum MlCopilotClientMessage {
     System {
         #[doc = "The content of the system message."]
         command: MlCopilotSystemCommand,
+    },
+    #[doc = "Attachments returned by API in response to a backend `RequestAttachments` message."]
+    #[serde(rename = "attachment_response")]
+    AttachmentResponse {
+        #[doc = "Error encountered while loading attachments, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Loaded attachment files. Empty when no matching attachments were found."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        files: Option<Vec<MlCopilotFile>>,
+        #[doc = "Prompt the attachments were loaded from."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt_id: Option<uuid::Uuid>,
+        #[doc = "Optional backend-provided identifier to correlate request/response pairs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        request_id: Option<String>,
+        #[doc = "Specific client message sequence, when requested."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        seq: Option<i32>,
     },
 }
 
@@ -12361,6 +13070,62 @@ pub enum MlCopilotMode {
     #[serde(rename = "thoughtful")]
     #[display("thoughtful")]
     Thoughtful,
+    #[doc = "Let the system automatically choose the model and reasoning effort."]
+    #[serde(rename = "auto")]
+    #[display("auto")]
+    Auto,
+}
+
+#[doc = "A client-facing ML copilot mode option."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlCopilotModeOption {
+    #[doc = "Human-readable display description."]
+    pub description: String,
+    #[doc = "Whether this mode is unavailable for the user's current plan."]
+    #[serde(default)]
+    pub disabled: bool,
+    #[doc = "Client icon identifier."]
+    pub icon: String,
+    #[doc = "Stable mode identifier to send in user messages."]
+    pub id: String,
+    #[doc = "Human-readable display label."]
+    pub label: String,
+}
+
+impl std::fmt::Display for MlCopilotModeOption {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlCopilotModeOption {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            format!("{:?}", self.disabled).into(),
+            self.icon.clone().into(),
+            self.id.clone().into(),
+            self.label.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "disabled".into(),
+            "icon".into(),
+            "id".into(),
+            "label".into(),
+        ]
+    }
 }
 
 #[doc = "The types of messages that can be sent by the server to the client."]
@@ -12411,6 +13176,14 @@ pub enum MlCopilotServerMessage {
         #[doc = "The informational text."]
         text: String,
     },
+    #[doc = "Available mode metadata for clients."]
+    #[serde(rename = "modes_response")]
+    ModesResponse {
+        #[doc = "Default mode identifier used when no mode is requested."]
+        default_mode: String,
+        #[doc = "Available modes in configuration order."]
+        modes: Vec<MlCopilotModeOption>,
+    },
     #[doc = "Notification that the backend is shutting down."]
     #[serde(rename = "backend_shutdown")]
     BackendShutdown {
@@ -12428,19 +13201,67 @@ pub enum MlCopilotServerMessage {
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
     Reasoning(ReasoningMessage),
+    #[doc = "Backend-only request for API to reload client attachments from storage.\n\nAPI \
+             handles this message internally and responds upstream with \
+             `MlCopilotClientMessage::AttachmentResponse`; it is not forwarded to the browser."]
+    #[serde(rename = "request_attachments")]
+    RequestAttachments {
+        #[doc = "Conversation to search for attachments. Used when prompt_id is not known."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        conversation_id: Option<uuid::Uuid>,
+        #[doc = "Attachment names to load. Empty means load all attachments from the selected \
+                 message(s)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        names: Option<Vec<String>>,
+        #[doc = "If true, return attachment metadata without loading file contents."]
+        #[serde(default)]
+        only_metadata: bool,
+        #[doc = "Prompt to load attachments from. Defaults to the active/resumed prompt."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt_id: Option<uuid::Uuid>,
+        #[doc = "Optional backend-provided identifier to correlate request/response pairs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        request_id: Option<String>,
+        #[doc = "Specific client message sequence to inspect. Defaults to recent client messages."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        seq: Option<i32>,
+    },
+    #[doc = "Notification that API finished loading all attachments for the conversation."]
+    #[serde(rename = "attachments_loaded")]
+    AttachmentsLoaded {
+        #[doc = "Optional backend-provided identifier to correlate request/response pairs."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        request_id: Option<String>,
+    },
+    #[doc = "Backend-only Zookeeper Auto-router metadata.\n\nAPI persists this on the active \
+             prompt and does not forward it to clients or replay it as a chat message."]
+    #[serde(rename = "zookeeper_auto_router_metadata")]
+    ZookeeperAutoRouterMetadata {
+        #[doc = "Auto-router classifier bucket, e.g. \"simple\", \"moderate\", or \"complex\"."]
+        bucket: String,
+        #[doc = "Prompt template/config label used by the router."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prompt_template: Option<String>,
+        #[doc = "Human-readable route reasons."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reasons: Option<Vec<String>>,
+        #[doc = "Selection stage, e.g. \"classifier\" or \"replay\"."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        stage: Option<String>,
+    },
     #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. \
              Includes server messages and client `User` messages.\n\nInvariants: - Includes \
              server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. \
              }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
              messages. - The following are NEVER included: `SessionData`, `ConversationId`, \
-             `Delta`, or `BackendShutdown`. - Ordering is stable: messages are ordered by prompt \
-             creation time within the conversation, then by the per-prompt `seq` value \
-             (monotonically increasing as seen in the original stream).\n\nWire format: - Each \
-             element is canonical serialized bytes (typically JSON) for either a \
-             `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an \
-             initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the \
-             server sends a single WebSocket Binary frame containing a MsgPack-encoded document \
-             of this enum: `Replay { messages }`."]
+             `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - Ordering is stable: \
+             messages are ordered by prompt creation time within the conversation, then by the \
+             per-prompt `seq` value (monotonically increasing as seen in the original \
+             stream).\n\nWire format: - Each element is canonical serialized bytes (typically \
+             JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - \
+             When delivered as an initial replay over the websocket (upon \
+             `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary \
+             frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation \
@@ -12639,338 +13460,6 @@ pub enum MlFeedback {
     Rejected,
 }
 
-#[doc = "Metadata for a ML prompt."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct MlPromptMetadata {
-    #[doc = "Code for the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub code: Option<String>,
-    #[doc = "The original source code for the model."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub original_source_code: Option<String>,
-    #[doc = "The source ranges the user suggested to change."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub source_ranges: Option<Vec<SourceRangePrompt>>,
-    #[doc = "The upstream conversation ID, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub upstream_conversation_id: Option<String>,
-}
-
-impl std::fmt::Display for MlPromptMetadata {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPromptMetadata {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(code) = &self.code {
-                format!("{:?}", code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(original_source_code) = &self.original_source_code {
-                format!("{:?}", original_source_code).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(source_ranges) = &self.source_ranges {
-                format!("{:?}", source_ranges).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(upstream_conversation_id) = &self.upstream_conversation_id {
-                format!("{:?}", upstream_conversation_id).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "code".into(),
-            "original_source_code".into(),
-            "source_ranges".into(),
-            "upstream_conversation_id".into(),
-        ]
-    }
-}
-
-#[doc = "ML prompt response payload for admin endpoints. This schema intentionally excludes \
-         internal linkage fields."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct MlPromptResponse {
-    #[doc = "When the prompt was completed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The conversation associated with this prompt, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub conversation_id: Option<uuid::Uuid>,
-    #[doc = "The date and time the ML prompt was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The error message if the prompt failed."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-    #[doc = "Feedback from the user, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub feedback: Option<MlFeedback>,
-    #[doc = "The unique identifier for the ML prompt."]
-    pub id: uuid::Uuid,
-    #[doc = "The KCL version being used."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub kcl_version: Option<String>,
-    #[doc = "The metadata for the prompt."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<MlPromptMetadata>,
-    #[doc = "The version of the model."]
-    pub model_version: String,
-    #[doc = "The output directory reference for generated files."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub output_file: Option<String>,
-    #[doc = "The name of the project, if any."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub project_name: Option<String>,
-    #[doc = "The prompt."]
-    pub prompt: String,
-    #[doc = "Sum of EndOfStream durations, in seconds."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub seconds: Option<i64>,
-    #[doc = "When the prompt was started."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The status of the prompt."]
-    pub status: ApiCallStatus,
-    #[doc = "The type of prompt."]
-    #[serde(rename = "type")]
-    pub type_: MlPromptType,
-    #[doc = "The date and time the ML prompt was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID of the user who created the ML prompt."]
-    pub user_id: uuid::Uuid,
-}
-
-impl std::fmt::Display for MlPromptResponse {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPromptResponse {
-    const LENGTH: usize = 18;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(completed_at) = &self.completed_at {
-                format!("{:?}", completed_at).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(conversation_id) = &self.conversation_id {
-                format!("{:?}", conversation_id).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.created_at).into(),
-            if let Some(error) = &self.error {
-                format!("{:?}", error).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(feedback) = &self.feedback {
-                format!("{:?}", feedback).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            if let Some(kcl_version) = &self.kcl_version {
-                format!("{:?}", kcl_version).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(metadata) = &self.metadata {
-                format!("{:?}", metadata).into()
-            } else {
-                String::new().into()
-            },
-            self.model_version.clone().into(),
-            if let Some(output_file) = &self.output_file {
-                format!("{:?}", output_file).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(project_name) = &self.project_name {
-                format!("{:?}", project_name).into()
-            } else {
-                String::new().into()
-            },
-            self.prompt.clone().into(),
-            if let Some(seconds) = &self.seconds {
-                format!("{:?}", seconds).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(started_at) = &self.started_at {
-                format!("{:?}", started_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.type_).into(),
-            format!("{:?}", self.updated_at).into(),
-            format!("{:?}", self.user_id).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "completed_at".into(),
-            "conversation_id".into(),
-            "created_at".into(),
-            "error".into(),
-            "feedback".into(),
-            "id".into(),
-            "kcl_version".into(),
-            "metadata".into(),
-            "model_version".into(),
-            "output_file".into(),
-            "project_name".into(),
-            "prompt".into(),
-            "seconds".into(),
-            "started_at".into(),
-            "status".into(),
-            "type_".into(),
-            "updated_at".into(),
-            "user_id".into(),
-        ]
-    }
-}
-
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct MlPromptResponseResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<MlPromptResponse>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for MlPromptResponseResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for MlPromptResponseResultsPage {
-    type Item = MlPromptResponse;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for MlPromptResponseResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
-#[doc = "A type of ML prompt."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum MlPromptType {
-    #[doc = "Text to CAD."]
-    #[serde(rename = "text_to_cad")]
-    #[display("text_to_cad")]
-    TextToCad,
-    #[doc = "Text to KCL."]
-    #[serde(rename = "text_to_kcl")]
-    #[display("text_to_kcl")]
-    TextToKcl,
-    #[doc = "Text to KCL iteration."]
-    #[serde(rename = "text_to_kcl_iteration")]
-    #[display("text_to_kcl_iteration")]
-    TextToKclIteration,
-    #[doc = "Text to KCL iteration with multiple files."]
-    #[serde(rename = "text_to_kcl_multi_file_iteration")]
-    #[display("text_to_kcl_multi_file_iteration")]
-    TextToKclMultiFileIteration,
-    #[doc = "Copilot chat/assist prompts."]
-    #[serde(rename = "copilot")]
-    #[display("copilot")]
-    Copilot,
-}
-
 #[doc = "Specify the amount of effort used in reasoning. Read the following for more info: https://platform.openai.com/docs/guides/reasoning#how-reasoning-works"]
 #[derive(
     serde :: Serialize,
@@ -13042,6 +13531,10 @@ pub enum MlToolResult {
         project_name: Option<String>,
         #[doc = "The status code of the tool execution."]
         status_code: i32,
+        #[doc = "Optional reversible delta for undoing/redoing a Zookeeper project edit locally. \
+                 The `outputs` map remains the resulting project state."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        zookeeper_edit_patch: Option<ZookeeperEditPatch>,
     },
     #[doc = "Mechanical knowledge base response."]
     #[serde(rename = "mechanical_knowledge_base")]
@@ -13050,31 +13543,6 @@ pub enum MlToolResult {
         response: String,
     },
 }
-
-#[doc = "Type for modeling-app events"]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
-pub enum ModelingAppEventType {
-    #[doc = "This event is sent before the modeling app or project is closed. The attachment \
-             should contain the contents of the most recent successful compile."]
-    #[serde(rename = "successful_compile_before_close")]
-    #[display("successful_compile_before_close")]
-    #[default]
-    SuccessfulCompileBeforeClose,
-}
-
 
 #[doc = "Modeling App share link capabilities."]
 #[derive(
@@ -13127,9 +13595,6 @@ pub struct ModelingAppSubscriptionTier {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
-    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
-    #[serde(default)]
-    pub is_custom_quote: bool,
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
@@ -13178,7 +13643,7 @@ impl std::fmt::Display for ModelingAppSubscriptionTier {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ModelingAppSubscriptionTier {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -13207,7 +13672,6 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.is_custom_quote).into(),
             format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
@@ -13253,7 +13717,6 @@ impl tabled::Tabled for ModelingAppSubscriptionTier {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
-            "is_custom_quote".into(),
             "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
@@ -13319,8 +13782,16 @@ pub enum ModelingCmd {
         #[doc = "Should this extrude create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
+        #[doc = "What direction to extrude in. If None, the engine will extrude in the direction \
+                 normal of the target's plane."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        direction: Option<DirectionType>,
         #[doc = "How far off the plane to extrude"]
         distance: f64,
+        #[doc = "What draft angle should be used in this extrusion? Negative values indicate an \
+                 outward draft, while positive values indicate an inward draft"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        draft_angle: Option<Angle>,
         #[doc = "Should the extrusion create a new object or be part of the existing object."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         extrude_method: Option<ExtrudeMethod>,
@@ -13392,7 +13863,13 @@ pub enum ModelingCmd {
         #[doc = "Should this sweep create a solid body or a surface?"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
-        #[doc = "What is this sweep relative to?"]
+        #[doc = "If true, before the sweep starts, the profile will be re-oriented so that it is \
+                 perpendicular to the path being swept along. If false, the profile is left in \
+                 its current orientation. Defaults to false."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        orient_profile_perpendicular: Option<bool>,
+        #[doc = "What is this sweep relative to? Deprecated; please use \
+                 `translate_profile_to_path` and `orient_profile_perpendicular` instead."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         relative_to: Option<RelativeTo>,
         #[doc = "If true, the sweep will be broken up into sub-sweeps (extrusions, revolves, \
@@ -13405,6 +13882,11 @@ pub enum ModelingCmd {
         tolerance: f64,
         #[doc = "Path along which to sweep."]
         trajectory: uuid::Uuid,
+        #[doc = "If true, the profile being swept will be moved to the path being swept along, \
+                 before the sweep starts. If false, the profile stays where it is, and the sweep \
+                 starts from there. Defaults to false."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        translate_profile_to_path: Option<bool>,
         #[doc = "What version of the sweeping algorithm to use. If None, or zero, the engine's \
                  default algorithm will be used"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -13507,7 +13989,12 @@ pub enum ModelingCmd {
         body_type: Option<BodyType>,
         #[doc = "The edge to use as the axis of revolution, must be linear and lie in the plane \
                  of the solid"]
-        edge_id: uuid::Uuid,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
+        #[doc = "Edge reference to use as the axis of revolution (new API). If both `edge_id` and \
+                 `edge_reference` are provided, `edge_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_reference: Option<EdgeSpecifier>,
         #[doc = "Should the revolution also revolve in the opposite direction along the given \
                  axis? If so, this specifies its angle."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -13727,6 +14214,12 @@ pub enum ModelingCmd {
         #[serde(rename = "entity_id2")]
         entity_id_2: uuid::Uuid,
     },
+    #[doc = "What is the length of this edge?"]
+    #[serde(rename = "edge_get_length")]
+    EdgeGetLength {
+        #[doc = "ID of the edge being queried."]
+        edge_id: uuid::Uuid,
+    },
     #[doc = "Create a pattern using this entity by specifying the transform for each desired \
              repetition. Transformations are performed in the following order (first applied to \
              last applied): scale, rotate, translate."]
@@ -13822,8 +14315,15 @@ pub enum ModelingCmd {
     #[doc = "Create a helix using the specified parameters."]
     #[serde(rename = "entity_make_helix_from_edge")]
     EntityMakeHelixFromEdge {
-        #[doc = "Edge about which to make the helix."]
-        edge_id: uuid::Uuid,
+        #[doc = "Edge ID about which to make the helix (legacy API, for backwards compatibility). \
+                 If both `edge_id` and `edge_reference` are provided, `edge_reference` takes \
+                 precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
+        #[doc = "Edge reference about which to make the helix (new API). If both `edge_id` and \
+                 `edge_reference` are provided, `edge_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_reference: Option<EdgeSpecifier>,
         #[doc = "Is the helix rotation clockwise?"]
         is_clockwise: bool,
         #[doc = "Length of the helix. If None, the length of the edge will be used instead."]
@@ -13837,7 +14337,16 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         start_angle: Option<Angle>,
     },
-    #[doc = "Mirror the input entities over the specified axis. (Currently only supports sketches)"]
+    #[doc = "Mirror the input entities over the specified axis, edge, or plane."]
+    #[serde(rename = "entity_mirror_across")]
+    EntityMirrorAcross {
+        #[doc = "What to mirror across"]
+        across: MirrorAcross,
+        #[doc = "ID of the mirror entities."]
+        ids: Vec<uuid::Uuid>,
+    },
+    #[doc = "Mirror the input entities over the specified axis. Deprecated; please use \
+             `EntityMirrorAcross`"]
     #[serde(rename = "entity_mirror")]
     EntityMirror {
         #[doc = "Axis to use as mirror."]
@@ -13847,12 +14356,19 @@ pub enum ModelingCmd {
         #[doc = "Point through which the mirror axis passes."]
         point: Point3D,
     },
-    #[doc = "Mirror the input entities over the specified edge. (Currently only supports sketches)"]
+    #[doc = "Mirror the input entities over the specified edge. Deprecated; please use \
+             `EntityMirrorAcross`"]
     #[serde(rename = "entity_mirror_across_edge")]
     EntityMirrorAcrossEdge {
-        #[doc = "The edge to use as the mirror axis, must be linear and lie in the plane of the \
-                 solid"]
-        edge_id: uuid::Uuid,
+        #[doc = "The edge to use as the mirror axis (legacy API). Must be linear and lie in the \
+                 plane of the solid. If both `edge_id` and `edge_reference` are provided, \
+                 `edge_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
+        #[doc = "Edge reference to use as the mirror axis (new API). If both `edge_id` and \
+                 `edge_reference` are provided, `edge_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_reference: Option<EdgeSpecifier>,
         #[doc = "ID of the mirror entities."]
         ids: Vec<uuid::Uuid>,
     },
@@ -13864,6 +14380,24 @@ pub enum ModelingCmd {
         selected_at_window: Point2D,
         #[doc = "What entity was selected?"]
         selection_type: SceneSelectionType,
+    },
+    #[doc = "Query the type of entity that was selected. E.g. if a face is selected the face id \
+             is returned, if an edge/vertex is selected then the face ids that uniquely define \
+             the edge/vertex are returned (typically two)."]
+    #[serde(rename = "query_entity_type_with_point")]
+    QueryEntityTypeWithPoint {
+        #[doc = "Where in the window was selected"]
+        selected_at_window: Point2D,
+        #[doc = "What entity was selected?"]
+        selection_type: SceneSelectionType,
+    },
+    #[doc = "Query the type of entity given its id. E.g. if a face is selected the face id is \
+             returned, if an edge/vertex is selected then the face ids that uniquely define the \
+             edge/vertex are returned (typically two)."]
+    #[serde(rename = "query_entity_type")]
+    QueryEntityType {
+        #[doc = "The entity id to query"]
+        entity_id: uuid::Uuid,
     },
     #[doc = "Adds one or more entities (by UUID) to the selection."]
     #[serde(rename = "select_add")]
@@ -13960,6 +14494,15 @@ pub enum ModelingCmd {
         object_id: uuid::Uuid,
         #[doc = "Roughness of the new material"]
         roughness: f64,
+    },
+    #[doc = "Set the name of an object"]
+    #[serde(rename = "object_set_name")]
+    ObjectSetName {
+        #[doc = "Name of the object. Using a zero-length name unsets the name."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        name: Option<String>,
+        #[doc = "Which object to change"]
+        object_id: uuid::Uuid,
     },
     #[doc = "What type of entity is this?"]
     #[serde(rename = "get_entity_type")]
@@ -14059,6 +14602,9 @@ pub enum ModelingCmd {
         #[doc = "Which edges you want to fillet."]
         #[serde(default)]
         edge_ids: Vec<uuid::Uuid>,
+        #[doc = "A struct containing the information required to reference an edge."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edges_references: Option<Vec<EdgeSpecifier>>,
         #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its \
                  ID will be the command ID used to send this command, and this field should be \
                  empty. If you've passed `n` IDs (to fillet `n` edges), then this should be \
@@ -14077,6 +14623,41 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the filleted surfaces. Must \
                  be positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
+        #[doc = "Which version of the edge cut algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<EdgeCutVersion>,
+    },
+    #[doc = "Cut the list of edge references with the given cut parameters"]
+    #[serde(rename = "solid3d_cut_edge_references")]
+    Solid3DCutEdgeReferences {
+        #[doc = "The cut type and information required to perform the cut."]
+        cut_type: CutTypeV2,
+        #[doc = "A struct containing the information required to reference an edge."]
+        #[serde(default)]
+        edges_references: Vec<EdgeSpecifier>,
+        #[doc = "What IDs should the resulting faces have? If you've only passed one edge ID, its \
+                 ID will be the command ID used to send this command, and this field should be \
+                 empty. If you've passed `n` IDs (to cut `n` edges), then this should be length \
+                 `n-1`, and the first edge will use the command ID used to send this command."]
+        #[serde(default)]
+        extra_face_ids: Vec<uuid::Uuid>,
+        #[doc = "Which object is being cut."]
+        object_id: uuid::Uuid,
+        #[doc = "Which cutting algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        strategy: Option<CutStrategy>,
+        #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
+                 positive (i.e. greater than zero)."]
+        tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
+        #[doc = "Which version of the edge cut algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<EdgeCutVersion>,
     },
     #[doc = "Cut the list of given edges with the given cut parameters."]
     #[serde(rename = "solid3d_cut_edges")]
@@ -14100,6 +14681,12 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
+        #[doc = "Which version of the edge cut algorithm to use."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<EdgeCutVersion>,
     },
     #[doc = "Determines whether a brep face is planar and returns its surface-local planar axes \
              if so"]
@@ -14277,6 +14864,12 @@ pub enum ModelingCmd {
         #[doc = "The default system color."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
+        #[doc = "The default color to use for highlight"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        highlight_color: Option<Color>,
+        #[doc = "The default color to use for selection"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        selection_color: Option<Color>,
     },
     #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
@@ -14293,9 +14886,16 @@ pub enum ModelingCmd {
     #[doc = "Project an entity on to a plane."]
     #[serde(rename = "project_entity_to_plane")]
     ProjectEntityToPlane {
-        #[doc = "Which entity to project (vertex or edge)."]
-        entity_id: uuid::Uuid,
-        #[doc = "Which plane to project entity_id onto."]
+        #[doc = "Which entity to project (vertex or edge). Legacy; if both `entity_id` and \
+                 `entity_reference` are provided, `entity_reference` takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        entity_id: Option<uuid::Uuid>,
+        #[doc = "Entity reference (e.g. edge by side_faces, vertex, face) to project. If both \
+                 `entity_id` and `entity_reference` are provided, `entity_reference` takes \
+                 precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        entity_reference: Option<EntityReference>,
+        #[doc = "Which plane to project the entity onto."]
         plane_id: uuid::Uuid,
         #[doc = "If true: the projected points are returned in the plane_id's coordinate system, \
                  else: the projected points are returned in the world coordinate system."]
@@ -14430,7 +15030,7 @@ pub enum ModelingCmd {
     #[doc = "Set the units of the scene. For all following commands, the units will be \
              interpreted as the given units. Any previously executed commands will not be \
              affected or have their units changed. They will remain in the units they were \
-             originally executed in."]
+             originally executed in. If not set, engine units default to mm."]
     #[serde(rename = "set_scene_units")]
     SetSceneUnits {
         #[doc = "Which units the scene uses."]
@@ -14615,6 +15215,14 @@ pub enum ModelingCmd {
     #[doc = "Clear the selection"]
     #[serde(rename = "select_clear")]
     SelectClear {},
+    #[doc = "Set the selection to exactly these entities (replaces previous selection). Empty \
+             array clears the selection."]
+    #[serde(rename = "select_entity")]
+    SelectEntity {
+        #[doc = "Which entities to select (face-based references for edges/vertices, face_id for \
+                 faces)"]
+        entities: Vec<EntityReference>,
+    },
     #[doc = "Find all IDs of selected entities"]
     #[serde(rename = "select_get")]
     SelectGet {},
@@ -14641,6 +15249,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new solid from intersecting several other solids. In other words, the part \
              of the input solids where they all overlap will be the output solid."]
@@ -14654,6 +15265,9 @@ pub enum ModelingCmd {
         #[doc = "The maximum acceptable surface gap computed between the joined solids. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will \
              be cut from. The 'tool' is what will be cut out from 'target'."]
@@ -14669,6 +15283,9 @@ pub enum ModelingCmd {
         tolerance: f64,
         #[doc = "Will be cut out from the 'target'."]
         tool_ids: Vec<uuid::Uuid>,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Create a new non-manifold body by intersecting all the input bodies, cutting and \
              splitting all the faces at the intersection boundaries."]
@@ -14692,6 +15309,9 @@ pub enum ModelingCmd {
                  themselves."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         tool_ids: Option<Vec<uuid::Uuid>>,
+        #[doc = "If true, use the legacy CSG algorithm."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        use_legacy: Option<bool>,
     },
     #[doc = "Make a new path by offsetting an object by a given distance. The new path's ID will \
              be the ID of this command."]
@@ -14764,6 +15384,16 @@ pub enum ModelingCmd {
         object_id: uuid::Uuid,
         #[doc = "First segment to follow to find the region."]
         segment: uuid::Uuid,
+        #[doc = "Which version of the Region endpoint to call."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<RegionVersion>,
+    },
+    #[doc = "Finds a suitable set of arguments that can be passed to CreateRegion to resolve this \
+             very region."]
+    #[serde(rename = "region_get_resolvable_intersection_info")]
+    RegionGetResolvableIntersectionInfo {
+        #[doc = "Which region to resolve"]
+        region_id: uuid::Uuid,
     },
     #[doc = "Create a region with a query point. The region should have an ID taken from the ID \
              of the 'CreateRegionFromQueryPoint' modeling command."]
@@ -14774,6 +15404,9 @@ pub enum ModelingCmd {
         #[doc = "The query point (in the same coordinates as the sketch itself) if a possible \
                  sketch region contains this point, then that region will be created"]
         query_point: Point2D,
+        #[doc = "Which version of the Region endpoint to call."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        version: Option<RegionVersion>,
     },
     #[doc = "Finds a suitable point inside the region for calling such that \
              CreateRegionFromQueryPoint will generate an identical region."]
@@ -15067,6 +15700,32 @@ pub enum Oauth2AppGrantType {
     ClientCredentials,
 }
 
+#[doc = "The deployment mode for an OAuth 2.0 app."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2AppMode {
+    #[doc = "Development mode permits HTTPS redirect URIs and local HTTP redirect URIs. Only the \
+             app owner, or an org admin for organization apps, can authorize development apps."]
+    #[serde(rename = "development")]
+    #[display("development")]
+    Development,
+    #[doc = "Production mode only permits secure non-local redirect URIs."]
+    #[serde(rename = "production")]
+    #[display("production")]
+    Production,
+}
+
 #[doc = "API response for a managed OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -15084,8 +15743,12 @@ pub struct Oauth2AppResponse {
     pub grant_types: Vec<Oauth2AppGrantType>,
     #[doc = "Whether this app is active."]
     pub is_active: bool,
+    #[doc = "The deployment mode for this app."]
+    pub mode: Oauth2AppMode,
     #[doc = "The display name of the app."]
     pub name: String,
+    #[doc = "The registered redirect URIs for this app."]
+    pub redirect_uris: Vec<String>,
     #[doc = "When the app record was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -15102,7 +15765,7 @@ impl std::fmt::Display for Oauth2AppResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Oauth2AppResponse {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.client_id).into(),
@@ -15111,7 +15774,9 @@ impl tabled::Tabled for Oauth2AppResponse {
             format!("{:?}", self.first_party).into(),
             format!("{:?}", self.grant_types).into(),
             format!("{:?}", self.is_active).into(),
+            format!("{:?}", self.mode).into(),
             self.name.clone().into(),
+            format!("{:?}", self.redirect_uris).into(),
             format!("{:?}", self.updated_at).into(),
         ]
     }
@@ -15124,7 +15789,9 @@ impl tabled::Tabled for Oauth2AppResponse {
             "first_party".into(),
             "grant_types".into(),
             "is_active".into(),
+            "mode".into(),
             "name".into(),
+            "redirect_uris".into(),
             "updated_at".into(),
         ]
     }
@@ -15167,6 +15834,14 @@ impl crate::types::paginate::Pagination for Oauth2AppResponseResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -15175,7 +15850,7 @@ impl crate::types::paginate::Pagination for Oauth2AppResponseResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -15201,6 +15876,120 @@ impl tabled::Tabled for Oauth2AppResponseResultsPage {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
     }
+}
+
+#[doc = "Result of approving or denying an OAuth authorization request."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AuthorizationDecisionResponse {
+    #[doc = "The URL the user agent should navigate to after the decision."]
+    pub redirect_url: String,
+}
+
+impl std::fmt::Display for Oauth2AuthorizationDecisionResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AuthorizationDecisionResponse {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.redirect_url.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["redirect_url".into()]
+    }
+}
+
+#[doc = "Details rendered by the OAuth consent page."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2AuthorizationRequestResponse {
+    #[doc = "The OAuth app display name."]
+    pub app_name: String,
+    #[doc = "When this authorization request expires."]
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The OAuth app owner display name, if available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_name: Option<String>,
+    #[doc = "The redirect URI that will receive the authorization result."]
+    pub redirect_uri: String,
+    #[doc = "The pending authorization request ID."]
+    pub request_id: uuid::Uuid,
+    #[doc = "The scopes requested by the app."]
+    pub scopes: Vec<Oauth2Scope>,
+}
+
+impl std::fmt::Display for Oauth2AuthorizationRequestResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.app_name.clone().into(),
+            format!("{:?}", self.expires_at).into(),
+            if let Some(owner_name) = &self.owner_name {
+                format!("{:?}", owner_name).into()
+            } else {
+                String::new().into()
+            },
+            self.redirect_uri.clone().into(),
+            format!("{:?}", self.request_id).into(),
+            format!("{:?}", self.scopes).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "app_name".into(),
+            "expires_at".into(),
+            "owner_name".into(),
+            "redirect_uri".into(),
+            "request_id".into(),
+            "scopes".into(),
+        ]
+    }
+}
+
+#[doc = "The OAuth 2.0 authorization response type."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[derive(Default)]
+pub enum Oauth2AuthorizationResponseType {
+    #[doc = "The authorization code response type."]
+    #[serde(rename = "code")]
+    #[display("code")]
+    #[default]
+    Code,
 }
 
 #[doc = "Information about an OAuth 2.0 client."]
@@ -15274,6 +16063,29 @@ impl tabled::Tabled for Oauth2ClientInfo {
     }
 }
 
+#[doc = "The PKCE code challenge method."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2CodeChallengeMethod {
+    #[doc = "Plain code challenge comparison."]
+    #[serde(rename = "PLAIN")]
+    #[display("PLAIN")]
+    Plain,
+    #[doc = "SHA-256 based PKCE challenge."]
+    S256,
+}
+
 #[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
     serde :: Serialize,
@@ -15297,6 +16109,130 @@ pub enum Oauth2GrantType {
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
 
+#[doc = "Supported OAuth 2.0 scopes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2Scope {
+    #[doc = "Grants access to modeling APIs."]
+    #[serde(rename = "modeling")]
+    #[display("modeling")]
+    Modeling,
+    #[doc = "Grants write access to admin APIs."]
+    #[serde(rename = "admin:write")]
+    #[display("admin:write")]
+    AdminWrite,
+}
+
+#[doc = "The OAuth 2.0 token endpoint grant types supported by the general token endpoint."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Oauth2TokenGrantType {
+    #[doc = "The authorization code grant."]
+    #[serde(rename = "authorization_code")]
+    #[display("authorization_code")]
+    AuthorizationCode,
+    #[doc = "The refresh token grant."]
+    #[serde(rename = "refresh_token")]
+    #[display("refresh_token")]
+    RefreshToken,
+}
+
+#[doc = "Form body for `/oauth2/token`."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Oauth2TokenRequestForm {
+    #[doc = "The OAuth app client ID."]
+    pub client_id: uuid::Uuid,
+    #[doc = "The authorization code, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
+    #[doc = "The PKCE verifier, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub code_verifier: Option<String>,
+    #[doc = "The OAuth token grant type."]
+    pub grant_type: Oauth2TokenGrantType,
+    #[doc = "The redirect URI, for `authorization_code`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uri: Option<String>,
+    #[doc = "The refresh token, for `refresh_token`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub refresh_token: Option<String>,
+}
+
+impl std::fmt::Display for Oauth2TokenRequestForm {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Oauth2TokenRequestForm {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.client_id).into(),
+            if let Some(code) = &self.code {
+                format!("{:?}", code).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(code_verifier) = &self.code_verifier {
+                format!("{:?}", code_verifier).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.grant_type).into(),
+            if let Some(redirect_uri) = &self.redirect_uri {
+                format!("{:?}", redirect_uri).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(refresh_token) = &self.refresh_token {
+                format!("{:?}", refresh_token).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "client_id".into(),
+            "code".into(),
+            "code_verifier".into(),
+            "grant_type".into(),
+            "redirect_uri".into(),
+            "refresh_token".into(),
+        ]
+    }
+}
 
 #[doc = "The response from the `ObjectBringToFront` endpoint."]
 #[derive(
@@ -15344,6 +16280,34 @@ impl std::fmt::Display for ObjectSetMaterialParamsPbr {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ObjectSetMaterialParamsPbr {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `ObjectSetName` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ObjectSetName {}
+
+impl std::fmt::Display for ObjectSetName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ObjectSetName {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -15577,6 +16541,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `ObjectSetMaterialParamsPbr` endpoint."]
         data: ObjectSetMaterialParamsPbr,
     },
+    #[serde(rename = "object_set_name")]
+    ObjectSetName {
+        #[doc = "The response from the `ObjectSetName` endpoint."]
+        data: ObjectSetName,
+    },
     #[serde(rename = "solid2d_add_hole")]
     Solid2DAddHole {
         #[doc = "The response from the `Solid2dAddHole` endpoint."]
@@ -15586,6 +16555,11 @@ pub enum OkModelingCmdResponse {
     Solid3DFilletEdge {
         #[doc = "The response from the `Solid3dFilletEdge` endpoint."]
         data: Solid3DFilletEdge,
+    },
+    #[serde(rename = "solid3d_cut_edge_references")]
+    Solid3DCutEdgeReferences {
+        #[doc = "The response from the `Solid3dCutEdgeReferences` endpoint."]
+        data: Solid3DCutEdgeReferences,
     },
     #[serde(rename = "solid3d_cut_edges")]
     Solid3DCutEdges {
@@ -15737,6 +16711,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `SelectClear` endpoint."]
         data: SelectClear,
     },
+    #[serde(rename = "select_entity")]
+    SelectEntity {
+        #[doc = "The response from the `SelectEntity` endpoint."]
+        data: SelectEntity,
+    },
     #[serde(rename = "export2d")]
     Export2D {
         #[doc = "The response from the `Export2d` endpoint."]
@@ -15756,6 +16735,16 @@ pub enum OkModelingCmdResponse {
     SelectWithPoint {
         #[doc = "The response from the `SelectWithPoint` command."]
         data: SelectWithPoint,
+    },
+    #[serde(rename = "query_entity_type_with_point")]
+    QueryEntityTypeWithPoint {
+        #[doc = "The response from the `QueryEntityTypeWithPoint` command."]
+        data: QueryEntityTypeWithPoint,
+    },
+    #[serde(rename = "query_entity_type")]
+    QueryEntityType {
+        #[doc = "The response from the `QueryEntityType` command."]
+        data: QueryEntityType,
     },
     #[serde(rename = "highlight_set_entity")]
     HighlightSetEntity {
@@ -16081,6 +17070,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `EntitiesGetDistance` command."]
         data: EntityGetDistance,
     },
+    #[serde(rename = "edge_get_length")]
+    EdgeGetLength {
+        #[doc = "The response from the `EdgeGetLength` command."]
+        data: EdgeGetLength,
+    },
     #[serde(rename = "face_edge_info")]
     FaceEdgeInfo {
         #[doc = "Faces and edges id info (most used in identifying geometry in patterned and \
@@ -16116,6 +17110,11 @@ pub enum OkModelingCmdResponse {
     EntityMirror {
         #[doc = "The response from the `EntityMirror` endpoint."]
         data: EntityMirror,
+    },
+    #[serde(rename = "entity_mirror_across")]
+    EntityMirrorAcross {
+        #[doc = "The response from the `EntityMirrorAcross` endpoint."]
+        data: EntityMirrorAcross,
     },
     #[serde(rename = "entity_mirror_across_edge")]
     EntityMirrorAcrossEdge {
@@ -16205,6 +17204,11 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from \
                  the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
+    },
+    #[serde(rename = "region_get_resolvable_intersection_info")]
+    RegionGetResolvableIntersectionInfo {
+        #[doc = "The response from the 'RegionGetResolvableIntersectionInfo'."]
+        data: RegionGetResolvableIntersectionInfo,
     },
     #[serde(rename = "create_region_from_query_point")]
     CreateRegionFromQueryPoint {
@@ -16436,195 +17440,6 @@ impl tabled::Tabled for Org {
     }
 }
 
-#[doc = "An address for an organization."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct OrgAddress {
-    #[doc = "The city component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-    #[doc = "The country component. This is a two-letter ISO country code."]
-    pub country: String,
-    #[doc = "The time and date the address was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The unique identifier of the address."]
-    pub id: uuid::Uuid,
-    #[doc = "The org ID that this address belongs to."]
-    pub org_id: uuid::Uuid,
-    #[doc = "The state component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub state: Option<String>,
-    #[doc = "The first street component."]
-    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
-    pub street_1: Option<String>,
-    #[doc = "The second street component."]
-    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
-    pub street_2: Option<String>,
-    #[doc = "The time and date the address was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The zip component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-impl std::fmt::Display for OrgAddress {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for OrgAddress {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(city) = &self.city {
-                format!("{:?}", city).into()
-            } else {
-                String::new().into()
-            },
-            self.country.clone().into(),
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.id).into(),
-            format!("{:?}", self.org_id).into(),
-            if let Some(state) = &self.state {
-                format!("{:?}", state).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(street_1) = &self.street_1 {
-                format!("{:?}", street_1).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(street_2) = &self.street_2 {
-                format!("{:?}", street_2).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.updated_at).into(),
-            if let Some(zip) = &self.zip {
-                format!("{:?}", zip).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "city".into(),
-            "country".into(),
-            "created_at".into(),
-            "id".into(),
-            "org_id".into(),
-            "state".into(),
-            "street_1".into(),
-            "street_2".into(),
-            "updated_at".into(),
-            "zip".into(),
-        ]
-    }
-}
-
-#[doc = "Extra admin-only details for an organization."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct OrgAdminDetails {
-    #[doc = "Latest billing address stored for the organization."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<OrgAddress>,
-    #[doc = "Readable billing address summary."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address_summary: Option<String>,
-    #[doc = "Block reason when the org is blocked."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub block: Option<BlockReason>,
-    #[doc = "Human-friendly block reason message."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub block_message: Option<String>,
-    #[doc = "Known payment methods on file."]
-    pub payment_methods: Vec<PaymentMethod>,
-    #[doc = "Summaries of the known payment methods."]
-    pub payment_methods_summary: Vec<String>,
-    #[doc = "Stripe customer identifier if one exists."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stripe_customer_id: Option<String>,
-    #[doc = "Direct link to the Stripe customer dashboard."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stripe_dashboard_url: Option<String>,
-}
-
-impl std::fmt::Display for OrgAdminDetails {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for OrgAdminDetails {
-    const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(address) = &self.address {
-                format!("{:?}", address).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(address_summary) = &self.address_summary {
-                format!("{:?}", address_summary).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(block) = &self.block {
-                format!("{:?}", block).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(block_message) = &self.block_message {
-                format!("{:?}", block_message).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.payment_methods).into(),
-            format!("{:?}", self.payment_methods_summary).into(),
-            if let Some(stripe_customer_id) = &self.stripe_customer_id {
-                format!("{:?}", stripe_customer_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(stripe_dashboard_url) = &self.stripe_dashboard_url {
-                format!("{:?}", stripe_dashboard_url).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "address".into(),
-            "address_summary".into(),
-            "block".into(),
-            "block_message".into(),
-            "payment_methods".into(),
-            "payment_methods_summary".into(),
-            "stripe_customer_id".into(),
-            "stripe_dashboard_url".into(),
-        ]
-    }
-}
-
 #[doc = "Dataset owned by an organization, reusable across multiple features."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16634,6 +17449,9 @@ pub struct OrgDataset {
     pub access_role_arn: String,
     #[doc = "The date and time the dataset was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "User-provided description for humans reviewing the dataset."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     #[doc = "The unique identifier for the dataset."]
     pub id: uuid::Uuid,
     #[doc = "Last recorded sync error message, if dataset access failed."]
@@ -16646,6 +17464,9 @@ pub struct OrgDataset {
     pub name: String,
     #[doc = "The ID of the org owning the dataset."]
     pub org_id: uuid::Uuid,
+    #[doc = "Whether a low raw-KCL similarity score should block conversion success for this \
+             dataset."]
+    pub require_raw_kcl_similarity_score_for_success: bool,
     #[doc = "Fully-qualified URI to the dataset location (e.g. s3://bucket/prefix)."]
     pub source_uri: String,
     #[doc = "Lifecycle status for this dataset."]
@@ -16668,11 +17489,16 @@ impl std::fmt::Display for OrgDataset {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDataset {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.access_role_arn.clone().into(),
             format!("{:?}", self.created_at).into(),
+            if let Some(description) = &self.description {
+                format!("{:?}", description).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.id).into(),
             if let Some(last_sync_error) = &self.last_sync_error {
                 format!("{:?}", last_sync_error).into()
@@ -16686,6 +17512,7 @@ impl tabled::Tabled for OrgDataset {
             },
             self.name.clone().into(),
             format!("{:?}", self.org_id).into(),
+            format!("{:?}", self.require_raw_kcl_similarity_score_for_success).into(),
             self.source_uri.clone().into(),
             format!("{:?}", self.status).into(),
             format!("{:?}", self.storage_provider).into(),
@@ -16697,11 +17524,13 @@ impl tabled::Tabled for OrgDataset {
         vec![
             "access_role_arn".into(),
             "created_at".into(),
+            "description".into(),
             "id".into(),
             "last_sync_error".into(),
             "last_sync_error_at".into(),
             "name".into(),
             "org_id".into(),
+            "require_raw_kcl_similarity_score_for_success".into(),
             "source_uri".into(),
             "status".into(),
             "storage_provider".into(),
@@ -16808,11 +17637,19 @@ pub struct OrgDatasetFileConversionDetails {
     #[doc = "Plain-text contents of the raw KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_output: Option<String>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the \
+             original model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the raw KCL model."]
     pub raw_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "Plain-text contents of the salon/refactored KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub salon_kcl_output: Option<String>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches \
+             the raw KCL model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "Snapshot images for the salon/refactored KCL model."]
     pub salon_kcl_snapshot_images: Vec<OrgDatasetSnapshotImage>,
     #[doc = "The date and time the conversion started."]
@@ -16839,7 +17676,7 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 23;
+    const LENGTH: usize = 25;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -16886,9 +17723,19 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             } else {
                 String::new().into()
             },
+            if let Some(raw_kcl_similarity_score) = &self.raw_kcl_similarity_score {
+                format!("{:?}", raw_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.raw_kcl_snapshot_images).into(),
             if let Some(salon_kcl_output) = &self.salon_kcl_output {
                 format!("{:?}", salon_kcl_output).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(salon_kcl_similarity_score) = &self.salon_kcl_similarity_score {
+                format!("{:?}", salon_kcl_similarity_score).into()
             } else {
                 String::new().into()
             },
@@ -16926,8 +17773,10 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             "output".into(),
             "phase".into(),
             "raw_kcl_output".into(),
+            "raw_kcl_similarity_score".into(),
             "raw_kcl_snapshot_images".into(),
             "salon_kcl_output".into(),
+            "salon_kcl_similarity_score".into(),
             "salon_kcl_snapshot_images".into(),
             "started_at".into(),
             "status".into(),
@@ -17040,6 +17889,11 @@ pub enum OrgDatasetFileConversionStatus {
     #[serde(rename = "error_user")]
     #[display("error_user")]
     ErrorUser,
+    #[doc = "Conversion produced a raw KCL result whose geometry diverged from the source model \
+             beyond the accepted threshold."]
+    #[serde(rename = "error_geometry_mismatch")]
+    #[display("error_geometry_mismatch")]
+    ErrorGeometryMismatch,
     #[doc = "Conversion failed because we didn't know how to handle the file. The conversion \
              should be retried with a new converter version."]
     #[serde(rename = "error_unsupported")]
@@ -17087,6 +17941,14 @@ pub struct OrgDatasetFileConversionSummary {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the \
+             original model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_kcl_similarity_score: Option<f64>,
+    #[doc = "Score from `0.0` to `1.0` that quantifies how closely the salon KCL model matches \
+             the raw KCL model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub salon_kcl_similarity_score: Option<f64>,
     #[doc = "The date and time the conversion started."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub started_at: Option<chrono::DateTime<chrono::Utc>>,
@@ -17111,7 +17973,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 18;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -17142,6 +18004,16 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
                 String::new().into()
             },
             format!("{:?}", self.phase).into(),
+            if let Some(raw_kcl_similarity_score) = &self.raw_kcl_similarity_score {
+                format!("{:?}", raw_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(salon_kcl_similarity_score) = &self.salon_kcl_similarity_score {
+                format!("{:?}", salon_kcl_similarity_score).into()
+            } else {
+                String::new().into()
+            },
             if let Some(started_at) = &self.started_at {
                 format!("{:?}", started_at).into()
             } else {
@@ -17171,6 +18043,8 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "manual_kcl_override_updated_at".into(),
             "metadata".into(),
             "phase".into(),
+            "raw_kcl_similarity_score".into(),
+            "salon_kcl_similarity_score".into(),
             "started_at".into(),
             "status".into(),
             "status_message".into(),
@@ -17216,6 +18090,14 @@ impl crate::types::paginate::Pagination for OrgDatasetFileConversionSummaryResul
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -17224,7 +18106,7 @@ impl crate::types::paginate::Pagination for OrgDatasetFileConversionSummaryResul
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -17289,6 +18171,14 @@ impl crate::types::paginate::Pagination for OrgDatasetResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -17297,7 +18187,7 @@ impl crate::types::paginate::Pagination for OrgDatasetResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -17743,6 +18633,14 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -17751,7 +18649,7 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -17762,79 +18660,6 @@ impl crate::types::paginate::Pagination for OrgMemberResultsPage {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgMemberResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct OrgResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<Org>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for OrgResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for OrgResultsPage {
-    type Item = Org;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for OrgResultsPage {
     const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
@@ -17881,6 +18706,53 @@ pub enum OrgRole {
     ServiceAccount,
 }
 
+#[doc = "Public skill context available to the caller's organization."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct OrgSkillResponse {
+    #[doc = "Short description injected into Zookeeper's initial prompt."]
+    pub description: String,
+    #[doc = "Stable skill identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Full markdown context loaded when the skill is activated."]
+    pub markdown: String,
+    #[doc = "Human-readable activation name."]
+    pub name: String,
+}
+
+impl std::fmt::Display for OrgSkillResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for OrgSkillResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            format!("{:?}", self.id).into(),
+            self.markdown.clone().into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "id".into(),
+            "markdown".into(),
+            "name".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `OrientToFace` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -17919,13 +18791,13 @@ impl tabled::Tabled for OrientToFace {
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum OriginType {
-    #[doc = "Local Origin (center of object bounding box)."]
+    #[doc = "Local Origin ([0, 0, 0] in object space)."]
     #[serde(rename = "local")]
     Local {},
-    #[doc = "Global Origin (0, 0, 0)."]
+    #[doc = "Global Origin ([0, 0, 0] in world space)."]
     #[serde(rename = "global")]
     Global {},
-    #[doc = "Custom Origin (user specified point)."]
+    #[doc = "Custom Origin (user specified point in world space)."]
     #[serde(rename = "custom")]
     Custom {
         #[doc = "Custom origin point."]
@@ -17998,13 +18870,12 @@ impl tabled::Tabled for OutputFile {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[derive(Default)]
-pub enum OutputFormat2DType {
+pub enum Type {
     #[serde(rename = "dxf")]
     #[display("dxf")]
     #[default]
     Dxf,
 }
-
 
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
@@ -18015,7 +18886,7 @@ pub struct OutputFormat2D {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub storage: Option<DxfStorage>,
     #[serde(rename = "type")]
-    pub type_: OutputFormat2DType,
+    pub type_: Type,
 }
 
 impl std::fmt::Display for OutputFormat2D {
@@ -18742,7 +19613,6 @@ pub enum PaymentMethodType {
     Card,
 }
 
-
 #[doc = "Defines a perspective view."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19177,6 +20047,53 @@ impl tabled::Tabled for PriceUpsertRequest {
     }
 }
 
+#[doc = "Optional fallback when primary UUIDs are missing from the client artifact graph (e.g. \
+         stale or engine-only ids). Identifies the same topology via a **parent** entity UUID and \
+         a **primitive index** on that parent.\n\nSemantics by selection kind (aligned with engine \
+         BREP topology):\n\n- **Face / Edge (3D)**: `parent_id` is the owning \
+         [`EntityType::Solid3D`] body UUID; `primitive_index` matches the index returned by \
+         **EntityGetPrimitiveIndex** for that face or edge (and matches **EntityGetParentId** → \
+         parent + **EntityGetPrimitiveIndex** → index). - **Vertex (3D)**: same `parent_id` \
+         (solid); `primitive_index` is the BREP vertex index on that solid. - **Solid2dEdge**: \
+         `parent_id` is the **Solid2D** profile UUID; `primitive_index` is the curve index within \
+         that profile. - **Segment**: `parent_id` is the **Path** UUID; `primitive_index` is the \
+         curve index within that path.\n\nOther [`EntityReference`] variants may omit this field \
+         or leave it unset when not applicable."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PrimitiveTopologyFallback {
+    #[doc = "UUID of the parent entity that owns the primitive (solid3d, solid2d, or path)."]
+    pub parent_id: uuid::Uuid,
+    #[doc = "Index of the face, edge, vertex, profile curve, or path segment on `parent_id`."]
+    pub primitive_index: u32,
+}
+
+impl std::fmt::Display for PrimitiveTopologyFallback {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PrimitiveTopologyFallback {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.parent_id).into(),
+            format!("{:?}", self.primitive_index).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["parent_id".into(), "primitive_index".into()]
+    }
+}
+
 #[doc = "Privacy settings for an org or user."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19207,6 +20124,31 @@ impl tabled::Tabled for PrivacySettings {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["can_train_on_data".into()]
     }
+}
+
+#[doc = "Archive formats supported by project download endpoints."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ProjectArchiveFormat {
+    #[doc = "Return a tar archive."]
+    #[serde(rename = "tar")]
+    #[display("tar")]
+    Tar,
+    #[doc = "Return a zip archive."]
+    #[serde(rename = "zip")]
+    #[display("zip")]
+    Zip,
 }
 
 #[doc = "Active category metadata available for project submission flows."]
@@ -19394,6 +20336,77 @@ impl tabled::Tabled for ProjectPointsToPlane {
     }
 }
 
+#[doc = "Owner-facing publication metadata for a project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectPublicationInfoResponse {
+    #[doc = "Moderator feedback when changes have been requested, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<String>,
+    #[doc = "Whether the current editable draft differs from the last live version."]
+    pub has_unpublished_changes: bool,
+    #[doc = "When a version of this project most recently became public."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_published_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Last version that successfully went live for this project."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_published_version_id: Option<uuid::Uuid>,
+    #[doc = "When the current version was most recently submitted for review."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub submitted_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+impl std::fmt::Display for ProjectPublicationInfoResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectPublicationInfoResponse {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(feedback) = &self.feedback {
+                format!("{:?}", feedback).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.has_unpublished_changes).into(),
+            if let Some(last_published_at) = &self.last_published_at {
+                format!("{:?}", last_published_at).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(last_published_version_id) = &self.last_published_version_id {
+                format!("{:?}", last_published_version_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(submitted_at) = &self.submitted_at {
+                format!("{:?}", submitted_at).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "feedback".into(),
+            "has_unpublished_changes".into(),
+            "last_published_at".into(),
+            "last_published_version_id".into(),
+            "submitted_at".into(),
+        ]
+    }
+}
+
 #[doc = "Owner-visible project detail payload."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -19413,13 +20426,17 @@ pub struct ProjectResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[doc = "Stable authenticated thumbnail URL, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_path: Option<String>,
+    pub preview_url: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
+    #[doc = "Owner-facing publication metadata for the current and last live version."]
+    pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
+    #[doc = "Opaque revision token for optimistic project mutations."]
+    pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
     #[doc = "When the project row was last updated."]
@@ -19438,7 +20455,7 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19448,13 +20465,15 @@ impl tabled::Tabled for ProjectResponse {
             format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_path) = &self.primary_preview_path {
-                format!("{:?}", primary_preview_path).into()
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
             } else {
                 String::new().into()
             },
             self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication).into(),
             format!("{:?}", self.publication_status).into(),
+            self.revision.clone().into(),
             self.title.clone().into(),
             format!("{:?}", self.updated_at).into(),
         ]
@@ -19469,11 +20488,64 @@ impl tabled::Tabled for ProjectResponse {
             "files".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_path".into(),
+            "preview_url".into(),
             "project_toml_path".into(),
+            "publication".into(),
             "publication_status".into(),
+            "revision".into(),
             "title".into(),
             "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "Owner-visible share-link metadata for project downloads."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectShareLinkResponse {
+    #[doc = "Access policy for the share link."]
+    pub access_mode: KclProjectShareLinkAccessMode,
+    #[doc = "Share-link creation timestamp."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Opaque identifier used in the public shared URL."]
+    pub key: String,
+    #[doc = "Share-link last update timestamp."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Fully-qualified URL that can be shared."]
+    pub url: String,
+}
+
+impl std::fmt::Display for ProjectShareLinkResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectShareLinkResponse {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.access_mode).into(),
+            format!("{:?}", self.created_at).into(),
+            self.key.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+            self.url.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "access_mode".into(),
+            "created_at".into(),
+            "key".into(),
+            "updated_at".into(),
+            "url".into(),
         ]
     }
 }
@@ -19495,13 +20567,17 @@ pub struct ProjectSummaryResponse {
     pub id: uuid::Uuid,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
-    #[doc = "Relative path to the primary preview image, when one exists."]
+    #[doc = "Stable authenticated thumbnail URL, when one exists."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub primary_preview_path: Option<String>,
+    pub preview_url: Option<String>,
     #[doc = "Relative path to the project's manifest file."]
     pub project_toml_path: String,
+    #[doc = "Owner-facing publication metadata for the current and last live version."]
+    pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
+    #[doc = "Opaque revision token for optimistic project mutations."]
+    pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
     #[doc = "When the project row was last updated."]
@@ -19520,7 +20596,7 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 11;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.category_ids).into(),
@@ -19529,13 +20605,15 @@ impl tabled::Tabled for ProjectSummaryResponse {
             self.entrypoint_path.clone().into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.preview_status).into(),
-            if let Some(primary_preview_path) = &self.primary_preview_path {
-                format!("{:?}", primary_preview_path).into()
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
             } else {
                 String::new().into()
             },
             self.project_toml_path.clone().into(),
+            format!("{:?}", self.publication).into(),
             format!("{:?}", self.publication_status).into(),
+            self.revision.clone().into(),
             self.title.clone().into(),
             format!("{:?}", self.updated_at).into(),
         ]
@@ -19549,9 +20627,11 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "entrypoint_path".into(),
             "id".into(),
             "preview_status".into(),
-            "primary_preview_path".into(),
+            "preview_url".into(),
             "project_toml_path".into(),
+            "publication".into(),
             "publication_status".into(),
+            "revision".into(),
             "title".into(),
             "updated_at".into(),
         ]
@@ -19579,6 +20659,37 @@ impl std::fmt::Display for PublicEmailMarketingConsentRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for PublicEmailMarketingConsentRequest {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.email.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["email".into()]
+    }
+}
+
+#[doc = "Request body for public mailing-list membership changes."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicMailingListMembershipRequest {
+    #[doc = "Email address to add or remove."]
+    pub email: String,
+}
+
+impl std::fmt::Display for PublicMailingListMembershipRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicMailingListMembershipRequest {
     const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![self.email.clone().into()]
@@ -19631,6 +20742,11 @@ pub struct PublicProjectResponse {
     pub description: String,
     #[doc = "Unique project identifier."]
     pub id: uuid::Uuid,
+    #[doc = "Current total public like count for the project."]
+    pub like_count: i64,
+    #[doc = "Whether the authenticated viewer currently likes the project."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub liked: Option<bool>,
     #[doc = "Public creator metadata."]
     pub owner: PublicProjectOwnerResponse,
     #[doc = "Stable public thumbnail URL, when one exists."]
@@ -19654,12 +20770,18 @@ impl std::fmt::Display for PublicProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for PublicProjectResponse {
-    const LENGTH: usize = 7;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.categories).into(),
             self.description.clone().into(),
             format!("{:?}", self.id).into(),
+            format!("{:?}", self.like_count).into(),
+            if let Some(liked) = &self.liked {
+                format!("{:?}", liked).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.owner).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -19676,11 +20798,117 @@ impl tabled::Tabled for PublicProjectResponse {
             "categories".into(),
             "description".into(),
             "id".into(),
+            "like_count".into(),
+            "liked".into(),
             "owner".into(),
             "preview_url".into(),
             "published_at".into(),
             "title".into(),
         ]
+    }
+}
+
+#[doc = "Signed-in viewer vote state for a public project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PublicProjectVoteResponse {
+    #[doc = "Current total public like count for the project."]
+    pub like_count: i64,
+    #[doc = "Whether the authenticated viewer currently likes the project."]
+    pub liked: bool,
+}
+
+impl std::fmt::Display for PublicProjectVoteResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PublicProjectVoteResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.like_count).into(),
+            format!("{:?}", self.liked).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["like_count".into(), "liked".into()]
+    }
+}
+
+#[doc = "The response from the `QueryEntityType` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct QueryEntityType {
+    #[doc = "How to reference the provided entity using face ids."]
+    pub reference: EntityReference,
+}
+
+impl std::fmt::Display for QueryEntityType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for QueryEntityType {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.reference).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["reference".into()]
+    }
+}
+
+#[doc = "The response from the `QueryEntityTypeWithPoint` command."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct QueryEntityTypeWithPoint {
+    #[doc = "How to reference the selected entity using face ids. None if no entity was found at \
+             the given point (e.g. clicked in empty space)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reference: Option<EntityReference>,
+}
+
+impl std::fmt::Display for QueryEntityTypeWithPoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for QueryEntityTypeWithPoint {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![if let Some(reference) = &self.reference {
+            format!("{:?}", reference).into()
+        } else {
+            String::new().into()
+        }]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["reference".into()]
     }
 }
 
@@ -19865,6 +21093,83 @@ impl tabled::Tabled for RegionGetQueryPoint {
     }
 }
 
+#[doc = "The response from the 'RegionGetResolvableIntersectionInfo'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RegionGetResolvableIntersectionInfo {
+    #[doc = "True if the region lies within the clockwise interior of the two intersections \
+             (inside a \"right\" turn from the segment to the intersection segment)"]
+    pub curve_clockwise: bool,
+    #[doc = "The total number of intersections between the two curves."]
+    pub intersection_count: u32,
+    #[doc = "Disambiguator providing the index of the intersection.  Can be non-zero if the two \
+             curves intersect multiple times"]
+    pub intersection_index: u32,
+    #[doc = "The UUID of the curve that intersects the walking curve that also borders the \
+             queried region"]
+    pub intersection_segment: uuid::Uuid,
+    #[doc = "The UUID of the walking curve that borders the queried region"]
+    pub segment: uuid::Uuid,
+}
+
+impl std::fmt::Display for RegionGetResolvableIntersectionInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RegionGetResolvableIntersectionInfo {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.curve_clockwise).into(),
+            format!("{:?}", self.intersection_count).into(),
+            format!("{:?}", self.intersection_index).into(),
+            format!("{:?}", self.intersection_segment).into(),
+            format!("{:?}", self.segment).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "curve_clockwise".into(),
+            "intersection_count".into(),
+            "intersection_index".into(),
+            "intersection_segment".into(),
+            "segment".into(),
+        ]
+    }
+}
+
+#[doc = "Region-creation algorithm version."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum RegionVersion {
+    #[doc = "The original region creation method. This should NOT be used anymore, but is \
+             maintained to avoid breaking old models."]
+    V0,
+    #[doc = "Fixes the bug in V0 where creating a region would shuffle the mapping from segment \
+             names/IDs to actual segment geometry."]
+    V1,
+}
+
 #[doc = "What is the given geometry relative to?"]
 #[derive(
     serde :: Serialize,
@@ -19922,7 +21227,14 @@ impl tabled::Tabled for RemoveSceneObjects {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Revolve {}
+pub struct Revolve {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Revolve {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -19936,13 +21248,24 @@ impl std::fmt::Display for Revolve {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Revolve {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -19950,7 +21273,14 @@ impl tabled::Tabled for Revolve {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct RevolveAboutEdge {}
+pub struct RevolveAboutEdge {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for RevolveAboutEdge {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -19964,13 +21294,24 @@ impl std::fmt::Display for RevolveAboutEdge {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for RevolveAboutEdge {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -20225,7 +21566,10 @@ pub struct SamlIdentityProvider {
     #[doc = "The organization ID the SAML identity provider belongs to."]
     pub org_id: uuid::Uuid,
     #[doc = "The private key for the SAML identity provider. This is the PEM corresponding to the \
-             X509 pair."]
+             X509 pair.\n\nNever serialized in API responses: the SP signing key is a secret used \
+             internally to sign AuthnRequests, and would otherwise leak to admin GETs, audit \
+             logs, support tooling, and browser history. Input is accepted via the dedicated \
+             `SamlIdentityProviderCreate` body type, not by deserializing this struct."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub private_key: Option<base64::Base64Data>,
     #[doc = "The public certificate for the SAML identity provider. This is the PEM corresponding \
@@ -20541,6 +21885,34 @@ impl std::fmt::Display for SelectClear {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for SelectClear {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `SelectEntity` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SelectEntity {}
+
+impl std::fmt::Display for SelectEntity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SelectEntity {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -20936,6 +22308,14 @@ impl crate::types::paginate::Pagination for ServiceAccountResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -20944,7 +22324,7 @@ impl crate::types::paginate::Pagination for ServiceAccountResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -21483,6 +22863,14 @@ impl crate::types::paginate::Pagination for ShortlinkResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -21491,7 +22879,7 @@ impl crate::types::paginate::Pagination for ShortlinkResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -21601,6 +22989,34 @@ impl std::fmt::Display for Solid2DAddHole {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Solid2DAddHole {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the `Solid3dCutEdgeReferences` endpoint."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Solid3DCutEdgeReferences {}
+
+impl std::fmt::Display for Solid3DCutEdgeReferences {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Solid3DCutEdgeReferences {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -22625,9 +24041,10 @@ pub enum SubscriptionTierPrice {
         #[doc = "The price."]
         price: f64,
     },
-    #[doc = "Enterprise: The price is not listed and the user needs to contact sales."]
-    #[serde(rename = "enterprise")]
-    Enterprise {},
+    #[doc = "Contract-managed pricing. The price is not self-serve and the customer must contact \
+             sales."]
+    #[serde(rename = "contract")]
+    Contract {},
 }
 
 #[doc = "An enum representing a subscription tier type."]
@@ -22849,6 +24266,49 @@ impl tabled::Tabled for SurfaceBlend {
     }
 }
 
+#[doc = "Details of a surface that was created under some body."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SurfaceCreated {
+    #[doc = "Which segment IDs was this surface swept from?"]
+    pub from_segments: Vec<uuid::Uuid>,
+    #[doc = "The surface's ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Which number face of the parent body is this?"]
+    pub primitive_face_index: u32,
+}
+
+impl std::fmt::Display for SurfaceCreated {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SurfaceCreated {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.from_segments).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.primitive_face_index).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "from_segments".into(),
+            "id".into(),
+            "primitive_face_index".into(),
+        ]
+    }
+}
+
 #[doc = "An object id, that corresponds to a surface body, and a list of edges of the surface."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -22889,7 +24349,14 @@ impl tabled::Tabled for SurfaceEdgeReference {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct Sweep {}
+pub struct Sweep {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for Sweep {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -22903,13 +24370,24 @@ impl std::fmt::Display for Sweep {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Sweep {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -23807,6 +25285,14 @@ impl crate::types::paginate::Pagination for TextToCadResponseResultsPage {
         &self,
         req: reqwest::Request,
     ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
         let mut req = req.try_clone().ok_or_else(|| {
             crate::types::error::Error::InvalidRequest(format!(
                 "failed to clone request: {:?}",
@@ -23815,7 +25301,7 @@ impl crate::types::paginate::Pagination for TextToCadResponseResultsPage {
         })?;
         req.url_mut()
             .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
         Ok(req)
     }
 
@@ -24049,7 +25535,14 @@ impl tabled::Tabled for TransformByForPoint4D {
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct TwistExtrude {}
+pub struct TwistExtrude {
+    #[doc = "Any new bodies created by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_created: Option<BodiesCreated>,
+    #[doc = "Any existing bodies updated by the request."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bodies_updated: Option<BodiesUpdated>,
+}
 
 impl std::fmt::Display for TwistExtrude {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
@@ -24063,13 +25556,24 @@ impl std::fmt::Display for TwistExtrude {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for TwistExtrude {
-    const LENGTH: usize = 0;
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec![
+            if let Some(bodies_created) = &self.bodies_created {
+                format!("{:?}", bodies_created).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(bodies_updated) = &self.bodies_updated {
+                format!("{:?}", bodies_updated).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
+        vec!["bodies_created".into(), "bodies_updated".into()]
     }
 }
 
@@ -25821,6 +27325,10 @@ impl tabled::Tabled for UnitTorqueConversion {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UnitVolume {
+    #[doc = "Cubic millimeters (mm³)"]
+    #[serde(rename = "mm3")]
+    #[display("mm3")]
+    Mm3,
     #[doc = "Cubic centimeters (cc or cm³) <https://en.wikipedia.org/wiki/Cubic_centimeter>"]
     #[serde(rename = "cm3")]
     #[display("cm3")]
@@ -26068,13 +27576,23 @@ impl tabled::Tabled for UpdateMemberToOrgBody {
     }
 }
 
-#[doc = "Request body for updating a public device-flow app."]
+#[doc = "Request body for updating a public OAuth app."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateOAuth2AppRequest {
+    #[doc = "The OAuth grant types this app can use."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub grant_types: Option<Vec<Oauth2AppGrantType>>,
+    #[doc = "The deployment mode for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<Oauth2AppMode>,
     #[doc = "The new display name of the app."]
-    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[doc = "The redirect URIs registered for this app."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub redirect_uris: Option<Vec<String>>,
 }
 
 impl std::fmt::Display for UpdateOAuth2AppRequest {
@@ -26089,13 +27607,39 @@ impl std::fmt::Display for UpdateOAuth2AppRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateOAuth2AppRequest {
-    const LENGTH: usize = 1;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.name.clone().into()]
+        vec![
+            if let Some(grant_types) = &self.grant_types {
+                format!("{:?}", grant_types).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(mode) = &self.mode {
+                format!("{:?}", mode).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(redirect_uris) = &self.redirect_uris {
+                format!("{:?}", redirect_uris).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into()]
+        vec![
+            "grant_types".into(),
+            "mode".into(),
+            "name".into(),
+            "redirect_uris".into(),
+        ]
     }
 }
 
@@ -26104,9 +27648,16 @@ impl tabled::Tabled for UpdateOAuth2AppRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateOrgDataset {
+    #[doc = "Optional description override. Null clears the description."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
     #[doc = "Optional new display name."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[doc = "Optional override for whether a low raw-KCL similarity score should block conversion \
+             success."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub require_raw_kcl_similarity_score_for_success: Option<bool>,
     #[doc = "Optional storage connection overrides."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<UpdateOrgDatasetSource>,
@@ -26124,11 +27675,23 @@ impl std::fmt::Display for UpdateOrgDataset {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateOrgDataset {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(description) = &self.description {
+                format!("{:?}", description).into()
+            } else {
+                String::new().into()
+            },
             if let Some(name) = &self.name {
                 format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(require_raw_kcl_similarity_score_for_success) =
+                &self.require_raw_kcl_similarity_score_for_success
+            {
+                format!("{:?}", require_raw_kcl_similarity_score_for_success).into()
             } else {
                 String::new().into()
             },
@@ -26141,7 +27704,12 @@ impl tabled::Tabled for UpdateOrgDataset {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into(), "source".into()]
+        vec![
+            "description".into(),
+            "name".into(),
+            "require_raw_kcl_similarity_score_for_success".into(),
+            "source".into(),
+        ]
     }
 }
 
@@ -26332,6 +27900,9 @@ pub struct UpdateUser {
     #[doc = "The user's phone number."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub phone: phone_number::PhoneNumber,
+    #[doc = "Public username/handle for community-facing features. Empty clears it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
 }
 
 impl std::fmt::Display for UpdateUser {
@@ -26346,7 +27917,7 @@ impl std::fmt::Display for UpdateUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(company) = &self.company {
@@ -26381,6 +27952,11 @@ impl tabled::Tabled for UpdateUser {
                 String::new().into()
             },
             format!("{:?}", self.phone).into(),
+            if let Some(username) = &self.username {
+                format!("{:?}", username).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -26394,6 +27970,7 @@ impl tabled::Tabled for UpdateUser {
             "is_onboarded".into(),
             "last_name".into(),
             "phone".into(),
+            "username".into(),
         ]
     }
 }
@@ -26460,6 +28037,8 @@ pub struct UserAdminDetails {
     #[doc = "CAD user info collected from website onboarding/CRM form."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_user_info: Option<UserCadInfoAdminDetails>,
+    #[doc = "Whether this user is permanently exempt from blocking."]
+    pub never_block: bool,
     #[doc = "Known payment methods on file."]
     pub payment_methods: Vec<PaymentMethod>,
     #[doc = "Summaries of the known payment methods."]
@@ -26484,7 +28063,7 @@ impl std::fmt::Display for UserAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.active_api_tokens_count).into(),
@@ -26515,6 +28094,7 @@ impl tabled::Tabled for UserAdminDetails {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.never_block).into(),
             format!("{:?}", self.payment_methods).into(),
             format!("{:?}", self.payment_methods_summary).into(),
             if let Some(stripe_customer_id) = &self.stripe_customer_id {
@@ -26540,6 +28120,7 @@ impl tabled::Tabled for UserAdminDetails {
             "block".into(),
             "block_message".into(),
             "cad_user_info".into(),
+            "never_block".into(),
             "payment_methods".into(),
             "payment_methods_summary".into(),
             "stripe_customer_id".into(),
@@ -26553,6 +28134,9 @@ impl tabled::Tabled for UserAdminDetails {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserCadInfoAdminDetails {
+    #[doc = "CAD/API experience level."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_experience_level: Option<CadExperienceLevel>,
     #[doc = "CAD industry selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_industry: Option<CadIndustry>,
@@ -26562,15 +28146,33 @@ pub struct UserCadInfoAdminDetails {
     #[doc = "Company size selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company_size: Option<CompanySize>,
+    #[doc = "Preferred design workflow."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub design_workflow: Option<CadDesignWorkflow>,
+    #[doc = "Whether the user has used Zoo Design Studio or the API before."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_used_zoo_design_studio_or_api_before: Option<bool>,
     #[doc = "Acquisition source selection."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us: Option<CadDiscoverySource>,
     #[doc = "Free-text acquisition source when `other` was selected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us_other: Option<String>,
+    #[doc = "Free-text city for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_city: Option<String>,
+    #[doc = "Free-text country for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_country: Option<String>,
+    #[doc = "Free-text state or region for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_state: Option<String>,
     #[doc = "Number of CAD users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number_of_cad_users: Option<String>,
+    #[doc = "Free-text description of what the user wants to build."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub what_are_you_building: Option<String>,
 }
 
 impl std::fmt::Display for UserCadInfoAdminDetails {
@@ -26585,9 +28187,14 @@ impl std::fmt::Display for UserCadInfoAdminDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserCadInfoAdminDetails {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(cad_experience_level) = &self.cad_experience_level {
+                format!("{:?}", cad_experience_level).into()
+            } else {
+                String::new().into()
+            },
             if let Some(cad_industry) = &self.cad_industry {
                 format!("{:?}", cad_industry).into()
             } else {
@@ -26603,6 +28210,18 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
             } else {
                 String::new().into()
             },
+            if let Some(design_workflow) = &self.design_workflow {
+                format!("{:?}", design_workflow).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(has_used_zoo_design_studio_or_api_before) =
+                &self.has_used_zoo_design_studio_or_api_before
+            {
+                format!("{:?}", has_used_zoo_design_studio_or_api_before).into()
+            } else {
+                String::new().into()
+            },
             if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
                 format!("{:?}", how_did_you_find_us).into()
             } else {
@@ -26613,8 +28232,28 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
             } else {
                 String::new().into()
             },
+            if let Some(location_city) = &self.location_city {
+                format!("{:?}", location_city).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_country) = &self.location_country {
+                format!("{:?}", location_country).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_state) = &self.location_state {
+                format!("{:?}", location_state).into()
+            } else {
+                String::new().into()
+            },
             if let Some(number_of_cad_users) = &self.number_of_cad_users {
                 format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(what_are_you_building) = &self.what_are_you_building {
+                format!("{:?}", what_are_you_building).into()
             } else {
                 String::new().into()
             },
@@ -26623,12 +28262,19 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "cad_experience_level".into(),
             "cad_industry".into(),
             "cad_user_type".into(),
             "company_size".into(),
+            "design_workflow".into(),
+            "has_used_zoo_design_studio_or_api_before".into(),
             "how_did_you_find_us".into(),
             "how_did_you_find_us_other".into(),
+            "location_city".into(),
+            "location_country".into(),
+            "location_state".into(),
             "number_of_cad_users".into(),
+            "what_are_you_building".into(),
         ]
     }
 }
@@ -26647,15 +28293,30 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum UserFeature {
-    #[serde(rename = "aquarium")]
-    #[display("aquarium")]
-    Aquarium,
+    #[serde(rename = "bodies_pane")]
+    #[display("bodies_pane")]
+    BodiesPane,
+    #[serde(rename = "enable_z0006_lint")]
+    #[display("enable_z0006_lint")]
+    EnableZ0006Lint,
+    #[serde(rename = "modeling_dialogs")]
+    #[display("modeling_dialogs")]
+    ModelingDialogs,
+    #[serde(rename = "plugins")]
+    #[display("plugins")]
+    Plugins,
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
-    #[serde(rename = "new_sketch_mode")]
-    #[display("new_sketch_mode")]
-    NewSketchMode,
+    #[serde(rename = "segments_based_regions")]
+    #[display("segments_based_regions")]
+    SegmentsBasedRegions,
+    #[serde(rename = "sketch_experimental_features")]
+    #[display("sketch_experimental_features")]
+    SketchExperimentalFeatures,
+    #[serde(rename = "web_app_file_browser")]
+    #[display("web_app_file_browser")]
+    WebAppFileBrowser,
 }
 
 #[doc = "Enabled features surfaced to end users."]
@@ -27046,79 +28707,6 @@ impl tabled::Tabled for UserResponse {
     }
 }
 
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct UserResponseResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<UserResponse>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for UserResponseResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for UserResponseResultsPage {
-    type Item = UserResponse;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair("next_page", self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for UserResponseResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
 #[doc = "A verification token response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -27391,6 +28979,9 @@ impl tabled::Tabled for WebSocketResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct WebsiteCadUserInfoForm {
+    #[doc = "Experience level with CAD software or APIs."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cad_experience_level: Option<CadExperienceLevel>,
     #[doc = "The industry of the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cad_industry: Option<CadIndustry>,
@@ -27400,15 +28991,33 @@ pub struct WebsiteCadUserInfoForm {
     #[doc = "Optional company size metadata."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company_size: Option<CompanySize>,
+    #[doc = "Which design workflow the user is most excited about."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub design_workflow: Option<CadDesignWorkflow>,
+    #[doc = "Whether the user has used Zoo Design Studio or the API before."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub has_used_zoo_design_studio_or_api_before: Option<bool>,
     #[doc = "How the user found Zoo."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us: Option<CadDiscoverySource>,
     #[doc = "Optional free-text value when \"Other\" is selected."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub how_did_you_find_us_other: Option<String>,
+    #[doc = "Optional city for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_city: Option<String>,
+    #[doc = "Optional country for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_country: Option<String>,
+    #[doc = "Optional state or region for the user's location."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location_state: Option<String>,
     #[doc = "The number of CAD users."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub number_of_cad_users: Option<String>,
+    #[doc = "Optional free-text description of what the user wants to build."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub what_are_you_building: Option<String>,
 }
 
 impl std::fmt::Display for WebsiteCadUserInfoForm {
@@ -27423,9 +29032,14 @@ impl std::fmt::Display for WebsiteCadUserInfoForm {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for WebsiteCadUserInfoForm {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(cad_experience_level) = &self.cad_experience_level {
+                format!("{:?}", cad_experience_level).into()
+            } else {
+                String::new().into()
+            },
             if let Some(cad_industry) = &self.cad_industry {
                 format!("{:?}", cad_industry).into()
             } else {
@@ -27441,6 +29055,18 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
             } else {
                 String::new().into()
             },
+            if let Some(design_workflow) = &self.design_workflow {
+                format!("{:?}", design_workflow).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(has_used_zoo_design_studio_or_api_before) =
+                &self.has_used_zoo_design_studio_or_api_before
+            {
+                format!("{:?}", has_used_zoo_design_studio_or_api_before).into()
+            } else {
+                String::new().into()
+            },
             if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
                 format!("{:?}", how_did_you_find_us).into()
             } else {
@@ -27451,8 +29077,28 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
             } else {
                 String::new().into()
             },
+            if let Some(location_city) = &self.location_city {
+                format!("{:?}", location_city).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_country) = &self.location_country {
+                format!("{:?}", location_country).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(location_state) = &self.location_state {
+                format!("{:?}", location_state).into()
+            } else {
+                String::new().into()
+            },
             if let Some(number_of_cad_users) = &self.number_of_cad_users {
                 format!("{:?}", number_of_cad_users).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(what_are_you_building) = &self.what_are_you_building {
+                format!("{:?}", what_are_you_building).into()
             } else {
                 String::new().into()
             },
@@ -27461,12 +29107,19 @@ impl tabled::Tabled for WebsiteCadUserInfoForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "cad_experience_level".into(),
             "cad_industry".into(),
             "cad_user_type".into(),
             "company_size".into(),
+            "design_workflow".into(),
+            "has_used_zoo_design_studio_or_api_before".into(),
             "how_did_you_find_us".into(),
             "how_did_you_find_us_other".into(),
+            "location_city".into(),
+            "location_country".into(),
+            "location_state".into(),
             "number_of_cad_users".into(),
+            "what_are_you_building".into(),
         ]
     }
 }
@@ -27689,9 +29342,6 @@ pub struct ZooProductSubscription {
     #[doc = "Features that are included in the subscription."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<SubscriptionTierFeature>>,
-    #[doc = "Indicates whether this plan uses custom-quoted pricing."]
-    #[serde(default)]
-    pub is_custom_quote: bool,
     #[doc = "Indicates whether the plan enables custom ML models."]
     #[serde(default)]
     pub ml_custom_models: bool,
@@ -27740,7 +29390,7 @@ impl std::fmt::Display for ZooProductSubscription {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscription {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(annual_discount) = &self.annual_discount {
@@ -27769,7 +29419,6 @@ impl tabled::Tabled for ZooProductSubscription {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.is_custom_quote).into(),
             format!("{:?}", self.ml_custom_models).into(),
             if let Some(monthly_pay_as_you_go_api_credits) = &self.monthly_pay_as_you_go_api_credits
             {
@@ -27815,7 +29464,6 @@ impl tabled::Tabled for ZooProductSubscription {
             "display_name".into(),
             "endpoints_included".into(),
             "features".into(),
-            "is_custom_quote".into(),
             "ml_custom_models".into(),
             "monthly_pay_as_you_go_api_credits".into(),
             "monthly_pay_as_you_go_api_credits_monetary_value".into(),
@@ -27992,6 +29640,142 @@ pub enum ZooTool {
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
     TextToCad,
+}
+
+#[doc = "Zookeeper Auto-router decision metadata persisted on a copilot prompt."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZookeeperAutoRouterMetadata {
+    #[doc = "Auto-router classifier bucket, e.g. \"simple\", \"moderate\", or \"complex\"."]
+    pub bucket: String,
+    #[doc = "Prompt template/config label used by the router."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_template: Option<String>,
+    #[doc = "Human-readable route reasons."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasons: Option<Vec<String>>,
+    #[doc = "Selection stage, e.g. \"classifier\" or \"replay\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stage: Option<String>,
+}
+
+impl std::fmt::Display for ZookeeperAutoRouterMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZookeeperAutoRouterMetadata {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.bucket.clone().into(),
+            if let Some(prompt_template) = &self.prompt_template {
+                format!("{:?}", prompt_template).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(reasons) = &self.reasons {
+                format!("{:?}", reasons).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stage) = &self.stage {
+                format!("{:?}", stage).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "bucket".into(),
+            "prompt_template".into(),
+            "reasons".into(),
+            "stage".into(),
+        ]
+    }
+}
+
+#[doc = "Local replay data for a single successful Zookeeper project edit."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZookeeperEditPatch {
+    #[doc = "Project files changed by this Zookeeper edit."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub changed_files: Option<Vec<ZookeeperEditPatchFile>>,
+    #[doc = "Stable id for the Zookeeper run that produced this edit."]
+    pub run_id: String,
+}
+
+impl std::fmt::Display for ZookeeperEditPatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZookeeperEditPatch {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(changed_files) = &self.changed_files {
+                format!("{:?}", changed_files).into()
+            } else {
+                String::new().into()
+            },
+            self.run_id.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["changed_files".into(), "run_id".into()]
+    }
+}
+
+#[doc = "Replay data for one project file changed by a Zookeeper edit."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "status")]
+pub enum ZookeeperEditPatchFile {
+    #[doc = "The file was created by Zookeeper."]
+    #[serde(rename = "created")]
+    Created {
+        #[doc = "File contents created by Zookeeper."]
+        contents: String,
+        #[doc = "Project-relative path to the changed file."]
+        path: String,
+    },
+    #[doc = "The file was modified by Zookeeper."]
+    #[serde(rename = "modified")]
+    Modified {
+        #[doc = "Machine-applicable unified diff from the previous contents to the new contents."]
+        diff: String,
+        #[doc = "Project-relative path to the changed file."]
+        path: String,
+    },
+    #[doc = "The file was deleted by Zookeeper."]
+    #[serde(rename = "deleted")]
+    Deleted {
+        #[doc = "Project-relative path to the changed file."]
+        path: String,
+        #[doc = "File contents before Zookeeper deleted the file."]
+        previous_contents: String,
+    },
 }
 
 #[doc = "The response from the `ZoomToFit` command."]

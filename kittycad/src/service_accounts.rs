@@ -71,55 +71,76 @@ impl ServiceAccounts {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path = ("org/service-accounts").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_for_org(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/service-accounts"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::ServiceAccountResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::ServiceAccountResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -227,10 +248,12 @@ impl ServiceAccounts {
              an org member. It deletes the requested service account for the organization.\n\nThis \
              endpoint does not actually delete the service account from the database. It merely \
              marks the token as invalid. We still want to keep the service account in the database \
-             for historical purposes.\n\n**Parameters:**\n\n- `token: &'astr`: The service \
-             account. (required)\n\n```rust,no_run\nasync fn \
-             example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        \
+             for historical purposes.\n\nThe token path parameter can be either the full service \
+             account token (prefixed with `svc-`) or the token's unique ID (a \
+             UUID).\n\n**Parameters:**\n\n- `token: &'astr`: The service account token (prefixed \
+             with `svc-`) or the token's unique ID (a UUID). (required)\n\n```rust,no_run\nasync \
+             fn example_service_accounts_delete_for_org() -> anyhow::Result<()> {\n    let client \
+             = kittycad::Client::new_from_env();\n    client\n        .service_accounts()\n        \
              .delete_for_org(\"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn delete_for_org<'a>(

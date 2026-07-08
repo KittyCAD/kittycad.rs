@@ -22,7 +22,31 @@ impl Ml {
         Self { client }
     }
 
-    #[doc = "Generate a CAD model from text.\n\nBecause our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated parts. Any other formats you request here will also be returned when you list your generated parts.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.\n\n**Parameters:**\n\n- `kcl: Option<bool>`: If we should output the kcl for the model.\n- `output_format: crate::types::FileExportFormat`: The format the output file should be converted to. (required)\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCad = client\n        .ml()\n        .create_text_to_cad(\n            Some(true),\n            kittycad::types::FileExportFormat::Ply,\n            &kittycad::types::TextToCadCreateBody {\n                kcl_version: Some(\"some-string\".to_string()),\n                model_version: Some(\"some-string\".to_string()),\n                project_name: Some(\"some-string\".to_string()),\n                prompt: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Generate a CAD model from text.\n\nPrefer the ML copilot websocket (`/ws/ml/copilot`) \
+             for new integrations. This REST endpoint is kept for existing Text-to-CAD clients, \
+             but it is no longer the recommended way to generate CAD models from a \
+             prompt.\n\nBecause our source of truth for the resulting model is a STEP file, you \
+             will always have STEP file contents when you list your generated parts. Any other \
+             formats you request here will also be returned when you list your generated \
+             parts.\n\nThis operation is performed asynchronously, the `id` of the operation will \
+             be returned. You can use the `id` returned from the request to get status information \
+             about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to \
+             note, if you hit the cache, this endpoint will return right away. So you only have to \
+             wait if the status is not `Completed` or `Failed`.\n\n**Parameters:**\n\n- `kcl: \
+             Option<bool>`: If we should output the kcl for the model.\n- `output_format: \
+             crate::types::FileExportFormat`: The format the output file should be converted to. \
+             (required)\n\n**NOTE:** This operation is marked as \
+             deprecated.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::TextToCad = client\n        .ml()\n        \
+             .create_text_to_cad(\n            Some(true),\n            \
+             kittycad::types::FileExportFormat::Ply,\n            \
+             &kittycad::types::TextToCadCreateBody {\n                kcl_version: \
+             Some(\"some-string\".to_string()),\n                model_version: \
+             Some(\"some-string\".to_string()),\n                project_name: \
+             Some(\"some-string\".to_string()),\n                prompt: \
+             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad<'a>(
         &'a self,
@@ -47,174 +71,6 @@ impl Ml {
 
         req = req.query(&query_params);
         req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "List all ML prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by a Zoo employee.\n\nThe ML prompts are returned in order of creation, with the most recently created ML prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn list_prompts<'a>(
-        &'a self,
-        limit: Option<u32>,
-        page_token: Option<String>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::MlPromptResponseResultsPage, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!("{}/{}", self.client.base_url, "ml-prompts"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
-        }
-
-        if let Some(p) = page_token {
-            query_params.push(("page_token", p));
-        }
-
-        if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "List all ML prompts.\n\nFor text-to-cad prompts, this will always return the STEP file contents as well as the format the user originally requested.\n\nThis endpoint requires authentication by a Zoo employee.\n\nThe ML prompts are returned in order of creation, with the most recently created ML prompts first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_ml_list_prompts_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut ml = client.ml();\n    let mut stream = ml.list_prompts_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    #[cfg(not(feature = "js"))]
-    pub fn list_prompts_stream<'a>(
-        &'a self,
-        limit: Option<u32>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<
-        Item = Result<crate::types::MlPromptResponse, crate::types::error::Error>,
-    > + Unpin
-           + '_ {
-        use futures::{StreamExt, TryFutureExt, TryStreamExt};
-
-        use crate::types::paginate::Pagination;
-        let stream = self
-            .list_prompts(limit, None, sort_by)
-            .map_ok(move |result| {
-                let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages = futures::stream::try_unfold(
-                    (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "ml-prompts"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
-                                            status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
-                                }
-                            }
-                            .map_ok(|result: crate::types::MlPromptResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
-                        }
-                    },
-                )
-                .try_flatten();
-                items.chain(next_pages)
-            })
-            .try_flatten_stream();
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
-        }
-    }
-
-    #[doc = "Get a ML prompt.\n\nThis endpoint requires authentication by a Zoo \
-             employee.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The id of the model to give \
-             feedback to. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_ml_get_prompt() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::MlPromptResponse \
-             = client\n        .ml()\n        .get_prompt(uuid::Uuid::from_str(\n            \
-             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_prompt<'a>(
-        &'a self,
-        id: uuid::Uuid,
-    ) -> Result<crate::types::MlPromptResponse, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "ml-prompts/{id}".replace("{id}", &format!("{}", id))
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -293,55 +149,76 @@ impl Ml {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path = ("ml/conversations").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_conversations_for_user(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "ml/conversations"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::ConversationResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::ConversationResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -628,7 +505,7 @@ impl Ml {
         }
     }
 
-    #[doc = "Iterate on a CAD model with a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint will soon be deprecated in favor of the `/ml/text-to-cad/multi-file/iteration` endpoint. In that the endpoint path will remain but it will have the same behavior as `ml/text-to-cad/multi-file/iteration`.\n\n**NOTE:** This operation is marked as deprecated.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            kcl_version: Some(\"some-string\".to_string()),\n            original_source_code: \"some-string\".to_string(),\n            project_name: Some(\"some-string\".to_string()),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                file: Some(\"some-string\".to_string()),\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Iterate on a CAD model with a prompt.\n\nPrefer the ML copilot websocket (`/ws/ml/copilot`) for new prompt-to-edit integrations. This REST endpoint is kept for existing clients, but it is no longer the recommended way to edit KCL or CAD models from a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint is deprecated in favor of `/ws/ml/copilot`.\n\n**NOTE:** This operation is marked as deprecated.\n\n```rust,no_run\nasync fn example_ml_create_text_to_cad_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadIteration = client\n        .ml()\n        .create_text_to_cad_iteration(&kittycad::types::TextToCadIterationBody {\n            kcl_version: Some(\"some-string\".to_string()),\n            original_source_code: \"some-string\".to_string(),\n            project_name: Some(\"some-string\".to_string()),\n            prompt: Some(\"some-string\".to_string()),\n            source_ranges: vec![kittycad::types::SourceRangePrompt {\n                file: Some(\"some-string\".to_string()),\n                prompt: \"some-string\".to_string(),\n                range: kittycad::types::SourceRange {\n                    end: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                    start: kittycad::types::SourcePosition {\n                        column: 4 as u32,\n                        line: 4 as u32,\n                    },\n                },\n            }],\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad_iteration<'a>(
         &'a self,
@@ -659,7 +536,7 @@ impl Ml {
         }
     }
 
-    #[doc = "Iterate on a multi-file CAD model with a prompt.\n\nThis endpoint can iterate on multi-file projects.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_create_text_to_cad_multi_file_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadMultiFileIteration = client\n        .ml()\n        .create_text_to_cad_multi_file_iteration(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::TextToCadMultiFileIterationBody {\n                conversation_id: Some(uuid::Uuid::from_str(\n                    \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n                )?),\n                kcl_version: Some(\"some-string\".to_string()),\n                project_name: Some(\"some-string\".to_string()),\n                prompt: Some(\"some-string\".to_string()),\n                source_ranges: Some(vec![kittycad::types::SourceRangePrompt {\n                    file: Some(\"some-string\".to_string()),\n                    prompt: \"some-string\".to_string(),\n                    range: kittycad::types::SourceRange {\n                        end: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                        start: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                    },\n                }]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Iterate on a multi-file CAD model with a prompt.\n\nPrefer the ML copilot websocket (`/ws/ml/copilot`) for new prompt-to-edit integrations. This REST endpoint is kept for existing multi-file iteration clients, but it is no longer the recommended way to edit KCL or CAD models from a prompt.\n\nThis endpoint can iterate on multi-file projects.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.\n\n**NOTE:** This operation is marked as deprecated.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_ml_create_text_to_cad_multi_file_iteration() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::TextToCadMultiFileIteration = client\n        .ml()\n        .create_text_to_cad_multi_file_iteration(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            &kittycad::types::TextToCadMultiFileIterationBody {\n                conversation_id: Some(uuid::Uuid::from_str(\n                    \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n                )?),\n                kcl_version: Some(\"some-string\".to_string()),\n                project_name: Some(\"some-string\".to_string()),\n                prompt: Some(\"some-string\".to_string()),\n                source_ranges: Some(vec![kittycad::types::SourceRangePrompt {\n                    file: Some(\"some-string\".to_string()),\n                    prompt: \"some-string\".to_string(),\n                    range: kittycad::types::SourceRange {\n                        end: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                        start: kittycad::types::SourcePosition {\n                            column: 4 as u32,\n                            line: 4 as u32,\n                        },\n                    },\n                }]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_text_to_cad_multi_file_iteration<'a>(
         &'a self,
@@ -784,55 +661,96 @@ impl Ml {
         let mut params = params;
         params.page_token = Default::default();
         let params_for_call = params.clone();
+        let ListTextToCadPartsForUserParams {
+            conversation_id,
+            limit,
+            no_models,
+            no_parts,
+            sort_by,
+            ..
+        } = params;
+        let pagination_url_path = ("user/text-to-cad").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = conversation_id.as_ref() {
+            pagination_query_params.push(("conversation_id", format!("{}", p)));
+        }
+
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = no_models.as_ref() {
+            pagination_query_params.push(("no_models", format!("{}", p)));
+        }
+
+        if let Some(p) = no_parts.as_ref() {
+            pagination_query_params.push(("no_parts", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_text_to_cad_parts_for_user(params_for_call)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "user/text-to-cad"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::TextToCadResponseResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::TextToCadResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -981,11 +899,22 @@ impl Ml {
                 ),
             );
         let resp = req.send().await?;
+        let headers = resp.headers().clone();
         if resp.status().is_client_error() || resp.status().is_server_error() {
-            return Err(crate::types::error::Error::UnexpectedResponse(resp));
+            let status = resp.status();
+            let url = resp.url().to_string();
+            let body = resp
+                .text()
+                .await
+                .unwrap_or_else(|_| "<error reading body>".to_owned());
+            return Err(crate::types::error::Error::UnexpectedResponse {
+                url,
+                status,
+                body,
+                headers,
+            });
         }
 
-        let headers = resp.headers().clone();
         let upgraded = resp
             .upgrade()
             .await
@@ -1022,11 +951,22 @@ impl Ml {
                 ),
             );
         let resp = req.send().await?;
+        let headers = resp.headers().clone();
         if resp.status().is_client_error() || resp.status().is_server_error() {
-            return Err(crate::types::error::Error::UnexpectedResponse(resp));
+            let status = resp.status();
+            let url = resp.url().to_string();
+            let body = resp
+                .text()
+                .await
+                .unwrap_or_else(|_| "<error reading body>".to_owned());
+            return Err(crate::types::error::Error::UnexpectedResponse {
+                url,
+                status,
+                body,
+                headers,
+            });
         }
 
-        let headers = resp.headers().clone();
         let upgraded = resp
             .upgrade()
             .await

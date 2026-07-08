@@ -2,6 +2,38 @@ use anyhow::Result;
 
 use crate::Client;
 #[derive(Clone, Debug)]
+pub struct Oauth2AuthorizeParams<'a> {
+    pub client_id: uuid::Uuid,
+    pub code_challenge: &'a str,
+    pub code_challenge_method: crate::types::Oauth2CodeChallengeMethod,
+    pub redirect_uri: &'a str,
+    pub response_type: crate::types::Oauth2AuthorizationResponseType,
+    pub scope: Option<String>,
+    pub state: &'a str,
+}
+
+impl<'a> Oauth2AuthorizeParams<'a> {
+    pub fn new(
+        client_id: uuid::Uuid,
+        code_challenge: &'a str,
+        code_challenge_method: crate::types::Oauth2CodeChallengeMethod,
+        redirect_uri: &'a str,
+        response_type: crate::types::Oauth2AuthorizationResponseType,
+        state: &'a str,
+    ) -> Self {
+        Self {
+            client_id,
+            code_challenge,
+            code_challenge_method,
+            redirect_uri,
+            response_type,
+            scope: Default::default(),
+            state,
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Oauth2 {
     pub client: Client,
 }
@@ -10,6 +42,160 @@ impl Oauth2 {
     #[doc(hidden)]
     pub fn new(client: Client) -> Self {
         Self { client }
+    }
+
+    #[doc = "Get a pending OAuth 2.0 authorization request for the consent page.\n\n**Parameters:**\n\n- `request_id: uuid::Uuid`: The pending authorization request ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_get_oauth_2_authorization_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AuthorizationRequestResponse = client\n        .oauth2()\n        .get_oauth_2_authorization_request(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_oauth_2_authorization_request<'a>(
+        &'a self,
+        request_id: uuid::Uuid,
+    ) -> Result<crate::types::Oauth2AuthorizationRequestResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/authorization-requests/{request_id}"
+                    .replace("{request_id}", &format!("{}", request_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Approve a pending OAuth 2.0 authorization request.\n\n**Parameters:**\n\n- `request_id: uuid::Uuid`: The pending authorization request ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_approve_oauth_2_authorization_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AuthorizationDecisionResponse = client\n        .oauth2()\n        .approve_oauth_2_authorization_request(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn approve_oauth_2_authorization_request<'a>(
+        &'a self,
+        request_id: uuid::Uuid,
+    ) -> Result<crate::types::Oauth2AuthorizationDecisionResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/authorization-requests/{request_id}/approve"
+                    .replace("{request_id}", &format!("{}", request_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Deny a pending OAuth 2.0 authorization request.\n\n**Parameters:**\n\n- `request_id: uuid::Uuid`: The pending authorization request ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_deny_oauth_2_authorization_request() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AuthorizationDecisionResponse = client\n        .oauth2()\n        .deny_oauth_2_authorization_request(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn deny_oauth_2_authorization_request<'a>(
+        &'a self,
+        request_id: uuid::Uuid,
+    ) -> Result<crate::types::Oauth2AuthorizationDecisionResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "oauth2/authorization-requests/{request_id}/deny"
+                    .replace("{request_id}", &format!("{}", request_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Start an OAuth 2.0 authorization code flow with PKCE.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth app client ID. (required)\n- `code_challenge: &'astr`: The PKCE code challenge. (required)\n- `code_challenge_method: crate::types::Oauth2CodeChallengeMethod`: The PKCE challenge method. (required)\n- `redirect_uri: &'astr`: The redirect URI for the client. (required)\n- `response_type: crate::types::Oauth2AuthorizationResponseType`: The OAuth response type. (required)\n- `scope: Option<String>`: The requested OAuth scopes.\n- `state: &'astr`: Opaque client state to round-trip back to the client. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_authorize() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_authorize(kittycad::oauth2::Oauth2AuthorizeParams {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            code_challenge: \"some-string\",\n            code_challenge_method: kittycad::types::Oauth2CodeChallengeMethod::S256,\n            redirect_uri: \"https://example.com/foo/bar\",\n            response_type: kittycad::types::Oauth2AuthorizationResponseType::Code,\n            scope: Some(\"some-string\".to_string()),\n            state: \"some-string\",\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn oauth_2_authorize<'a>(
+        &'a self,
+        params: Oauth2AuthorizeParams<'a>,
+    ) -> Result<(), crate::types::error::Error> {
+        let Oauth2AuthorizeParams {
+            client_id,
+            code_challenge,
+            code_challenge_method,
+            redirect_uri,
+            response_type,
+            scope,
+            state,
+        } = params;
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "oauth2/authorize"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![
+            ("client_id", format!("{}", client_id)),
+            ("code_challenge", code_challenge.to_string()),
+            (
+                "code_challenge_method",
+                format!("{}", code_challenge_method),
+            ),
+            ("redirect_uri", redirect_uri.to_string()),
+            ("response_type", format!("{}", response_type)),
+            ("state", state.to_string()),
+        ];
+        if let Some(p) = scope {
+            query_params.push(("scope", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
     }
 
     #[doc = "Start an OAuth 2.0 Device Authorization Grant.\n\nThis endpoint is designed to be \
@@ -144,7 +330,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `code: Option<String>`: The authorization code.\n- `id_token: Option<String>`: For Apple only, a JSON web token containing the user’s identity information.\n- `provider: crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: The state that we had passed in through the user consent URL.\n- `user: Option<String>`: For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`\n\n```rust,no_run\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Microsoft,\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Listen for callbacks for the OAuth 2.0 provider.\n\n**Parameters:**\n\n- `code: Option<String>`: The authorization code.\n- `id_token: Option<String>`: For Apple only, a JSON web token containing the user’s identity information.\n- `provider: crate::types::AccountProvider`: The provider. (required)\n- `state: Option<String>`: The state that we had passed in through the user consent URL.\n- `user: Option<String>`: For Apple only, a JSON string containing the data requested in the scope property. The returned data is in the following format: `{ \"name\": { \"firstName\": string, \"lastName\": string }, \"email\": string }`\n\n```rust,no_run\nasync fn example_oauth2_oauth_2_provider_callback() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_provider_callback(\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            kittycad::types::AccountProvider::Github,\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_callback<'a>(
         &'a self,
@@ -201,10 +387,9 @@ impl Oauth2 {
              example_oauth2_oauth_2_provider_callback_post() -> anyhow::Result<()> {\n    let \
              client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        \
              .oauth_2_provider_callback_post(\n            \
-             kittycad::types::AccountProvider::Microsoft,\n            \
-             &kittycad::types::AuthCallback {\n                code: \
-             Some(\"some-string\".to_string()),\n                id_token: \
-             Some(\"some-string\".to_string()),\n                state: \
+             kittycad::types::AccountProvider::Github,\n            &kittycad::types::AuthCallback \
+             {\n                code: Some(\"some-string\".to_string()),\n                \
+             id_token: Some(\"some-string\".to_string()),\n                state: \
              Some(\"some-string\".to_string()),\n                user: \
              Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    \
              Ok(())\n}\n```"]
@@ -246,7 +431,7 @@ impl Oauth2 {
              kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2ClientInfo \
              = client\n        .oauth2()\n        .oauth_2_provider_consent(\n            \
              Some(\"some-string\".to_string()),\n            \
-             kittycad::types::AccountProvider::Microsoft,\n        )\n        .await?;\n    \
+             kittycad::types::AccountProvider::Github,\n        )\n        .await?;\n    \
              println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn oauth_2_provider_consent<'a>(
@@ -280,6 +465,31 @@ impl Oauth2 {
                     status,
                 )
             })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Exchange an authorization code or refresh token for an OAuth 2.0 access token.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_oauth_2_token() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .oauth2()\n        .oauth_2_token(&kittycad::types::Oauth2TokenRequestForm {\n            client_id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            code: Some(\"some-string\".to_string()),\n            code_verifier: Some(\"some-string\".to_string()),\n            grant_type: kittycad::types::Oauth2TokenGrantType::RefreshToken,\n            redirect_uri: Some(\"https://example.com/foo/bar\".to_string()),\n            refresh_token: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn oauth_2_token<'a>(
+        &'a self,
+        body: &crate::types::Oauth2TokenRequestForm,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "oauth2/token"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.form(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
         } else {
             let text = resp.text().await.unwrap_or_default();
             Err(crate::types::error::Error::Server {
@@ -408,55 +618,76 @@ impl Oauth2 {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path = ("org/oauth2/apps").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_org_oauth_2_apps(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/oauth2/apps"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -475,14 +706,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
-             creates an active public device-flow app owned by the authenticated \
-             organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
-             .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            name: \
-             \"some-string\".to_string(),\n        })\n        .await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+    #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It creates an active public OAuth app owned by the authenticated organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            mode: Some(kittycad::types::Oauth2AppMode::Production),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_org_oauth_2_app<'a>(
         &'a self,
@@ -547,17 +771,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Update an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It \
-             updates the name of the organization's active public OAuth \
-             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
-             = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
-             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It updates the configuration of the organization's active public OAuth app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_update_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_org_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n                mode: Some(kittycad::types::Oauth2AppMode::Production),\n                name: Some(\"some-string\".to_string()),\n                redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_org_oauth_2_app<'a>(
         &'a self,
@@ -695,59 +909,77 @@ impl Oauth2 {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path =
+            ("orgs/{id}/oauth2/apps".replace("{id}", &format!("{}", id))).to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_oauth_2_apps_for_any_org(id, limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!(
-                                        "{}/{}",
-                                        self.client.base_url,
-                                        "orgs/{id}/oauth2/apps".replace("{id}", &format!("{}", id))
-                                    ),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -826,55 +1058,76 @@ impl Oauth2 {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path = ("user/oauth2/apps").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_user_oauth_2_apps(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "user/oauth2/apps"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
@@ -893,14 +1146,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
-             user. It creates an active public device-flow app owned by the authenticated \
-             user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        \
-             .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            \
-             name: \"some-string\".to_string(),\n        })\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It creates an active public OAuth app owned by the authenticated user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            mode: Some(kittycad::types::Oauth2AppMode::Production),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_oauth_2_app<'a>(
         &'a self,
@@ -965,17 +1211,7 @@ impl Oauth2 {
         }
     }
 
-    #[doc = "Update a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo \
-             user. It updates the name of the authenticated user's active public OAuth \
-             app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse \
-             = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::UpdateOAuth2AppRequest {\n                name: \
-             \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    \
-             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It updates the configuration of the authenticated user's active public OAuth app.\n\n**Parameters:**\n\n- `client_id: uuid::Uuid`: The OAuth client identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_oauth2_update_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .update_user_oauth_2_app(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOAuth2AppRequest {\n                grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n                mode: Some(kittycad::types::Oauth2AppMode::Production),\n                name: Some(\"some-string\".to_string()),\n                redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_oauth_2_app<'a>(
         &'a self,
@@ -1113,59 +1349,76 @@ impl Oauth2 {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let pagination_url_path = ("users/{id}/oauth2/apps".replace("{id}", id)).to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
         let stream = self
             .list_oauth_2_apps_for_any_user(id, limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!(
-                                        "{}/{}",
-                                        self.client.base_url,
-                                        "users/{id}/oauth2/apps".replace("{id}", id)
-                                    ),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::Oauth2AppResponseResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
