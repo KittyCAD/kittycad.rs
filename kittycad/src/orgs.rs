@@ -234,74 +234,86 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        let stream = self
-            .list_datasets(limit, None, sort_by)
+        let pagination_url_path = ("org/datasets").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        self.list_datasets(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/datasets"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::OrgDatasetResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::OrgDatasetResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream();
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
-        }
+            .try_flatten_stream()
+            .boxed()
     }
 
-    #[doc = "Register a new org dataset.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            name: \"some-string\".to_string(),\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: Some(\"some-string\".to_string()),\n                provider: kittycad::types::StorageProvider::ZooManaged,\n                uri: Some(\"some-string\".to_string()),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Register a new org dataset.\n\nIf the dataset lives in S3, call `/org/dataset/s3/policies` first so you can generate the trust, permission, and bucket policies scoped to your dataset before invoking this endpoint.\n\n```rust,no_run\nasync fn example_orgs_create_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .create_dataset(&kittycad::types::CreateOrgDataset {\n            description: Some(\"some-string\".to_string()),\n            name: \"some-string\".to_string(),\n            require_raw_kcl_similarity_score_for_success: true,\n            source: kittycad::types::OrgDatasetSource {\n                access_role_arn: Some(\"some-string\".to_string()),\n                provider: kittycad::types::StorageProvider::ZooManaged,\n                uri: Some(\"some-string\".to_string()),\n            },\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_dataset<'a>(
         &'a self,
@@ -373,7 +385,7 @@ impl Orgs {
         }
     }
 
-    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                name: Some(\"some-string\".to_string()),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::ZooManaged),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update dataset metadata or storage credentials for the caller's organization.\n\nIMPORTANT: Use this endpoint to fix connectivity to the same underlying storage location (e.g. rotating credentials or correcting a typo). Do not repoint an existing dataset at a completely different bucket or provider—create a new dataset instead so conversions in flight keep their original source. This warning applies to every storage backend, not just S3.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_update_dataset() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDataset = client\n        .orgs()\n        .update_dataset(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateOrgDataset {\n                description: Some(\"some-string\".to_string()),\n                name: Some(\"some-string\".to_string()),\n                require_raw_kcl_similarity_score_for_success: Some(true),\n                source: Some(kittycad::types::UpdateOrgDatasetSource {\n                    access_role_arn: Some(\"some-string\".to_string()),\n                    provider: Some(kittycad::types::StorageProvider::ZooManaged),\n                    uri: Some(\"some-string\".to_string()),\n                }),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_dataset<'a>(
         &'a self,
@@ -557,16 +569,22 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        let stream = self . list_dataset_conversions (filter , id , limit , None , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , "org/datasets/{id}/conversions" . replace ("{id}" , & format ! ("{}" , id))) ,) ; req = req . bearer_auth (& self . client . token) ; let mut request = req . build () ? ; request = new_result . next_page (request) ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
+        let pagination_url_path =
+            ("org/datasets/{id}/conversions".replace("{id}", &format!("{}", id))).to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = filter.as_ref() {
+            pagination_query_params.push(("filter", p.clone()));
         }
 
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
         }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        self . list_dataset_conversions (filter , id , limit , None , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
     }
 
     #[doc = "Fetch the metadata and converted output for a single dataset conversion.\n\nUnlike list/search endpoints, this returns the full conversion payload: latest output text plus decoded snapshot image payloads for original, raw-KCL, and salon-KCL stages.\n\n**Parameters:**\n\n- `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n- `id: uuid::Uuid`: Dataset identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionDetails = client\n        .orgs()\n        .get_dataset_conversion(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -803,16 +821,23 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        let stream = self . search_dataset_conversions (id , limit , None , q , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , "org/datasets/{id}/search/conversions" . replace ("{id}" , & format ! ("{}" , id))) ,) ; req = req . bearer_auth (& self . client . token) ; let mut request = req . build () ? ; request = new_result . next_page (request) ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
+        let pagination_url_path = ("org/datasets/{id}/search/conversions"
+            .replace("{id}", &format!("{}", id)))
+        .to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
         }
 
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
+        if let Some(p) = q.as_ref() {
+            pagination_query_params.push(("q", p.clone()));
         }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        self . search_dataset_conversions (id , limit , None , q , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
     }
 
     #[doc = "Run semantic search across chunked conversion outputs for a dataset.\n\nThis embeds \
@@ -1018,71 +1043,87 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        let stream = self
-            .list_members(limit, None, role, sort_by)
+        let pagination_url_path = ("org/members").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = role.as_ref() {
+            pagination_query_params.push(("role", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        self.list_members(limit, None, role, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/members"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::OrgMemberResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::OrgMemberResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream();
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
-        }
+            .try_flatten_stream()
+            .boxed()
     }
 
     #[doc = "Add a member to your org.\n\nIf the user exists, this will add them to your org. If \
@@ -1493,245 +1534,97 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
-        let stream = self
-            .get_shortlinks(limit, None, sort_by)
+        let pagination_url_path = ("org/shortlinks").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = sort_by.as_ref() {
+            pagination_query_params.push(("sort_by", format!("{}", p)));
+        }
+
+        self.get_shortlinks(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
                     (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "org/shortlinks"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
                                             status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
+                                        })
+                                    }
                                 }
+                                .map_ok(|result: crate::types::ShortlinkResultsPage| {
+                                    Some((
+                                        futures::stream::iter(result.items().into_iter().map(Ok)),
+                                        (new_result.next_page_token(), result),
+                                    ))
+                                })
+                                .await
+                            } else {
+                                Ok(None)
                             }
-                            .map_ok(|result: crate::types::ShortlinkResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
                         }
                     },
                 )
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream();
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
-        }
+            .try_flatten_stream()
+            .boxed()
     }
 
-    #[doc = "List orgs.\n\nThis endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List every skill that belongs to the caller's organization.\n\n```rust,no_run\nasync \
+             fn example_orgs_list_skills() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             Vec<kittycad::types::OrgSkillResponse> = client.orgs().list_skills().await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn list<'a>(
+    pub async fn list_skills<'a>(
         &'a self,
-        limit: Option<u32>,
-        page_token: Option<String>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> Result<crate::types::OrgResultsPage, crate::types::error::Error> {
+    ) -> Result<Vec<crate::types::OrgSkillResponse>, crate::types::error::Error> {
         let mut req = self.client.client.request(
             http::Method::GET,
-            format!("{}/{}", self.client.base_url, "orgs"),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = limit {
-            query_params.push(("limit", format!("{}", p)));
-        }
-
-        if let Some(p) = page_token {
-            query_params.push(("page_token", p));
-        }
-
-        if let Some(p) = sort_by {
-            query_params.push(("sort_by", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "List orgs.\n\nThis endpoint requires authentication by a Zoo employee. The orgs are returned in order of creation, with the most recently created orgs first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::CreatedAtSortMode>`\n\n```rust,no_run\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_stream(\n        Some(4 as u32),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    #[cfg(not(feature = "js"))]
-    pub fn list_stream<'a>(
-        &'a self,
-        limit: Option<u32>,
-        sort_by: Option<crate::types::CreatedAtSortMode>,
-    ) -> impl futures::Stream<Item = Result<crate::types::Org, crate::types::error::Error>> + Unpin + '_
-    {
-        use futures::{StreamExt, TryFutureExt, TryStreamExt};
-
-        use crate::types::paginate::Pagination;
-        let stream = self
-            .list(limit, None, sort_by)
-            .map_ok(move |result| {
-                let items = futures::stream::iter(result.items().into_iter().map(Ok));
-                let next_pages = futures::stream::try_unfold(
-                    (None, result),
-                    move |(prev_page_token, new_result)| async move {
-                        if new_result.has_more_pages()
-                            && !new_result.items().is_empty()
-                            && prev_page_token != new_result.next_page_token()
-                        {
-                            async {
-                                let mut req = self.client.client.request(
-                                    http::Method::GET,
-                                    format!("{}/{}", self.client.base_url, "orgs"),
-                                );
-                                req = req.bearer_auth(&self.client.token);
-                                let mut request = req.build()?;
-                                request = new_result.next_page(request)?;
-                                let resp = self.client.client.execute(request).await?;
-                                let status = resp.status();
-                                if status.is_success() {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    serde_json::from_str(&text).map_err(|err| {
-                                        crate::types::error::Error::from_serde_error(
-                                            format_serde_error::SerdeError::new(
-                                                text.to_string(),
-                                                err,
-                                            ),
-                                            status,
-                                        )
-                                    })
-                                } else {
-                                    let text = resp.text().await.unwrap_or_default();
-                                    Err(crate::types::error::Error::Server {
-                                        body: text.to_string(),
-                                        status,
-                                    })
-                                }
-                            }
-                            .map_ok(|result: crate::types::OrgResultsPage| {
-                                Some((
-                                    futures::stream::iter(result.items().into_iter().map(Ok)),
-                                    (new_result.next_page_token(), result),
-                                ))
-                            })
-                            .await
-                        } else {
-                            Ok(None)
-                        }
-                    },
-                )
-                .try_flatten();
-                items.chain(next_pages)
-            })
-            .try_flatten_stream();
-        #[cfg(target_arch = "wasm32")]
-        {
-            stream.boxed_local()
-        }
-
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            stream.boxed()
-        }
-    }
-
-    #[doc = "Get an org.\n\nThis endpoint requires authentication by a Zoo employee. It gets the information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_get_any() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Org = client\n        .orgs()\n        .get_any(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_any<'a>(
-        &'a self,
-        id: uuid::Uuid,
-    ) -> Result<crate::types::Org, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "orgs/{id}".replace("{id}", &format!("{}", id))
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Get admin-only details for an organization.\n\nZoo admins can retrieve extended information about any organization, while non-admins receive a 404 to avoid leaking existence.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_admin_details_get() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgAdminDetails = client\n        .orgs()\n        .admin_details_get(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn admin_details_get<'a>(
-        &'a self,
-        id: uuid::Uuid,
-    ) -> Result<crate::types::OrgAdminDetails, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "orgs/{id}/admin/details".replace("{id}", &format!("{}", id))
-            ),
+            format!("{}/{}", self.client.base_url, "org/skills"),
         );
         req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;

@@ -1,4 +1,5 @@
 //! Utility functions used for pagination.
+#![allow(clippy::result_large_err)]
 
 use anyhow::Result;
 
@@ -18,6 +19,15 @@ pub trait Pagination {
         &self,
         req: reqwest::Request,
     ) -> Result<reqwest::Request, crate::types::error::Error>;
+
+    /// Modify a request to get the next page using the operation's page parameter.
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        _page_param: &str,
+    ) -> Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page(req)
+    }
 
     /// Get the items from a page.
     fn items(&self) -> Vec<Self::Item>;
