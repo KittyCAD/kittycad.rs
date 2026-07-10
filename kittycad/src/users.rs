@@ -848,15 +848,7 @@ impl Users {
         }
     }
 
-    #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this \
-             request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). \
-             (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        \
-             .update_subscription_for(\n            \"some-string\",\n            \
-             &kittycad::types::ZooProductSubscriptionsUserRequest {\n                modeling_app: \
-             \"some-string\".to_string(),\n                pay_annually: Some(true),\n            \
-             },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update a subscription for a user.\n\nYou must be a Zoo admin to perform this request.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). (required)\n\n```rust,no_run\nasync fn example_users_update_subscription_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .users()\n        .update_subscription_for(\n            \"some-string\",\n            &kittycad::types::ZooProductSubscriptionsUserRequest {\n                downgrade_reason: Some(\n                    kittycad::types::ZooProductSubscriptionDowngradeReason::ZookeeperResultsLowQuality,\n                ),\n                downgrade_reason_text: Some(\"some-string\".to_string()),\n                modeling_app: \"some-string\".to_string(),\n                pay_annually: Some(true),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_subscription_for<'a>(
         &'a self,

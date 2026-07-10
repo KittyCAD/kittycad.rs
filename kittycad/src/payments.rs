@@ -1292,7 +1292,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            downgrade_reason: Some(\n                kittycad::types::ZooProductSubscriptionDowngradeReason::ZookeeperResultsLowQuality,\n            ),\n            downgrade_reason_text: Some(\"some-string\".to_string()),\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_subscription<'a>(
         &'a self,
@@ -1323,7 +1323,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            downgrade_reason: Some(\n                kittycad::types::ZooProductSubscriptionDowngradeReason::ZookeeperResultsLowQuality,\n            ),\n            downgrade_reason_text: Some(\"some-string\".to_string()),\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_subscription<'a>(
         &'a self,
