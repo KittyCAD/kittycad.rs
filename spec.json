@@ -38603,6 +38603,193 @@
           }
         ]
       },
+      "Feature": {
+        "description": "Feature-like switches determined by environment, rules, and overrides.",
+        "oneOf": [
+          {
+            "description": "Enables the bodies pane in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "bodies_pane"
+            ]
+          },
+          {
+            "description": "When enabled, auth is restricted to only employees.",
+            "type": "string",
+            "enum": [
+              "auth_restricted_to_employees"
+            ]
+          },
+          {
+            "description": "Enables emitting telemetry to BigQuery, otherwise received telemetry is just dropped.",
+            "type": "string",
+            "enum": [
+              "big_query_telemetry"
+            ]
+          },
+          {
+            "description": "Stripe related features are enabled.",
+            "type": "string",
+            "enum": [
+              "billing"
+            ]
+          },
+          {
+            "description": "Disable signup through email or OAuth.",
+            "type": "string",
+            "enum": [
+              "disallow_self_signup"
+            ]
+          },
+          {
+            "description": "Email sending is handled by AWS SES.",
+            "type": "string",
+            "enum": [
+              "email_with_s_e_s"
+            ]
+          },
+          {
+            "description": "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "enable_z0006_lint"
+            ]
+          },
+          {
+            "description": "New KCL lexer and parser.",
+            "type": "string",
+            "enum": [
+              "kcl_new_lexer_parser"
+            ]
+          },
+          {
+            "description": "Immediately redirect to our Govcloud environment (zoogov.dev).",
+            "type": "string",
+            "enum": [
+              "redirect_to_govcloud"
+            ]
+          },
+          {
+            "description": "Requires SAML auth and orgs for all users.",
+            "type": "string",
+            "enum": [
+              "require_saml_auth"
+            ]
+          },
+          {
+            "description": "Only to be used only for local development. Allows bypassing certain features or makes local dev easier.",
+            "type": "string",
+            "enum": [
+              "local_dev"
+            ]
+          },
+          {
+            "description": "Enables customers to subscribe to our newsletter.",
+            "type": "string",
+            "enum": [
+              "newsletter"
+            ]
+          },
+          {
+            "description": "Prefix email subjects with the environment so we can better identify the source.",
+            "type": "string",
+            "enum": [
+              "prefix_email_subject"
+            ]
+          },
+          {
+            "description": "Enterprise-only CockroachDB features (like `REGIONAL BY ROW`) are enabled in this environment.",
+            "type": "string",
+            "enum": [
+              "enterprise_cockroach"
+            ]
+          },
+          {
+            "description": "Always use cookies with same-site=none.",
+            "type": "string",
+            "enum": [
+              "same_site_none_cookies"
+            ]
+          },
+          {
+            "description": "Notify us via slack if we're missing tax info for a customer.",
+            "type": "string",
+            "enum": [
+              "validate_tax_info"
+            ]
+          },
+          {
+            "description": "Enables modeling dialogs in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "modeling_dialogs"
+            ]
+          },
+          {
+            "description": "Enables plugins in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "plugins"
+            ]
+          },
+          {
+            "description": "Grants access to the beta proprietary-to-KCL conversion endpoint.",
+            "type": "string",
+            "enum": [
+              "proprietary_to_kcl_conversion_beta"
+            ]
+          },
+          {
+            "description": "Enables the topological segments-based region API for point-and-click in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "segments_based_regions"
+            ]
+          },
+          {
+            "description": "Enables sketch solve experimental features in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "sketch_experimental_features"
+            ]
+          },
+          {
+            "description": "Enables the public-facing web app file browser feature.",
+            "type": "string",
+            "enum": [
+              "web_app_file_browser"
+            ]
+          },
+          {
+            "description": "Enables private Zookeeper Pro mode access in ML Copilot.",
+            "type": "string",
+            "enum": [
+              "zookeeper_pro_mode"
+            ]
+          },
+          {
+            "description": "Allow creating a session via an existing API key",
+            "type": "string",
+            "enum": [
+              "unsafe_allow_api_key_auth"
+            ]
+          },
+          {
+            "description": "Allow shortlinks to have a domain of localhost.",
+            "type": "string",
+            "enum": [
+              "unsafe_allow_localhost_shortlinks"
+            ]
+          },
+          {
+            "description": "Enable ZooCorp OAuth2. This adds https://auth.corp.zoo.dev as an OAuth2 provider.",
+            "type": "string",
+            "enum": [
+              "zoo_corp_auth"
+            ]
+          }
+        ]
+      },
       "FileCenterOfMass": {
         "description": "A file center of mass result.",
         "type": "object",
@@ -41459,6 +41646,13 @@
             "type": "string",
             "enum": [
               "auto"
+            ]
+          },
+          {
+            "description": "Use the private Zoo Pro model for internal Zookeeper workflows.",
+            "type": "string",
+            "enum": [
+              "zookeeper_pro"
             ]
           }
         ]
@@ -48169,6 +48363,13 @@
         "description": "Supported OAuth 2.0 scopes.",
         "oneOf": [
           {
+            "description": "Grants read access to the authenticated user's profile.",
+            "type": "string",
+            "enum": [
+              "user:read"
+            ]
+          },
+          {
             "description": "Grants access to modeling APIs.",
             "type": "string",
             "enum": [
@@ -54849,6 +55050,76 @@
               "file_name",
               "type"
             ]
+          },
+          {
+            "description": "A project file that is being created by the AI. This does not contain KCL code.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "description": "The content of the file.",
+                "type": "string"
+              },
+              "file_name": {
+                "description": "The file name.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "created_project_file"
+                ]
+              }
+            },
+            "required": [
+              "content",
+              "file_name",
+              "type"
+            ]
+          },
+          {
+            "description": "A project file that is being updated by the AI. This does not contain KCL code.",
+            "type": "object",
+            "properties": {
+              "content": {
+                "description": "The content of the file.",
+                "type": "string"
+              },
+              "file_name": {
+                "description": "The file name.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "updated_project_file"
+                ]
+              }
+            },
+            "required": [
+              "content",
+              "file_name",
+              "type"
+            ]
+          },
+          {
+            "description": "A project file that is being deleted by the AI.",
+            "type": "object",
+            "properties": {
+              "file_name": {
+                "description": "The file name.",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "deleted_project_file"
+                ]
+              }
+            },
+            "required": [
+              "file_name",
+              "type"
+            ]
           }
         ]
       },
@@ -60165,19 +60436,6 @@
           }
         }
       },
-      "UserFeature": {
-        "type": "string",
-        "enum": [
-          "bodies_pane",
-          "enable_z0006_lint",
-          "modeling_dialogs",
-          "plugins",
-          "proprietary_to_kcl_conversion_beta",
-          "segments_based_regions",
-          "sketch_experimental_features",
-          "web_app_file_browser"
-        ]
-      },
       "UserFeatureEntry": {
         "description": "Enabled features surfaced to end users.",
         "type": "object",
@@ -60186,7 +60444,7 @@
             "description": "Stable identifier for the feature flag (snake_case).",
             "allOf": [
               {
-                "$ref": "#/components/schemas/UserFeature"
+                "$ref": "#/components/schemas/Feature"
               }
             ]
           }
@@ -61119,6 +61377,67 @@
           }
         ]
       },
+      "ZooProductSubscriptionDowngradeReason": {
+        "description": "Customer-selected reason for downgrading an individual subscription.",
+        "oneOf": [
+          {
+            "description": "The subscription price is too expensive for the customer.",
+            "type": "string",
+            "enum": [
+              "cost_too_high"
+            ]
+          },
+          {
+            "description": "The customer encountered product errors or bugs.",
+            "type": "string",
+            "enum": [
+              "errors_or_bugs"
+            ]
+          },
+          {
+            "description": "The product is missing features the customer needs.",
+            "type": "string",
+            "enum": [
+              "missing_features"
+            ]
+          },
+          {
+            "description": "The customer prefers another AI product.",
+            "type": "string",
+            "enum": [
+              "another_ai_product_better"
+            ]
+          },
+          {
+            "description": "The customer is unhappy with Zookeeper output quality.",
+            "type": "string",
+            "enum": [
+              "zookeeper_results_low_quality"
+            ]
+          },
+          {
+            "description": "The customer runs out of reasoning time too quickly.",
+            "type": "string",
+            "enum": [
+              "reasoning_time_runs_out"
+            ]
+          },
+          {
+            "description": "The product feels too slow for the customer.",
+            "type": "string",
+            "enum": [
+              "product_too_slow"
+            ]
+          },
+          {
+            "description": "The customer selected another reason.",
+            "type": "string",
+            "enum": [
+              "other"
+            ]
+          }
+        ]
+      },
       "ZooProductSubscriptions": {
         "description": "A struct of Zoo product subscriptions.",
         "type": "object",
@@ -61172,6 +61491,20 @@
         "description": "A struct of Zoo product subscriptions a user can request.",
         "type": "object",
         "properties": {
+          "downgrade_reason": {
+            "nullable": true,
+            "description": "Customer-selected reason for downgrading back to the free tier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ZooProductSubscriptionDowngradeReason"
+              }
+            ]
+          },
+          "downgrade_reason_text": {
+            "nullable": true,
+            "description": "Optional customer-provided context for the downgrade reason.",
+            "type": "string"
+          },
           "modeling_app": {
             "description": "Slug of the modeling app subscription tier requested.",
             "type": "string"

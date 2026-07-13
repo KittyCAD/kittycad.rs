@@ -9685,6 +9685,127 @@ pub enum FbxStorage {
     Binary,
 }
 
+#[doc = "Feature-like switches determined by environment, rules, and overrides."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Feature {
+    #[doc = "Enables the bodies pane in Zoo Design Studio."]
+    #[serde(rename = "bodies_pane")]
+    #[display("bodies_pane")]
+    BodiesPane,
+    #[doc = "When enabled, auth is restricted to only employees."]
+    #[serde(rename = "auth_restricted_to_employees")]
+    #[display("auth_restricted_to_employees")]
+    AuthRestrictedToEmployees,
+    #[doc = "Enables emitting telemetry to BigQuery, otherwise received telemetry is just dropped."]
+    #[serde(rename = "big_query_telemetry")]
+    #[display("big_query_telemetry")]
+    BigQueryTelemetry,
+    #[doc = "Stripe related features are enabled."]
+    #[serde(rename = "billing")]
+    #[display("billing")]
+    Billing,
+    #[doc = "Disable signup through email or OAuth."]
+    #[serde(rename = "disallow_self_signup")]
+    #[display("disallow_self_signup")]
+    DisallowSelfSignup,
+    #[doc = "Email sending is handled by AWS SES."]
+    #[serde(rename = "email_with_s_e_s")]
+    #[display("email_with_s_e_s")]
+    EmailWithSES,
+    #[doc = "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio."]
+    #[serde(rename = "enable_z0006_lint")]
+    #[display("enable_z0006_lint")]
+    EnableZ0006Lint,
+    #[doc = "New KCL lexer and parser."]
+    #[serde(rename = "kcl_new_lexer_parser")]
+    #[display("kcl_new_lexer_parser")]
+    KclNewLexerParser,
+    #[doc = "Immediately redirect to our Govcloud environment (zoogov.dev)."]
+    #[serde(rename = "redirect_to_govcloud")]
+    #[display("redirect_to_govcloud")]
+    RedirectToGovcloud,
+    #[doc = "Requires SAML auth and orgs for all users."]
+    #[serde(rename = "require_saml_auth")]
+    #[display("require_saml_auth")]
+    RequireSamlAuth,
+    #[doc = "Only to be used only for local development. Allows bypassing certain features or makes local dev easier."]
+    #[serde(rename = "local_dev")]
+    #[display("local_dev")]
+    LocalDev,
+    #[doc = "Enables customers to subscribe to our newsletter."]
+    #[serde(rename = "newsletter")]
+    #[display("newsletter")]
+    Newsletter,
+    #[doc = "Prefix email subjects with the environment so we can better identify the source."]
+    #[serde(rename = "prefix_email_subject")]
+    #[display("prefix_email_subject")]
+    PrefixEmailSubject,
+    #[doc = "Enterprise-only CockroachDB features (like `REGIONAL BY ROW`) are enabled in this environment."]
+    #[serde(rename = "enterprise_cockroach")]
+    #[display("enterprise_cockroach")]
+    EnterpriseCockroach,
+    #[doc = "Always use cookies with same-site=none."]
+    #[serde(rename = "same_site_none_cookies")]
+    #[display("same_site_none_cookies")]
+    SameSiteNoneCookies,
+    #[doc = "Notify us via slack if we're missing tax info for a customer."]
+    #[serde(rename = "validate_tax_info")]
+    #[display("validate_tax_info")]
+    ValidateTaxInfo,
+    #[doc = "Enables modeling dialogs in Zoo Design Studio."]
+    #[serde(rename = "modeling_dialogs")]
+    #[display("modeling_dialogs")]
+    ModelingDialogs,
+    #[doc = "Enables plugins in Zoo Design Studio."]
+    #[serde(rename = "plugins")]
+    #[display("plugins")]
+    Plugins,
+    #[doc = "Grants access to the beta proprietary-to-KCL conversion endpoint."]
+    #[serde(rename = "proprietary_to_kcl_conversion_beta")]
+    #[display("proprietary_to_kcl_conversion_beta")]
+    ProprietaryToKclConversionBeta,
+    #[doc = "Enables the topological segments-based region API for point-and-click in Zoo Design Studio."]
+    #[serde(rename = "segments_based_regions")]
+    #[display("segments_based_regions")]
+    SegmentsBasedRegions,
+    #[doc = "Enables sketch solve experimental features in Zoo Design Studio."]
+    #[serde(rename = "sketch_experimental_features")]
+    #[display("sketch_experimental_features")]
+    SketchExperimentalFeatures,
+    #[doc = "Enables the public-facing web app file browser feature."]
+    #[serde(rename = "web_app_file_browser")]
+    #[display("web_app_file_browser")]
+    WebAppFileBrowser,
+    #[doc = "Enables private Zookeeper Pro mode access in ML Copilot."]
+    #[serde(rename = "zookeeper_pro_mode")]
+    #[display("zookeeper_pro_mode")]
+    ZookeeperProMode,
+    #[doc = "Allow creating a session via an existing API key"]
+    #[serde(rename = "unsafe_allow_api_key_auth")]
+    #[display("unsafe_allow_api_key_auth")]
+    UnsafeAllowApiKeyAuth,
+    #[doc = "Allow shortlinks to have a domain of localhost."]
+    #[serde(rename = "unsafe_allow_localhost_shortlinks")]
+    #[display("unsafe_allow_localhost_shortlinks")]
+    UnsafeAllowLocalhostShortlinks,
+    #[doc = "Enable ZooCorp OAuth2. This adds https://auth.corp.zoo.dev as an OAuth2 provider."]
+    #[serde(rename = "zoo_corp_auth")]
+    #[display("zoo_corp_auth")]
+    ZooCorpAuth,
+}
+
 #[doc = "A file center of mass result."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12857,6 +12978,10 @@ pub enum MlCopilotMode {
     #[serde(rename = "auto")]
     #[display("auto")]
     Auto,
+    #[doc = "Use the private Zoo Pro model for internal Zookeeper workflows."]
+    #[serde(rename = "zookeeper_pro")]
+    #[display("zookeeper_pro")]
+    ZookeeperPro,
 }
 
 #[doc = "A client-facing ML copilot mode option."]
@@ -15683,6 +15808,10 @@ impl std::default::Default for Oauth2GrantType {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Oauth2Scope {
+    #[doc = "Grants read access to the authenticated user's profile."]
+    #[serde(rename = "user:read")]
+    #[display("user:read")]
+    UserRead,
     #[doc = "Grants access to modeling APIs."]
     #[serde(rename = "modeling")]
     #[display("modeling")]
@@ -20514,6 +20643,28 @@ pub enum ReasoningMessage {
     #[doc = "A KCL file that is being deleted by the AI."]
     #[serde(rename = "deleted_kcl_file")]
     DeletedKclFile {
+        #[doc = "The file name."]
+        file_name: String,
+    },
+    #[doc = "A project file that is being created by the AI. This does not contain KCL code."]
+    #[serde(rename = "created_project_file")]
+    CreatedProjectFile {
+        #[doc = "The content of the file."]
+        content: String,
+        #[doc = "The file name."]
+        file_name: String,
+    },
+    #[doc = "A project file that is being updated by the AI. This does not contain KCL code."]
+    #[serde(rename = "updated_project_file")]
+    UpdatedProjectFile {
+        #[doc = "The content of the file."]
+        content: String,
+        #[doc = "The file name."]
+        file_name: String,
+    },
+    #[doc = "A project file that is being deleted by the AI."]
+    #[serde(rename = "deleted_project_file")]
+    DeletedProjectFile {
         #[doc = "The file name."]
         file_name: String,
     },
@@ -27683,53 +27834,13 @@ impl tabled::Tabled for UserCadInfoAdminDetails {
     }
 }
 
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum UserFeature {
-    #[serde(rename = "bodies_pane")]
-    #[display("bodies_pane")]
-    BodiesPane,
-    #[serde(rename = "enable_z0006_lint")]
-    #[display("enable_z0006_lint")]
-    EnableZ0006Lint,
-    #[serde(rename = "modeling_dialogs")]
-    #[display("modeling_dialogs")]
-    ModelingDialogs,
-    #[serde(rename = "plugins")]
-    #[display("plugins")]
-    Plugins,
-    #[serde(rename = "proprietary_to_kcl_conversion_beta")]
-    #[display("proprietary_to_kcl_conversion_beta")]
-    ProprietaryToKclConversionBeta,
-    #[serde(rename = "segments_based_regions")]
-    #[display("segments_based_regions")]
-    SegmentsBasedRegions,
-    #[serde(rename = "sketch_experimental_features")]
-    #[display("sketch_experimental_features")]
-    SketchExperimentalFeatures,
-    #[serde(rename = "web_app_file_browser")]
-    #[display("web_app_file_browser")]
-    WebAppFileBrowser,
-}
-
 #[doc = "Enabled features surfaced to end users."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserFeatureEntry {
     #[doc = "Stable identifier for the feature flag (snake_case)."]
-    pub id: UserFeature,
+    pub id: Feature,
 }
 
 impl std::fmt::Display for UserFeatureEntry {
@@ -28864,6 +28975,55 @@ impl tabled::Tabled for ZooProductSubscription {
     }
 }
 
+#[doc = "Customer-selected reason for downgrading an individual subscription."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ZooProductSubscriptionDowngradeReason {
+    #[doc = "The subscription price is too expensive for the customer."]
+    #[serde(rename = "cost_too_high")]
+    #[display("cost_too_high")]
+    CostTooHigh,
+    #[doc = "The customer encountered product errors or bugs."]
+    #[serde(rename = "errors_or_bugs")]
+    #[display("errors_or_bugs")]
+    ErrorsOrBugs,
+    #[doc = "The product is missing features the customer needs."]
+    #[serde(rename = "missing_features")]
+    #[display("missing_features")]
+    MissingFeatures,
+    #[doc = "The customer prefers another AI product."]
+    #[serde(rename = "another_ai_product_better")]
+    #[display("another_ai_product_better")]
+    AnotherAiProductBetter,
+    #[doc = "The customer is unhappy with Zookeeper output quality."]
+    #[serde(rename = "zookeeper_results_low_quality")]
+    #[display("zookeeper_results_low_quality")]
+    ZookeeperResultsLowQuality,
+    #[doc = "The customer runs out of reasoning time too quickly."]
+    #[serde(rename = "reasoning_time_runs_out")]
+    #[display("reasoning_time_runs_out")]
+    ReasoningTimeRunsOut,
+    #[doc = "The product feels too slow for the customer."]
+    #[serde(rename = "product_too_slow")]
+    #[display("product_too_slow")]
+    ProductTooSlow,
+    #[doc = "The customer selected another reason."]
+    #[serde(rename = "other")]
+    #[display("other")]
+    Other,
+}
+
 #[doc = "A struct of Zoo product subscriptions."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -28963,6 +29123,12 @@ impl tabled::Tabled for ZooProductSubscriptionsOrgRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ZooProductSubscriptionsUserRequest {
+    #[doc = "Customer-selected reason for downgrading back to the free tier."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub downgrade_reason: Option<ZooProductSubscriptionDowngradeReason>,
+    #[doc = "Optional customer-provided context for the downgrade reason."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub downgrade_reason_text: Option<String>,
     #[doc = "Slug of the modeling app subscription tier requested."]
     pub modeling_app: String,
     #[doc = "If the customer chooses to pay annually or monthly, we can add that here. The annual discount will apply if there is a discount for the subscription."]
@@ -28982,9 +29148,19 @@ impl std::fmt::Display for ZooProductSubscriptionsUserRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(downgrade_reason) = &self.downgrade_reason {
+                format!("{:?}", downgrade_reason).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(downgrade_reason_text) = &self.downgrade_reason_text {
+                format!("{:?}", downgrade_reason_text).into()
+            } else {
+                String::new().into()
+            },
             self.modeling_app.clone().into(),
             if let Some(pay_annually) = &self.pay_annually {
                 format!("{:?}", pay_annually).into()
@@ -28995,7 +29171,12 @@ impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["modeling_app".into(), "pay_annually".into()]
+        vec![
+            "downgrade_reason".into(),
+            "downgrade_reason_text".into(),
+            "modeling_app".into(),
+            "pay_annually".into(),
+        ]
     }
 }
 
