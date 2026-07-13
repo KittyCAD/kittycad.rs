@@ -301,7 +301,8 @@ impl Payments {
             pagination_query_params.push(("limit", format!("{}", p)));
         }
 
-        self.list_invoices_for_org(limit, None)
+        let stream = self
+            .list_invoices_for_org(limit, None)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -366,8 +367,16 @@ impl Payments {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Redirect to a fresh Stripe-hosted payment-method update link for your org.\n\nIf the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated as an org admin, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n\n**Parameters:**\n\n- `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n\nIf omitted, this defaults to the account page.\n\n```rust,no_run\nasync fn example_payments_redirect_method_portal_link_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_org(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n```"]
@@ -1070,7 +1079,8 @@ impl Payments {
             pagination_query_params.push(("limit", format!("{}", p)));
         }
 
-        self.list_invoices_for_user(limit, None)
+        let stream = self
+            .list_invoices_for_user(limit, None)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -1135,8 +1145,16 @@ impl Payments {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Redirect to a fresh Stripe-hosted payment-method update link for your user.\n\nIf the request is not authenticated, this redirects to website login with a callback back to this endpoint. If authenticated, it creates a fresh hosted Stripe portal session and redirects the browser to it.\n\n**Parameters:**\n\n- `return_url: Option<String>`: The URL Stripe should offer after the hosted flow completes.\n\nIf omitted, this defaults to the account page.\n\n```rust,no_run\nasync fn example_payments_redirect_method_portal_link_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .payments()\n        .redirect_method_portal_link_for_user(Some(\"https://example.com/foo/bar\".to_string()))\n        .await?;\n    Ok(())\n}\n```"]
