@@ -198,7 +198,8 @@
     "/ai/text-to-cad/{output_format}": {
       "post": {
         "tags": [
-          "ml"
+          "ml",
+          "hidden"
         ],
         "summary": "Generate a CAD model from text.",
         "description": "Prefer the ML copilot websocket (`/ws/ml/copilot`) for new integrations. This REST endpoint is kept for existing Text-to-CAD clients, but it is no longer the recommended way to generate CAD models from a prompt.\n\nBecause our source of truth for the resulting model is a STEP file, you will always have STEP file contents when you list your generated parts. Any other formats you request here will also be returned when you list your generated parts.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nOne thing to note, if you hit the cache, this endpoint will return right away. So you only have to wait if the status is not `Completed` or `Failed`.",
@@ -5412,7 +5413,8 @@
     "/ml/text-to-cad/iteration": {
       "post": {
         "tags": [
-          "ml"
+          "ml",
+          "hidden"
         ],
         "summary": "Iterate on a CAD model with a prompt.",
         "description": "Prefer the ML copilot websocket (`/ws/ml/copilot`) for new prompt-to-edit integrations. This REST endpoint is kept for existing clients, but it is no longer the recommended way to edit KCL or CAD models from a prompt.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nThis endpoint is deprecated in favor of `/ws/ml/copilot`.",
@@ -5602,7 +5604,8 @@
     "/ml/text-to-cad/multi-file/iteration": {
       "post": {
         "tags": [
-          "ml"
+          "ml",
+          "hidden"
         ],
         "summary": "Iterate on a multi-file CAD model with a prompt.",
         "description": "Prefer the ML copilot websocket (`/ws/ml/copilot`) for new prompt-to-edit integrations. This REST endpoint is kept for existing multi-file iteration clients, but it is no longer the recommended way to edit KCL or CAD models from a prompt.\n\nThis endpoint can iterate on multi-file projects.\n\nEven if you give specific ranges to edit, the model might change more than just those in order to make the changes you requested without breaking the code.\n\nYou always get the whole code back, even if you only changed a small part of it. This endpoint will always return all the code back, including files that were not changed. If your original source code imported a stl/gltf/step/etc file, the output will not include that file since the model will never change non-kcl files. The endpoint will only return the kcl files that were changed.\n\nThis operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\nInput filepaths will be normalized and re-canonicalized to be under the current working directory -- so returned paths may differ from provided paths, and care must be taken when handling user provided paths.",
@@ -22518,6 +22521,197 @@
         }
       }
     },
+    "/user/factory/jobs": {
+      "post": {
+        "tags": [
+          "factory",
+          "hidden"
+        ],
+        "summary": "Submit a part for manufacturing. Requires a signed-in Zoo account.",
+        "description": "The request is `multipart/form-data`: - one JSON part named `body` (`FactoryIntakeForm`) whose `fields` object holds   free-form intake data (material, finish, quantity, notes, …). It is stored   verbatim, so fields can be added or renamed without an API change. - one or more file parts (any part name). At least one file is required.\n\nThe submitter's identity (email, name, user id) comes from the authenticated account, not the form.\n\n`fields` is free-form and the server does not validate it, but the Factory operator dashboard renders `material` and `finish` as dropdowns with a known set of values. Send these exact strings so a submission maps onto a first-class option instead of showing up as a one-off custom entry: - `finish`: `\"As machined\"`, `\"Bead blast\"`, `\"Anodized\"`, or   `\"Other (see notes)\"` — describe the real finish in `notes` when choosing   `\"Other (see notes)\"`. - `material`: `\"6061 Aluminum\"`, `\"Stainless Steel\"`, `\"Titanium\"`, or `\"Other (see notes)\"` (real material in   `notes`). - `quantity`: a positive integer.\n\nAny other value is still accepted and stored verbatim; it just appears in the dashboard as a custom entry rather than a recognized option.\n\nExample `body` part: ```json { \"fields\": { \"material\": \"6061 Aluminum\", \"finish\": \"Anodized\", \"quantity\": 10, \"notes\": \"deburr all edges\" } } ```\n\nExample request (curl): ``` curl -X POST https://api.zoo.dev/user/factory/jobs \\   -H \"Authorization: Bearer $ZOO_API_TOKEN\" \\   -F 'body={\"fields\":{\"material\":\"6061 Aluminum\",\"finish\":\"Anodized\",\"quantity\":10}};type=application/json' \\   -F 'file=@bracket.step' ```\n\nReturns `201` with the created job (`FactoryJobResponse`).",
+        "operationId": "create_user_factory_job",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_user_factory_job",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/user/features": {
       "get": {
         "tags": [
@@ -31484,7 +31678,7 @@
         "properties": {
           "adjacent_info": {
             "nullable": true,
-            "description": "Adjacent edge and face info.",
+            "description": "Next adjacent edge and face info.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/EdgeInfo"
@@ -31503,6 +31697,15 @@
           "original_info": {
             "nullable": true,
             "description": "Original edge id and face info.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EdgeInfo"
+              }
+            ]
+          },
+          "previous_adjacent_info": {
+            "nullable": true,
+            "description": "Previous adjacent edge and face info.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/EdgeInfo"
@@ -33774,6 +33977,10 @@
           }
         ]
       },
+      "BeginExecution": {
+        "description": "The response from the 'BeginExecution'.",
+        "type": "object"
+      },
       "BillingCadence": {
         "description": "How often a contract is expected to bill or renew operationally.",
         "oneOf": [
@@ -34735,6 +34942,13 @@
             "type": "string",
             "enum": [
               "upgrade_downgrade_abuse"
+            ]
+          },
+          {
+            "description": "An explicit admin block that can only be removed by admin intervention.",
+            "type": "string",
+            "enum": [
+              "admin"
             ]
           }
         ]
@@ -36220,6 +36434,68 @@
         "description": "A billing currency code.\n\nThis is intentionally billing-owned instead of Stripe-owned, so contract and manual invoice flows can use the same validated type without reaching back into a provider-specific crate.",
         "type": "string"
       },
+      "CurveDebug": {
+        "description": "A debug-view of the segment of a curve.",
+        "type": "object",
+        "properties": {
+          "center": {
+            "nullable": true,
+            "description": "Center point of segment.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "end": {
+            "nullable": true,
+            "description": "End point of segment.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "id": {
+            "description": "ID for this segment.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModelingCmdId"
+              }
+            ]
+          },
+          "mid": {
+            "nullable": true,
+            "description": "Midpoint on a three point arc",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          },
+          "segment_type": {
+            "description": "What kind of segment is it (line, arc, etc)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CurveTypeDebug"
+              }
+            ]
+          },
+          "start": {
+            "nullable": true,
+            "description": "Start point of segment or circle.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point2d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "segment_type"
+        ]
+      },
       "CurveGetControlPoints": {
         "description": "The response from the `CurveGetControlPoints` command.",
         "type": "object",
@@ -36290,6 +36566,32 @@
           "line",
           "arc",
           "nurbs"
+        ]
+      },
+      "CurveTypeDebug": {
+        "description": "What type of curve is being viewed?",
+        "oneOf": [
+          {
+            "description": "Line with a start and end.",
+            "type": "string",
+            "enum": [
+              "line"
+            ]
+          },
+          {
+            "description": "Arc with a start, end and center.",
+            "type": "string",
+            "enum": [
+              "three_point_arc"
+            ]
+          },
+          {
+            "description": "Circle with a center and radius.",
+            "type": "string",
+            "enum": [
+              "circle"
+            ]
+          }
         ]
       },
       "CustomModel": {
@@ -36919,10 +37221,6 @@
           }
         ]
       },
-      "DisableDryRun": {
-        "description": "The response from the `DisableDryRun` endpoint.",
-        "type": "object"
-      },
       "Discount": {
         "description": "The resource representing a Discount.",
         "type": "object",
@@ -37259,12 +37557,12 @@
           }
         ]
       },
-      "EnableDryRun": {
-        "description": "The response from the `EnableDryRun` endpoint.",
-        "type": "object"
-      },
       "EnableSketchMode": {
         "description": "The response from the `EnableSketchMode` endpoint.",
+        "type": "object"
+      },
+      "EndExecution": {
+        "description": "The response from the 'EndExecution'.",
         "type": "object"
       },
       "EngineUtilEvaluatePath": {
@@ -38045,6 +38343,11 @@
         "description": "Extended user information.\n\nThis is mostly used for internal purposes. It returns a mapping of the user's information, including that of our third party services we use for users: Stripe",
         "type": "object",
         "properties": {
+          "allow_pay_as_you_go": {
+            "description": "Whether the user has opted into pay-as-you-go charges after using their included credits.",
+            "default": false,
+            "type": "boolean"
+          },
           "block": {
             "nullable": true,
             "description": "If the user should be blocked and the reason why.",
@@ -38557,6 +38860,37 @@
           }
         }
       },
+      "FactoryJobResponse": {
+        "description": "Response returned when a Factory job is created. Only customer-facing ids are exposed: the job id (the customer's reference) and its current version id. The internal Help Desk thread id is deliberately NOT returned (internal-only per the ERD).",
+        "type": "object",
+        "properties": {
+          "current_version_id": {
+            "nullable": true,
+            "description": "The current (first) version id of the job.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "id": {
+            "description": "The stable, customer-facing job id.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "status": {
+            "description": "The initial workflow status (`new`).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ]
+      },
       "FailureWebSocketResponse": {
         "description": "Unsuccessful Websocket response.",
         "type": "object",
@@ -38607,13 +38941,6 @@
         "description": "Feature-like switches determined by environment, rules, and overrides.",
         "oneOf": [
           {
-            "description": "Enables the bodies pane in Zoo Design Studio.",
-            "type": "string",
-            "enum": [
-              "bodies_pane"
-            ]
-          },
-          {
             "description": "When enabled, auth is restricted to only employees.",
             "type": "string",
             "enum": [
@@ -38653,6 +38980,13 @@
             "type": "string",
             "enum": [
               "enable_z0006_lint"
+            ]
+          },
+          {
+            "description": "Enables the Factory portal.",
+            "type": "string",
+            "enum": [
+              "factory_portal"
             ]
           },
           {
@@ -38754,17 +39088,24 @@
             ]
           },
           {
-            "description": "Enables the public-facing web app file browser feature.",
+            "description": "Enables cloud storage for web and desktop. Yes desktop too, the name is old and will go away soon.",
             "type": "string",
             "enum": [
               "web_app_file_browser"
             ]
           },
           {
-            "description": "Enables private Zookeeper Pro mode access in ML Copilot.",
+            "description": "Enables Zookeeper Pro mode access in ML Copilot.",
             "type": "string",
             "enum": [
               "zookeeper_pro_mode"
+            ]
+          },
+          {
+            "description": "Enables Zookeeper Ultra mode access in ML Copilot.",
+            "type": "string",
+            "enum": [
+              "zookeeper_ultra_mode"
             ]
           },
           {
@@ -41278,6 +41619,32 @@
             "additionalProperties": false
           },
           {
+            "description": "Reflect across an edge identified by its adjacent faces. If used with a 3D mirror, the edge will define the normal of the mirror plane.",
+            "type": "object",
+            "properties": {
+              "edge_reference": {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "description": "Stable edge reference.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/EdgeSpecifier"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "reference"
+                ]
+              }
+            },
+            "required": [
+              "edge_reference"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Reflect across an axis (that goes through a point) If used with a 3D mirror, the axis will define the normal of the mirror plane.",
             "type": "object",
             "properties": {
@@ -41654,6 +42021,13 @@
             "enum": [
               "zookeeper_pro"
             ]
+          },
+          {
+            "description": "Use the Zoo Ultra model for internal Zookeeper workflows.",
+            "type": "string",
+            "enum": [
+              "zookeeper_ultra"
+            ]
           }
         ]
       },
@@ -42020,7 +42394,44 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Backend-only completed tool result used for portable Zookeeper recovery.\n\nAPI persists this message and includes it only in replay sent to the text-to-CAD backend. It is never forwarded to browser clients.",
+            "type": "object",
+            "properties": {
+              "zookeeper_recovery_tool_output": {
+                "type": "object",
+                "properties": {
+                  "call_id": {
+                    "description": "Application-level tool call identifier.",
+                    "type": "string"
+                  },
+                  "output": {
+                    "description": "Bounded readable output derived from the completed tool result.",
+                    "type": "string"
+                  },
+                  "project_updated": {
+                    "description": "Whether the tool changed the current project.",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "tool_name": {
+                    "description": "Name of the completed tool.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "call_id",
+                  "output",
+                  "tool_name"
+                ]
+              }
+            },
+            "required": [
+              "zookeeper_recovery_tool_output"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` messages. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
@@ -42517,7 +42928,7 @@
             "type": "boolean"
           },
           "monthly_pay_as_you_go_api_credits": {
-            "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
+            "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out. This is equivalent to the monetary value divided by the price of an API credit.",
             "default": 0,
             "type": "integer",
             "format": "uint64",
@@ -42525,7 +42936,7 @@
           },
           "monthly_pay_as_you_go_api_credits_monetary_value": {
             "title": "double",
-            "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+            "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out.",
             "default": 0.0,
             "type": "number",
             "format": "money-usd"
@@ -42727,10 +43138,19 @@
               },
               "direction": {
                 "nullable": true,
-                "description": "What direction to extrude in. If None, the engine will extrude in the direction normal of the target's plane.",
+                "description": "What direction to extrude in. If None, the engine will extrude in the direction normal of the target's plane. Legacy field; if `direction_reference` is provided, the reference takes precedence.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/DirectionType"
+                  }
+                ]
+              },
+              "direction_reference": {
+                "nullable": true,
+                "description": "Edge specifier identifying the edge direction to use. If provided, this takes precedence over `direction`.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/EdgeSpecifier"
                   }
                 ]
               },
@@ -42784,10 +43204,20 @@
                 ]
               },
               "target": {
-                "description": "Which sketch to extrude. Must be a closed 2D solid.",
+                "nullable": true,
+                "description": "Which sketch to extrude (legacy API). Must be a closed 2D solid. If `target_reference` is provided, the reference takes precedence.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "target_reference": {
+                "nullable": true,
+                "description": "Edge specifier identifying the edge to extrude. If provided, this takes precedence over `target`.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/EdgeSpecifier"
                   }
                 ]
               },
@@ -42800,7 +43230,6 @@
             },
             "required": [
               "distance",
-              "target",
               "type"
             ]
           },
@@ -42974,6 +43403,15 @@
                 "nullable": true,
                 "description": "If true, before the sweep starts, the profile will be re-oriented so that it is perpendicular to the path being swept along. If false, the profile is left in its current orientation. Defaults to false.",
                 "type": "boolean"
+              },
+              "projected_axis": {
+                "nullable": true,
+                "description": "If orient_profile_perpendicular is true, the sketch shall be oriented such that the local Y axis of the sketch will be oriented to align with this element as much as possible. Defaults to +Z if not set",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DirectionType"
+                  }
+                ]
               },
               "relative_to": {
                 "nullable": true,
@@ -46065,36 +46503,6 @@
             ]
           },
           {
-            "description": "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change.",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "enable_dry_run"
-                ]
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          {
-            "description": "Sets whether or not changes to the scene or its objects will be done as a \"dry run\" In a dry run, successful commands won't actually change the model. This is useful for catching errors before actually making the change.",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "disable_dry_run"
-                ]
-              }
-            },
-            "required": [
-              "type"
-            ]
-          },
-          {
             "description": "Set the background color of the scene.",
             "type": "object",
             "properties": {
@@ -47215,6 +47623,7 @@
             "type": "object",
             "properties": {
               "edge_id": {
+                "nullable": true,
                 "description": "Any edge that lies on the extrusion base path.",
                 "type": "string",
                 "format": "uuid"
@@ -47232,7 +47641,6 @@
               }
             },
             "required": [
-              "edge_id",
               "object_id",
               "type"
             ]
@@ -47242,6 +47650,7 @@
             "type": "object",
             "properties": {
               "edge_id": {
+                "nullable": true,
                 "description": "Any edge that lies on the extrusion base path.",
                 "type": "string",
                 "format": "uuid"
@@ -47259,7 +47668,6 @@
               }
             },
             "required": [
-              "edge_id",
               "object_id",
               "type"
             ]
@@ -47935,6 +48343,41 @@
             ]
           },
           {
+            "description": "Tell the engine you're beginning execution, and will be sending many API calls shortly. The engine will render your geometry in reduced detail, to make execution faster. Call EndExecution to restore high quality once you're done sending commands.",
+            "type": "object",
+            "properties": {
+              "enable_render": {
+                "description": "Should rendering occur, or not? If enabled, rendering will be low resolution until you call EndExecution.",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "begin_execution"
+                ]
+              }
+            },
+            "required": [
+              "enable_render",
+              "type"
+            ]
+          },
+          {
+            "description": "Tell the engine you're finished execution, and it should resume rendering at high resolution.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "end_execution"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
             "description": "Returns the closest edge to this point.",
             "type": "object",
             "properties": {
@@ -47961,6 +48404,30 @@
             },
             "required": [
               "closest_to",
+              "type"
+            ]
+          },
+          {
+            "description": "Gets debug information about a sketch",
+            "type": "object",
+            "properties": {
+              "path_id": {
+                "description": "Which path to query",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sketch_get_info"
+                ]
+              }
+            },
+            "required": [
+              "path_id",
               "type"
             ]
           }
@@ -49282,42 +49749,6 @@
                 "type": "string",
                 "enum": [
                   "sketch_mode_disable"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/EnableDryRun"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "enable_dry_run"
-                ]
-              }
-            },
-            "required": [
-              "data",
-              "type"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "data": {
-                "$ref": "#/components/schemas/DisableDryRun"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "disable_dry_run"
                 ]
               }
             },
@@ -51526,12 +51957,66 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/BeginExecution"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "begin_execution"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/EndExecution"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "end_execution"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/ClosestEdge"
               },
               "type": {
                 "type": "string",
                 "enum": [
                   "closest_edge"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SketchGetInfo"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "sketch_get_info"
                 ]
               }
             },
@@ -52381,6 +52866,20 @@
             "type": "string",
             "enum": [
               "error_geometry_mismatch"
+            ]
+          },
+          {
+            "description": "Conversion failed because generated KCL failed to execute.",
+            "type": "string",
+            "enum": [
+              "error_execution"
+            ]
+          },
+          {
+            "description": "Conversion failed because a required conversion service connection or dependency was unavailable.",
+            "type": "string",
+            "enum": [
+              "error_connection"
             ]
           },
           {
@@ -56137,6 +56636,34 @@
         "required": [
           "face_id",
           "path_id"
+        ]
+      },
+      "SketchGetInfo": {
+        "description": "The response from the 'SketchGetInfo'.",
+        "type": "object",
+        "properties": {
+          "curves": {
+            "description": "All curves in this sketch.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CurveDebug"
+            }
+          },
+          "region_count": {
+            "description": "How many regions the Toolpaths library thinks exist",
+            "type": "integer",
+            "format": "uint16",
+            "minimum": 0
+          },
+          "region_obj": {
+            "description": "OBJ representation of the topology from Toolpaths library.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "curves",
+          "region_count",
+          "region_obj"
         ]
       },
       "SketchModeDisable": {
@@ -60178,6 +60705,11 @@
         "description": "The user-modifiable parts of a User.",
         "type": "object",
         "properties": {
+          "allow_pay_as_you_go": {
+            "nullable": true,
+            "description": "Whether the user has opted into pay-as-you-go charges after using their included credits.",
+            "type": "boolean"
+          },
           "company": {
             "description": "The user's company.",
             "type": "string"
@@ -60589,6 +61121,11 @@
         "description": "Public user payload returned by the API.",
         "type": "object",
         "properties": {
+          "allow_pay_as_you_go": {
+            "description": "Whether the user has opted into pay-as-you-go charges after using their included credits.",
+            "default": false,
+            "type": "boolean"
+          },
           "block": {
             "nullable": true,
             "description": "If the user should be blocked and the reason why.",
@@ -61295,7 +61832,7 @@
                 "type": "boolean"
               },
               "monthly_pay_as_you_go_api_credits": {
-                "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month. This is equivalent to the monetary value divided by the price of an API credit.",
+                "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out. This is equivalent to the monetary value divided by the price of an API credit.",
                 "default": 0,
                 "type": "integer",
                 "format": "uint64",
@@ -61303,7 +61840,7 @@
               },
               "monthly_pay_as_you_go_api_credits_monetary_value": {
                 "title": "double",
-                "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. This re-ups on the 1st of each month.",
+                "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out.",
                 "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
@@ -61740,6 +62277,13 @@
       "description": "Endpoints that allow for code execution or creation of code execution environments.",
       "externalDocs": {
         "url": "https://zoo.dev/docs/api/executor"
+      }
+    },
+    {
+      "name": "factory",
+      "description": "Operations for submitting and managing Factory manufacturing jobs.",
+      "externalDocs": {
+        "url": "https://zoo.dev/docs/api/factory"
       }
     },
     {
