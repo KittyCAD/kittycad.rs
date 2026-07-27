@@ -161,7 +161,8 @@ impl ApiCalls {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.org_list(limit, None, sort_by)
+        let stream = self
+            .org_list(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -226,8 +227,16 @@ impl ApiCalls {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Get an API call for an org.\n\nThis endpoint requires authentication by an org admin. It returns details of the requested API call for the user's org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The ID of the API call. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_api_calls_get_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiCallWithPrice = client\n        .api_calls()\n        .get_for_org(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -334,7 +343,8 @@ impl ApiCalls {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.user_list(limit, None, sort_by)
+        let stream = self
+            .user_list(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -399,8 +409,16 @@ impl ApiCalls {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Get an API call for a user.\n\nThis endpoint requires authentication by any Zoo user. \
@@ -521,7 +539,8 @@ impl ApiCalls {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_for_user(id, limit, None, sort_by)
+        let stream = self
+            .list_for_user(id, limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -586,7 +605,15 @@ impl ApiCalls {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 }

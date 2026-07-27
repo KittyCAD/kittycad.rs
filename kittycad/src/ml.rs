@@ -159,7 +159,8 @@ impl Ml {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_conversations_for_user(limit, None, sort_by)
+        let stream = self
+            .list_conversations_for_user(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -224,8 +225,16 @@ impl Ml {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Converts a proprietary CAD format to KCL.\n\nThis endpoint is used to convert a \
@@ -682,7 +691,8 @@ impl Ml {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_text_to_cad_parts_for_user(params_for_call)
+        let stream = self
+            .list_text_to_cad_parts_for_user(params_for_call)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -747,8 +757,16 @@ impl Ml {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Get a text-to-CAD response.\n\nThis endpoint requires authentication by any Zoo user. \
