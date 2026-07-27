@@ -12,7 +12,7 @@ jobs:
     name: cargo build (wasm)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.0
+      - uses: actions/checkout@v7.0.1
       - name: Cache cargo registry
         uses: actions/cache@v6.1.0
         with:
