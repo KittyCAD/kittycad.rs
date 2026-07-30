@@ -457,6 +457,30 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1billing~1usage-collection-threshold/delete/x-rust",
+    "value": {
+      "example": "/// Restore the default for the authenticated organization's aggregate-usage collection threshold.\n/// \n/// **Parameters:**\n/// \n/// - `expected_version: i64`: Version returned by the read that this mutation is based on. (required)\nasync fn example_payments_reset_org_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .reset_org_usage_collection_threshold(4 as i64)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.reset_org_usage_collection_threshold"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1billing~1usage-collection-threshold/get/x-rust",
+    "value": {
+      "example": "/// Get the authenticated organization's aggregate-usage collection threshold.\nasync fn example_payments_get_org_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .get_org_usage_collection_threshold()\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_org_usage_collection_threshold"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1org~1billing~1usage-collection-threshold/put/x-rust",
+    "value": {
+      "example": "/// Set the authenticated organization's aggregate-usage collection threshold.\nasync fn example_payments_set_org_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .set_org_usage_collection_threshold(&kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.set_org_usage_collection_threshold"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1dataset~1s3~1policies/get/x-rust",
     "value": {
       "example": "/// Return the IAM policies customers should apply when onboarding an S3 dataset.\n/// \n/// **Parameters:**\n/// \n/// - `role_arn: &'astr`: IAM role ARN customers expect Zoo to assume when reading the dataset. (required)\n/// - `uri: &'astr`: Dataset URI used to scope generated IAM policies. (required)\nasync fn example_orgs_dataset_s_3_policies() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::DatasetS3Policies = client\n        .orgs()\n        .dataset_s_3_policies(\"some-string\", \"some-string\")\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1139,7 +1163,7 @@
     "op": "add",
     "path": "/paths/~1user/put/x-rust",
     "value": {
-      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n            username: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Update your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates information about the authenticated user.\nuse std::str::FromStr;\nasync fn example_users_update_self() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UserResponse = client\n        .users()\n        .update_self(&kittycad::types::UpdateUser {\n            allow_pay_as_you_go: Some(true),\n            company: Some(\"some-string\".to_string()),\n            discord: Some(\"some-string\".to_string()),\n            first_name: Some(\"some-string\".to_string()),\n            github: Some(\"some-string\".to_string()),\n            image: \"https://example.com/foo/bar\".to_string(),\n            is_onboarded: Some(true),\n            last_name: Some(\"some-string\".to_string()),\n            phone: kittycad::types::phone_number::PhoneNumber::from_str(\"+1555-555-5555\")?,\n            username: Some(\"some-string\".to_string()),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_self"
     }
   },
@@ -1189,6 +1213,30 @@
     "value": {
       "example": "/// Get an API token for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.\n/// \n/// **Parameters:**\n/// \n/// - `token: &'astr`: The API token. (required)\nasync fn example_api_tokens_get_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ApiToken = client.api_tokens().get_for_user(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/api_tokens/struct.ApiTokens.html#method.get_for_user"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1billing~1usage-collection-threshold/delete/x-rust",
+    "value": {
+      "example": "/// Restore the default for your personal aggregate-usage collection threshold.\n/// \n/// **Parameters:**\n/// \n/// - `expected_version: i64`: Version returned by the read that this mutation is based on. (required)\nasync fn example_payments_reset_user_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .reset_user_usage_collection_threshold(4 as i64)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.reset_user_usage_collection_threshold"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1billing~1usage-collection-threshold/get/x-rust",
+    "value": {
+      "example": "/// Get your personal aggregate-usage collection threshold.\n/// \n/// The effective threshold is the amount of accrued, unfunded usage that causes an early invoice before the normal billing-period close.\nasync fn example_payments_get_user_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .get_user_usage_collection_threshold()\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_user_usage_collection_threshold"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1billing~1usage-collection-threshold/put/x-rust",
+    "value": {
+      "example": "/// Set your personal aggregate-usage collection threshold.\nasync fn example_payments_set_user_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .set_user_usage_collection_threshold(&kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.set_user_usage_collection_threshold"
     }
   },
   {
@@ -1245,6 +1293,30 @@
     "value": {
       "example": "/// Get extended information about your user.\n/// \n/// Get the user information for the authenticated user.\n/// \n/// Alternatively, you can also use the `/users-extended/me` endpoint.\nasync fn example_users_get_self_extended() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ExtendedUser = client.users().get_self_extended().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.get_self_extended"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1factory~1finishes/get/x-rust",
+    "value": {
+      "example": "/// List finishes currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\nasync fn example_factory_get_user_finishes() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::FactoryCustomerCatalogOption> =\n        client.factory().get_user_finishes().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_finishes"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1factory~1jobs/post/x-rust",
+    "value": {
+      "example": "/// Submit a part for manufacturing. Requires a signed-in Zoo account.\n/// \n/// The request is `multipart/form-data`: - one JSON part named `body` (`FactoryIntakeForm`) whose `fields` object holds   intake data (material, finish, quantity, notes, …). Material and finish   are required customer-visible catalog names; all other fields are stored   verbatim so they can be added or renamed without an API change. - one or more file parts (any part name). At least one file is required.\n/// \n/// The submitter's identity (email, name, user id) comes from the authenticated account, not the form.\n/// \n/// Fetch `GET /user/factory/materials` and `GET /user/factory/finishes`, then send the returned exact `material` and `finish` names. The server rejects missing, non-string, unknown, deleted, and internal-only choices with these stable field-specific `error_code` values: - `factory_material_input_missing` - `factory_material_input_invalid_type` - `factory_material_not_found` - `factory_material_not_customer_visible` - `factory_finish_input_missing` - `factory_finish_input_invalid_type` - `factory_finish_not_found` - `factory_finish_not_customer_visible` - `quantity`: a positive integer.\n/// \n/// Example `body` part: ```ignorejson { \"fields\": { \"material\": \"6061 Aluminum\", \"finish\": \"Anodized\", \"quantity\": 10, \"notes\": \"deburr all edges\" } } ```ignore\n/// \n/// Example request (curl): ```ignore curl -X POST https://api.zoo.dev/user/factory/jobs \\   -H \"Authorization: Bearer $ZOO_API_TOKEN\" \\   -F 'body={\"fields\":{\"material\":\"6061 Aluminum\",\"finish\":\"Anodized\",\"quantity\":10}};type=application/json' \\   -F 'file=@bracket.step' ```ignore\n/// \n/// Returns `201` with the created job (`FactoryJobResponse`).\nasync fn example_factory_create_user_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryJobResponse = client\n        .factory()\n        .create_user_job(vec![kittycad::types::multipart::Attachment {\n            name: \"thing\".to_string(),\n            filepath: Some(\"myfile.json\".into()),\n            content_type: Some(\"application/json\".to_string()),\n            data: std::fs::read(\"myfile.json\").unwrap(),\n        }])\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.create_user_job"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1factory~1materials/get/x-rust",
+    "value": {
+      "example": "/// List materials currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\nasync fn example_factory_get_user_materials() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::FactoryCustomerCatalogOption> =\n        client.factory().get_user_materials().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_materials"
     }
   },
   {

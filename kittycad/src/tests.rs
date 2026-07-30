@@ -487,6 +487,7 @@ fn assert_no_query_pair(url: &url::Url, name: &str) {
 #[test]
 fn test_empty_phone_number() {
     let user_info = crate::types::UpdateUser {
+        allow_pay_as_you_go: None,
         first_name: Some("John".to_string()),
         last_name: Some("Doe".to_string()),
         phone: Default::default(),
