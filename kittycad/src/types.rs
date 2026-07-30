@@ -811,7 +811,7 @@ impl tabled::Tabled for AddressDetails {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AdjacencyInfo {
-    #[doc = "Adjacent edge and face info."]
+    #[doc = "Next adjacent edge and face info."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub adjacent_info: Option<EdgeInfo>,
     #[doc = "Opposite edge and face info."]
@@ -820,6 +820,9 @@ pub struct AdjacencyInfo {
     #[doc = "Original edge id and face info."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub original_info: Option<EdgeInfo>,
+    #[doc = "Previous adjacent edge and face info."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub previous_adjacent_info: Option<EdgeInfo>,
 }
 
 impl std::fmt::Display for AdjacencyInfo {
@@ -834,7 +837,7 @@ impl std::fmt::Display for AdjacencyInfo {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AdjacencyInfo {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 4;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(adjacent_info) = &self.adjacent_info {
@@ -852,6 +855,11 @@ impl tabled::Tabled for AdjacencyInfo {
             } else {
                 String::new().into()
             },
+            if let Some(previous_adjacent_info) = &self.previous_adjacent_info {
+                format!("{:?}", previous_adjacent_info).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -860,6 +868,173 @@ impl tabled::Tabled for AdjacencyInfo {
             "adjacent_info".into(),
             "opposite_info".into(),
             "original_info".into(),
+            "previous_adjacent_info".into(),
+        ]
+    }
+}
+
+#[doc = "Inclusive amount bounds for a threshold authority."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AggregateUsageCollectionThresholdBounds {
+    pub maximum_amount: f64,
+    pub minimum_amount: f64,
+}
+
+impl std::fmt::Display for AggregateUsageCollectionThresholdBounds {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AggregateUsageCollectionThresholdBounds {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.maximum_amount).into(),
+            format!("{:?}", self.minimum_amount).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["maximum_amount".into(), "minimum_amount".into()]
+    }
+}
+
+#[doc = "An explicit collection-threshold value to configure for an account."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AggregateUsageCollectionThresholdSet {
+    pub amount: f64,
+    #[doc = "Version returned by the read that this mutation is based on."]
+    pub expected_version: i64,
+}
+
+impl std::fmt::Display for AggregateUsageCollectionThresholdSet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AggregateUsageCollectionThresholdSet {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.amount).into(),
+            format!("{:?}", self.expected_version).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["amount".into(), "expected_version".into()]
+    }
+}
+
+#[doc = "Precedence source that determines an account's effective threshold."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum AggregateUsageCollectionThresholdSource {
+    #[serde(rename = "admin")]
+    #[display("admin")]
+    Admin,
+    #[serde(rename = "customer")]
+    #[display("customer")]
+    Customer,
+    #[serde(rename = "system_default")]
+    #[display("system_default")]
+    SystemDefault,
+}
+
+#[doc = "Configured and effective aggregate-usage collection-threshold state."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AggregateUsageCollectionThresholdView {
+    #[doc = "Zoo-controlled override. When present, customer mutations are disabled."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub admin_amount: Option<f64>,
+    #[doc = "Inclusive amount bounds for a threshold authority."]
+    pub admin_bounds: AggregateUsageCollectionThresholdBounds,
+    #[doc = "Customer preference used when no Zoo-controlled override is active."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub customer_amount: Option<f64>,
+    #[doc = "Inclusive amount bounds for a threshold authority."]
+    pub customer_bounds: AggregateUsageCollectionThresholdBounds,
+    pub default_amount: f64,
+    pub effective_amount: f64,
+    #[doc = "Precedence source that determines an account's effective threshold."]
+    pub source: AggregateUsageCollectionThresholdSource,
+    #[doc = "Monotonic version of the account's append-only threshold history."]
+    pub version: i64,
+}
+
+impl std::fmt::Display for AggregateUsageCollectionThresholdView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AggregateUsageCollectionThresholdView {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(admin_amount) = &self.admin_amount {
+                format!("{:?}", admin_amount).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.admin_bounds).into(),
+            if let Some(customer_amount) = &self.customer_amount {
+                format!("{:?}", customer_amount).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.customer_bounds).into(),
+            format!("{:?}", self.default_amount).into(),
+            format!("{:?}", self.effective_amount).into(),
+            format!("{:?}", self.source).into(),
+            format!("{:?}", self.version).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "admin_amount".into(),
+            "admin_bounds".into(),
+            "customer_amount".into(),
+            "customer_bounds".into(),
+            "default_amount".into(),
+            "effective_amount".into(),
+            "source".into(),
+            "version".into(),
         ]
     }
 }
@@ -2939,6 +3114,34 @@ impl tabled::Tabled for BatchResponse {
     }
 }
 
+#[doc = "The response from the 'BeginExecution'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct BeginExecution {}
+
+impl std::fmt::Display for BeginExecution {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for BeginExecution {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
 #[doc = "How often a contract is expected to bill or renew operationally."]
 #[derive(
     serde :: Serialize,
@@ -3945,10 +4148,18 @@ pub enum BlockReason {
     #[serde(rename = "payment_method_failed")]
     #[display("payment_method_failed")]
     PaymentMethodFailed,
+    #[doc = "The account reached its configured pay-as-you-go collection threshold."]
+    #[serde(rename = "billing_threshold_reached")]
+    #[display("billing_threshold_reached")]
+    BillingThresholdReached,
     #[doc = "The user repeatedly upgraded and downgraded to recycle free-plan credits."]
     #[serde(rename = "upgrade_downgrade_abuse")]
     #[display("upgrade_downgrade_abuse")]
     UpgradeDowngradeAbuse,
+    #[doc = "An explicit admin block that can only be removed by admin intervention."]
+    #[serde(rename = "admin")]
+    #[display("admin")]
+    Admin,
 }
 
 #[doc = "List of bodies that were created by an operation."]
@@ -6282,6 +6493,81 @@ pub enum CreatedAtSortMode {
     CreatedAtDescending,
 }
 
+#[doc = "A debug-view of the segment of a curve."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CurveDebug {
+    #[doc = "Center point of segment."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub center: Option<Point2D>,
+    #[doc = "End point of segment."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub end: Option<Point2D>,
+    #[doc = "ID for this segment."]
+    pub id: uuid::Uuid,
+    #[doc = "Midpoint on a three point arc"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub mid: Option<Point2D>,
+    #[doc = "What kind of segment is it (line, arc, etc)"]
+    pub segment_type: CurveTypeDebug,
+    #[doc = "Start point of segment or circle."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub start: Option<Point2D>,
+}
+
+impl std::fmt::Display for CurveDebug {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CurveDebug {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(center) = &self.center {
+                format!("{:?}", center).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(end) = &self.end {
+                format!("{:?}", end).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            if let Some(mid) = &self.mid {
+                format!("{:?}", mid).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.segment_type).into(),
+            if let Some(start) = &self.start {
+                format!("{:?}", start).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "center".into(),
+            "end".into(),
+            "id".into(),
+            "mid".into(),
+            "segment_type".into(),
+            "start".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `CurveGetControlPoints` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -6432,6 +6718,35 @@ pub enum CurveType {
     #[serde(rename = "nurbs")]
     #[display("nurbs")]
     Nurbs,
+}
+
+#[doc = "What type of curve is being viewed?"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum CurveTypeDebug {
+    #[doc = "Line with a start and end."]
+    #[serde(rename = "line")]
+    #[display("line")]
+    Line,
+    #[doc = "Arc with a start, end and center."]
+    #[serde(rename = "three_point_arc")]
+    #[display("three_point_arc")]
+    ThreePointArc,
+    #[doc = "Circle with a center and radius."]
+    #[serde(rename = "circle")]
+    #[display("circle")]
+    Circle,
 }
 
 #[doc = "Custom ML model created by a user for an organization."]
@@ -7382,34 +7697,6 @@ pub enum DirectionType {
     },
 }
 
-#[doc = "The response from the `DisableDryRun` endpoint."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DisableDryRun {}
-
-impl std::fmt::Display for DisableDryRun {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DisableDryRun {
-    const LENGTH: usize = 0;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-}
-
 #[doc = "The resource representing a Discount."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7887,34 +8174,6 @@ pub enum EmailMarketingConsentStatus {
     Declined,
 }
 
-#[doc = "The response from the `EnableDryRun` endpoint."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct EnableDryRun {}
-
-impl std::fmt::Display for EnableDryRun {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for EnableDryRun {
-    const LENGTH: usize = 0;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![]
-    }
-}
-
 #[doc = "The response from the `EnableSketchMode` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -7933,6 +8192,34 @@ impl std::fmt::Display for EnableSketchMode {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for EnableSketchMode {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the 'EndExecution'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct EndExecution {}
+
+impl std::fmt::Display for EndExecution {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for EndExecution {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
@@ -9097,6 +9384,10 @@ impl tabled::Tabled for ExtendPath {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ExtendedUser {
+    #[doc = "Whether the user has opted into pay-as-you-go charges after using their included \
+             credits."]
+    #[serde(default)]
+    pub allow_pay_as_you_go: bool,
     #[doc = "If the user should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
@@ -9170,9 +9461,10 @@ impl std::fmt::Display for ExtendedUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ExtendedUser {
-    const LENGTH: usize = 20;
+    const LENGTH: usize = 21;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.allow_pay_as_you_go).into(),
             if let Some(block) = &self.block {
                 format!("{:?}", block).into()
             } else {
@@ -9242,6 +9534,7 @@ impl tabled::Tabled for ExtendedUser {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "allow_pay_as_you_go".into(),
             "block".into(),
             "can_train_on_data".into(),
             "company".into(),
@@ -9761,6 +10054,83 @@ impl tabled::Tabled for FaceIsPlanar {
     }
 }
 
+#[doc = "One customer-selectable Factory catalog entry."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerCatalogOption {
+    #[doc = "Exact catalog name to submit in the corresponding intake field."]
+    pub name: String,
+}
+
+impl std::fmt::Display for FactoryCustomerCatalogOption {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerCatalogOption {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into()]
+    }
+}
+
+#[doc = "Response returned when a Factory job is created. Only customer-facing ids are exposed: \
+         the job id (the customer's reference) and its current version id. The internal Help Desk \
+         thread id is deliberately NOT returned (internal-only per the ERD)."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryJobResponse {
+    #[doc = "The current (first) version id of the job."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_version_id: Option<uuid::Uuid>,
+    #[doc = "The stable, customer-facing job id."]
+    pub id: uuid::Uuid,
+    #[doc = "The initial workflow status (`new`)."]
+    pub status: String,
+}
+
+impl std::fmt::Display for FactoryJobResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryJobResponse {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(current_version_id) = &self.current_version_id {
+                format!("{:?}", current_version_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            self.status.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["current_version_id".into(), "id".into(), "status".into()]
+    }
+}
+
 #[doc = "Unsuccessful Websocket response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9846,10 +10216,6 @@ pub enum FbxStorage {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum Feature {
-    #[doc = "Enables the bodies pane in Zoo Design Studio."]
-    #[serde(rename = "bodies_pane")]
-    #[display("bodies_pane")]
-    BodiesPane,
     #[doc = "When enabled, auth is restricted to only employees."]
     #[serde(rename = "auth_restricted_to_employees")]
     #[display("auth_restricted_to_employees")]
@@ -9874,6 +10240,10 @@ pub enum Feature {
     #[serde(rename = "enable_z0006_lint")]
     #[display("enable_z0006_lint")]
     EnableZ0006Lint,
+    #[doc = "Enables the Factory portal."]
+    #[serde(rename = "factory_portal")]
+    #[display("factory_portal")]
+    FactoryPortal,
     #[doc = "New KCL lexer and parser."]
     #[serde(rename = "kcl_new_lexer_parser")]
     #[display("kcl_new_lexer_parser")]
@@ -9933,14 +10303,19 @@ pub enum Feature {
     #[serde(rename = "sketch_experimental_features")]
     #[display("sketch_experimental_features")]
     SketchExperimentalFeatures,
-    #[doc = "Enables the public-facing web app file browser feature."]
+    #[doc = "Enables cloud storage for web and desktop. Yes desktop too, the name is old and will \
+             go away soon."]
     #[serde(rename = "web_app_file_browser")]
     #[display("web_app_file_browser")]
     WebAppFileBrowser,
-    #[doc = "Enables private Zookeeper Pro mode access in ML Copilot."]
+    #[doc = "Enables Zookeeper Pro mode access in ML Copilot."]
     #[serde(rename = "zookeeper_pro_mode")]
     #[display("zookeeper_pro_mode")]
     ZookeeperProMode,
+    #[doc = "Enables Zookeeper Ultra mode access in ML Copilot."]
+    #[serde(rename = "zookeeper_ultra_mode")]
+    #[display("zookeeper_ultra_mode")]
+    ZookeeperUltraMode,
     #[doc = "Allow creating a session via an existing API key"]
     #[serde(rename = "unsafe_allow_api_key_auth")]
     #[display("unsafe_allow_api_key_auth")]
@@ -12998,6 +13373,13 @@ pub enum MirrorAcross {
         #[doc = "Edge ID."]
         id: uuid::Uuid,
     },
+    #[doc = "Reflect across an edge identified by its adjacent faces. If used with a 3D mirror, \
+             the edge will define the normal of the mirror plane."]
+    #[serde(rename = "edge_reference")]
+    EdgeReference {
+        #[doc = "Stable edge reference."]
+        reference: EdgeSpecifier,
+    },
     #[doc = "Reflect across an axis (that goes through a point) If used with a 3D mirror, the \
              axis will define the normal of the mirror plane."]
     #[serde(rename = "axis")]
@@ -13203,6 +13585,10 @@ pub enum MlCopilotMode {
     #[serde(rename = "zookeeper_pro")]
     #[display("zookeeper_pro")]
     ZookeeperPro,
+    #[doc = "Use the Zoo Ultra model for internal Zookeeper workflows."]
+    #[serde(rename = "zookeeper_ultra")]
+    #[display("zookeeper_ultra")]
+    ZookeeperUltra,
 }
 
 #[doc = "A client-facing ML copilot mode option."]
@@ -13378,19 +13764,36 @@ pub enum MlCopilotServerMessage {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         stage: Option<String>,
     },
+    #[doc = "Backend-only completed tool result used for portable Zookeeper recovery.\n\nAPI \
+             persists this message and includes it only in replay sent to the text-to-CAD \
+             backend. It is never forwarded to browser clients."]
+    #[serde(rename = "zookeeper_recovery_tool_output")]
+    ZookeeperRecoveryToolOutput {
+        #[doc = "Application-level tool call identifier."]
+        call_id: String,
+        #[doc = "Bounded readable output derived from the completed tool result."]
+        output: String,
+        #[doc = "Whether the tool changed the current project."]
+        #[serde(default)]
+        project_updated: bool,
+        #[doc = "Name of the completed tool."]
+        tool_name: String,
+    },
     #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. \
              Includes server messages and client `User` messages.\n\nInvariants: - Includes \
              server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. \
              }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
              messages. - The following are NEVER included: `SessionData`, `ConversationId`, \
-             `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - Ordering is stable: \
-             messages are ordered by prompt creation time within the conversation, then by the \
-             per-prompt `seq` value (monotonically increasing as seen in the original \
-             stream).\n\nWire format: - Each element is canonical serialized bytes (typically \
-             JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - \
-             When delivered as an initial replay over the websocket (upon \
-             `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary \
-             frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
+             `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - \
+             `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
+             backend and is filtered from client replay. - Ordering is stable: messages are \
+             ordered by prompt creation time within the conversation, then by the per-prompt \
+             `seq` value (monotonically increasing as seen in the original stream).\n\nWire \
+             format: - Each element is canonical serialized bytes (typically JSON) for either a \
+             `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an \
+             initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the \
+             server sends a single WebSocket Binary frame containing a MsgPack-encoded document \
+             of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation \
@@ -13728,12 +14131,14 @@ pub struct ModelingAppSubscriptionTier {
     #[serde(default)]
     pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
-             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
-             the monetary value divided by the price of an API credit."]
+             modeling app per month. Credit replenishment remains calendar-month based while \
+             anniversary billing is rolled out. This is equivalent to the monetary value divided \
+             by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
-             the modeling app per month. This re-ups on the 1st of each month."]
+             the modeling app per month. Credit replenishment remains calendar-month based while \
+             anniversary billing is rolled out."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
@@ -13912,9 +14317,14 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         body_type: Option<BodyType>,
         #[doc = "What direction to extrude in. If None, the engine will extrude in the direction \
-                 normal of the target's plane."]
+                 normal of the target's plane. Legacy field; if `direction_reference` is \
+                 provided, the reference takes precedence."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         direction: Option<DirectionType>,
+        #[doc = "Edge specifier identifying the edge direction to use. If provided, this takes \
+                 precedence over `direction`."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        direction_reference: Option<EdgeSpecifier>,
         #[doc = "How far off the plane to extrude"]
         distance: f64,
         #[doc = "What draft angle should be used in this extrusion? Negative values indicate an \
@@ -13937,8 +14347,14 @@ pub enum ModelingCmd {
                  specifies its distance."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         opposite: Option<String>,
-        #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
-        target: uuid::Uuid,
+        #[doc = "Which sketch to extrude (legacy API). Must be a closed 2D solid. If \
+                 `target_reference` is provided, the reference takes precedence."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target: Option<uuid::Uuid>,
+        #[doc = "Edge specifier identifying the edge to extrude. If provided, this takes \
+                 precedence over `target`."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target_reference: Option<EdgeSpecifier>,
     },
     #[doc = "Command for extruding a solid 2d to a reference geometry."]
     #[serde(rename = "extrude_to_reference")]
@@ -13997,6 +14413,11 @@ pub enum ModelingCmd {
                  its current orientation. Defaults to false."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         orient_profile_perpendicular: Option<bool>,
+        #[doc = "If orient_profile_perpendicular is true, the sketch shall be oriented such that \
+                 the local Y axis of the sketch will be oriented to align with this element as \
+                 much as possible. Defaults to +Z if not set"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        projected_axis: Option<DirectionType>,
         #[doc = "What is this sweep relative to? Deprecated; please use \
                  `translate_profile_to_path` and `orient_profile_perpendicular` instead."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -14961,16 +15382,6 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         planar_normal: Option<Point3D>,
     },
-    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
-             run\" In a dry run, successful commands won't actually change the model. This is \
-             useful for catching errors before actually making the change."]
-    #[serde(rename = "enable_dry_run")]
-    EnableDryRun {},
-    #[doc = "Sets whether or not changes to the scene or its objects will be done as a \"dry \
-             run\" In a dry run, successful commands won't actually change the model. This is \
-             useful for catching errors before actually making the change."]
-    #[serde(rename = "disable_dry_run")]
-    DisableDryRun {},
     #[doc = "Set the background color of the scene."]
     #[serde(rename = "set_background_color")]
     SetBackgroundColor {
@@ -15329,7 +15740,8 @@ pub enum ModelingCmd {
     #[serde(rename = "solid3d_get_extrusion_face_info")]
     Solid3DGetExtrusionFaceInfo {
         #[doc = "Any edge that lies on the extrusion base path."]
-        edge_id: uuid::Uuid,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
         #[doc = "The Solid3d object whose extrusion is being queried."]
         object_id: uuid::Uuid,
     },
@@ -15337,7 +15749,8 @@ pub enum ModelingCmd {
     #[serde(rename = "solid3d_get_adjacency_info")]
     Solid3DGetAdjacencyInfo {
         #[doc = "Any edge that lies on the extrusion base path."]
-        edge_id: uuid::Uuid,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_id: Option<uuid::Uuid>,
         #[doc = "The Solid3d object whose info is being queried."]
         object_id: uuid::Uuid,
     },
@@ -15571,6 +15984,19 @@ pub enum ModelingCmd {
         #[doc = "The surface to offset."]
         surface_id: uuid::Uuid,
     },
+    #[doc = "Tell the engine you're beginning execution, and will be sending many API calls \
+             shortly. The engine will render your geometry in reduced detail, to make execution \
+             faster. Call EndExecution to restore high quality once you're done sending commands."]
+    #[serde(rename = "begin_execution")]
+    BeginExecution {
+        #[doc = "Should rendering occur, or not? If enabled, rendering will be low resolution \
+                 until you call EndExecution."]
+        enable_render: bool,
+    },
+    #[doc = "Tell the engine you're finished execution, and it should resume rendering at high \
+             resolution."]
+    #[serde(rename = "end_execution")]
+    EndExecution {},
     #[doc = "Returns the closest edge to this point."]
     #[serde(rename = "closest_edge")]
     ClosestEdge {
@@ -15581,6 +16007,12 @@ pub enum ModelingCmd {
                  the scene."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         object_id: Option<uuid::Uuid>,
+    },
+    #[doc = "Gets debug information about a sketch"]
+    #[serde(rename = "sketch_get_info")]
+    SketchGetInfo {
+        #[doc = "Which path to query"]
+        path_id: uuid::Uuid,
     },
 }
 
@@ -16741,16 +17173,6 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the `SketchModeDisable` endpoint."]
         data: SketchModeDisable,
     },
-    #[serde(rename = "enable_dry_run")]
-    EnableDryRun {
-        #[doc = "The response from the `EnableDryRun` endpoint."]
-        data: EnableDryRun,
-    },
-    #[serde(rename = "disable_dry_run")]
-    DisableDryRun {
-        #[doc = "The response from the `DisableDryRun` endpoint."]
-        data: DisableDryRun,
-    },
     #[serde(rename = "curve_set_constraint")]
     CurveSetConstraint {
         #[doc = "The response from the `CurveSetConstraint` endpoint."]
@@ -17372,10 +17794,25 @@ pub enum OkModelingCmdResponse {
         #[doc = "The response from the 'OffsetSurface'."]
         data: OffsetSurface,
     },
+    #[serde(rename = "begin_execution")]
+    BeginExecution {
+        #[doc = "The response from the 'BeginExecution'."]
+        data: BeginExecution,
+    },
+    #[serde(rename = "end_execution")]
+    EndExecution {
+        #[doc = "The response from the 'EndExecution'."]
+        data: EndExecution,
+    },
     #[serde(rename = "closest_edge")]
     ClosestEdge {
         #[doc = "The response from the 'ClosestEdge'."]
         data: ClosestEdge,
+    },
+    #[serde(rename = "sketch_get_info")]
+    SketchGetInfo {
+        #[doc = "The response from the 'SketchGetInfo'."]
+        data: SketchGetInfo,
     },
 }
 
@@ -18029,6 +18466,15 @@ pub enum OrgDatasetFileConversionStatus {
     #[serde(rename = "error_geometry_mismatch")]
     #[display("error_geometry_mismatch")]
     ErrorGeometryMismatch,
+    #[doc = "Conversion failed because generated KCL failed to execute."]
+    #[serde(rename = "error_execution")]
+    #[display("error_execution")]
+    ErrorExecution,
+    #[doc = "Conversion failed because a required conversion service connection or dependency was \
+             unavailable."]
+    #[serde(rename = "error_connection")]
+    #[display("error_connection")]
+    ErrorConnection,
     #[doc = "Conversion failed because we didn't know how to handle the file. The conversion \
              should be retried with a new converter version."]
     #[serde(rename = "error_unsupported")]
@@ -23102,6 +23548,45 @@ impl tabled::Tabled for SideFace {
     }
 }
 
+#[doc = "The response from the 'SketchGetInfo'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SketchGetInfo {
+    #[doc = "All curves in this sketch."]
+    pub curves: Vec<CurveDebug>,
+    #[doc = "How many regions the Toolpaths library thinks exist"]
+    pub region_count: u16,
+    #[doc = "OBJ representation of the topology from Toolpaths library."]
+    pub region_obj: String,
+}
+
+impl std::fmt::Display for SketchGetInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SketchGetInfo {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.curves).into(),
+            format!("{:?}", self.region_count).into(),
+            self.region_obj.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["curves".into(), "region_count".into(), "region_obj".into()]
+    }
+}
+
 #[doc = "The response from the `SketchModeDisable` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -28035,6 +28520,10 @@ impl tabled::Tabled for UpdateShortlinkRequest {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UpdateUser {
+    #[doc = "Whether the user has opted into pay-as-you-go charges after using their included \
+             credits."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub allow_pay_as_you_go: Option<bool>,
     #[doc = "The user's company."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub company: Option<String>,
@@ -28076,9 +28565,14 @@ impl std::fmt::Display for UpdateUser {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UpdateUser {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(allow_pay_as_you_go) = &self.allow_pay_as_you_go {
+                format!("{:?}", allow_pay_as_you_go).into()
+            } else {
+                String::new().into()
+            },
             if let Some(company) = &self.company {
                 format!("{:?}", company).into()
             } else {
@@ -28121,6 +28615,7 @@ impl tabled::Tabled for UpdateUser {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "allow_pay_as_you_go".into(),
             "company".into(),
             "discord".into(),
             "first_name".into(),
@@ -28657,6 +29152,10 @@ pub enum UserOrgRole {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct UserResponse {
+    #[doc = "Whether the user has opted into pay-as-you-go charges after using their included \
+             credits."]
+    #[serde(default)]
+    pub allow_pay_as_you_go: bool,
     #[doc = "If the user should be blocked and the reason why."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub block: Option<BlockReason>,
@@ -28730,9 +29229,10 @@ impl std::fmt::Display for UserResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for UserResponse {
-    const LENGTH: usize = 20;
+    const LENGTH: usize = 21;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.allow_pay_as_you_go).into(),
             if let Some(block) = &self.block {
                 format!("{:?}", block).into()
             } else {
@@ -28802,6 +29302,7 @@ impl tabled::Tabled for UserResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "allow_pay_as_you_go".into(),
             "block".into(),
             "block_message".into(),
             "can_train_on_data".into(),
@@ -29465,12 +29966,14 @@ pub struct ZooProductSubscription {
     #[serde(default)]
     pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
-             modeling app per month. This re-ups on the 1st of each month. This is equivalent to \
-             the monetary value divided by the price of an API credit."]
+             modeling app per month. Credit replenishment remains calendar-month based while \
+             anniversary billing is rolled out. This is equivalent to the monetary value divided \
+             by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
-             the modeling app per month. This re-ups on the 1st of each month."]
+             the modeling app per month. Credit replenishment remains calendar-month based while \
+             anniversary billing is rolled out."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]

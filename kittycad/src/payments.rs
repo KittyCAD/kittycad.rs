@@ -12,6 +12,132 @@ impl Payments {
         Self { client }
     }
 
+    #[doc = "Get the authenticated organization's aggregate-usage collection \
+             threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_get_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .get_org_usage_collection_threshold()\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_usage_collection_threshold<'a>(
+        &'a self,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Set the authenticated organization's aggregate-usage collection \
+             threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_set_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        \
+             .set_org_usage_collection_threshold(&\
+             kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as \
+             f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn set_org_usage_collection_threshold<'a>(
+        &'a self,
+        body: &crate::types::AggregateUsageCollectionThresholdSet,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Restore the default for the authenticated organization's aggregate-usage collection \
+             threshold.\n\n**Parameters:**\n\n- `expected_version: i64`: Version returned by the \
+             read that this mutation is based on. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_reset_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .reset_org_usage_collection_threshold(4 as i64)\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn reset_org_usage_collection_threshold<'a>(
+        &'a self,
+        expected_version: i64,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let query_params = vec![("expected_version", format!("{}", expected_version))];
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get payment info about your org.\n\nThis includes billing address, phone, and \
              name.\n\nThis endpoint requires authentication by an org admin. It gets the payment \
              information for the authenticated user's org.\n\n```rust,no_run\nasync fn \
@@ -738,6 +864,132 @@ impl Payments {
         );
         req = req.bearer_auth(&self.client.token);
         req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Get your personal aggregate-usage collection threshold.\n\nThe effective threshold is \
+             the amount of accrued, unfunded usage that causes an early invoice before the normal \
+             billing-period close.\n\n```rust,no_run\nasync fn \
+             example_payments_get_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .get_user_usage_collection_threshold()\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_usage_collection_threshold<'a>(
+        &'a self,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Set your personal aggregate-usage collection threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_set_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        \
+             .set_user_usage_collection_threshold(&\
+             kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as \
+             f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn set_user_usage_collection_threshold<'a>(
+        &'a self,
+        body: &crate::types::AggregateUsageCollectionThresholdSet,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Restore the default for your personal aggregate-usage collection \
+             threshold.\n\n**Parameters:**\n\n- `expected_version: i64`: Version returned by the \
+             read that this mutation is based on. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_reset_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .reset_user_usage_collection_threshold(4 as i64)\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn reset_user_usage_collection_threshold<'a>(
+        &'a self,
+        expected_version: i64,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url, "user/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let query_params = vec![("expected_version", format!("{}", expected_version))];
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

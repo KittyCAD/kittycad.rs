@@ -84,6 +84,11 @@ pub mod apps;
 /// FROM: <https://zoo.dev/docs/api/executor>
 #[cfg(feature = "requests")]
 pub mod executor;
+/// Operations for submitting and managing Factory manufacturing jobs.
+///
+/// FROM: <https://zoo.dev/docs/api/factory>
+#[cfg(feature = "requests")]
+pub mod factory;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://zoo.dev/docs/api/file>
@@ -429,6 +434,13 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/executor>
     pub fn executor(&self) -> executor::Executor {
         executor::Executor::new(self.clone())
+    }
+
+    /// Operations for submitting and managing Factory manufacturing jobs.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/factory>
+    pub fn factory(&self) -> factory::Factory {
+        factory::Factory::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
