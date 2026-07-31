@@ -40211,7 +40211,7 @@
             ]
           },
           {
-            "description": "Stripe related features are enabled.",
+            "description": "Internal ledger and contract billing are enabled.",
             "type": "string",
             "enum": [
               "billing"
