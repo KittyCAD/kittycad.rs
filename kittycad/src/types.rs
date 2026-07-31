@@ -10224,7 +10224,7 @@ pub enum Feature {
     #[serde(rename = "big_query_telemetry")]
     #[display("big_query_telemetry")]
     BigQueryTelemetry,
-    #[doc = "Stripe related features are enabled."]
+    #[doc = "Internal ledger and contract billing are enabled."]
     #[serde(rename = "billing")]
     #[display("billing")]
     Billing,
