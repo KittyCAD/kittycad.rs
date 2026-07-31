@@ -37562,6 +37562,23 @@
           "source"
         ]
       },
+      "CreatePlanarSurface": {
+        "description": "The response from the 'CreatePlanarSurface'.",
+        "type": "object",
+        "properties": {
+          "surfaces": {
+            "description": "the list of the ids of the surfaces that were created from the planar surface command",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "surfaces"
+        ]
+      },
       "CreateProjectShareLinkRequest": {
         "description": "Request payload for creating a new project share link.",
         "type": "object",
@@ -44529,10 +44546,20 @@
                 ]
               },
               "target": {
-                "description": "Which sketch to extrude. Must be a closed 2D solid.",
+                "nullable": true,
+                "description": "Which sketch or edge to extrude (legacy API).\n\nMust be a closed 2D solid, or an edge for surface extrusions. Either `target` or `target_reference` must be provided.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/ModelingCmdId"
+                  }
+                ]
+              },
+              "target_reference": {
+                "nullable": true,
+                "description": "Edge specifier identifying the source edge to extrude. If provided, this takes precedence over `target`.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/EdgeSpecifier"
                   }
                 ]
               },
@@ -44545,7 +44572,6 @@
             },
             "required": [
               "reference",
-              "target",
               "type"
             ]
           },
@@ -49427,6 +49453,39 @@
             ]
           },
           {
+            "description": "Create a planar surface bounded by the connection of various paths and curves. 'CreatePlanarSurface' modeling command.",
+            "type": "object",
+            "properties": {
+              "curve_ids": {
+                "description": "Which curves to create the planar surface(s) from. Curves must be provided in the order they are connected to each other They must form a closed loop, either by themselves or in a group",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "tolerance": {
+                "description": "Tolerance for the planar surface creation. Must be positive (i.e. greater than zero).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LengthUnit"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_planar_surface"
+                ]
+              }
+            },
+            "required": [
+              "curve_ids",
+              "tolerance",
+              "type"
+            ]
+          },
+          {
             "description": "Finds a suitable set of arguments that can be passed to CreateRegion to resolve this very region.",
             "type": "object",
             "properties": {
@@ -53093,6 +53152,24 @@
                 "type": "string",
                 "enum": [
                   "create_region"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/CreatePlanarSurface"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "create_planar_surface"
                 ]
               }
             },
