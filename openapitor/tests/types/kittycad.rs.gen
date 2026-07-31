@@ -6211,6 +6211,37 @@ impl tabled::Tabled for CreateOrgDataset {
     }
 }
 
+#[doc = "The response from the 'CreatePlanarSurface'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreatePlanarSurface {
+    #[doc = "the list of the ids of the surfaces that were created from the planar surface command"]
+    pub surfaces: Vec<uuid::Uuid>,
+}
+
+impl std::fmt::Display for CreatePlanarSurface {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreatePlanarSurface {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.surfaces).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["surfaces".into()]
+    }
+}
+
 #[doc = "Request payload for creating a new project share link."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -14082,8 +14113,12 @@ pub enum ModelingCmd {
         faces: Option<ExtrudedFaceInfo>,
         #[doc = "Reference to extrude to. Extrusion occurs along the target's normal until it is as close to the reference as possible."]
         reference: ExtrudeReference,
-        #[doc = "Which sketch to extrude. Must be a closed 2D solid."]
-        target: uuid::Uuid,
+        #[doc = "Which sketch or edge to extrude (legacy API).\n\nMust be a closed 2D solid, or an edge for surface extrusions. Either `target` or `target_reference` must be provided."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target: Option<uuid::Uuid>,
+        #[doc = "Edge specifier identifying the source edge to extrude. If provided, this takes precedence over `target`."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target_reference: Option<EdgeSpecifier>,
     },
     #[doc = "Command for twist extruding a solid 2d."]
     #[serde(rename = "twist_extrude")]
@@ -15476,6 +15511,14 @@ pub enum ModelingCmd {
         #[doc = "Which version of the Region endpoint to call."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         version: Option<RegionVersion>,
+    },
+    #[doc = "Create a planar surface bounded by the connection of various paths and curves. 'CreatePlanarSurface' modeling command."]
+    #[serde(rename = "create_planar_surface")]
+    CreatePlanarSurface {
+        #[doc = "Which curves to create the planar surface(s) from. Curves must be provided in the order they are connected to each other They must form a closed loop, either by themselves or in a group"]
+        curve_ids: Vec<uuid::Uuid>,
+        #[doc = "Tolerance for the planar surface creation. Must be positive (i.e. greater than zero)."]
+        tolerance: f64,
     },
     #[doc = "Finds a suitable set of arguments that can be passed to CreateRegion to resolve this very region."]
     #[serde(rename = "region_get_resolvable_intersection_info")]
@@ -17286,6 +17329,11 @@ pub enum OkModelingCmdResponse {
     CreateRegion {
         #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
+    },
+    #[serde(rename = "create_planar_surface")]
+    CreatePlanarSurface {
+        #[doc = "The response from the 'CreatePlanarSurface'."]
+        data: CreatePlanarSurface,
     },
     #[serde(rename = "region_get_resolvable_intersection_info")]
     RegionGetResolvableIntersectionInfo {
