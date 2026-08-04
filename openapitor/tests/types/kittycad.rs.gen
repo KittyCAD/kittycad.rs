@@ -4114,6 +4114,10 @@ pub enum BlockReason {
     #[serde(rename = "billing_threshold_reached")]
     #[display("billing_threshold_reached")]
     BillingThresholdReached,
+    #[doc = "The user exhausted their included credits without opting into pay-as-you-go charges."]
+    #[serde(rename = "pay_as_you_go_disabled")]
+    #[display("pay_as_you_go_disabled")]
+    PayAsYouGoDisabled,
     #[doc = "The user repeatedly upgraded and downgraded to recycle free-plan credits."]
     #[serde(rename = "upgrade_downgrade_abuse")]
     #[display("upgrade_downgrade_abuse")]
@@ -5966,6 +5970,14 @@ pub enum ConversionSortMode {
     #[serde(rename = "status_descending")]
     #[display("status_descending")]
     StatusDescending,
+    #[doc = "Sort by phase in increasing order."]
+    #[serde(rename = "phase_ascending")]
+    #[display("phase_ascending")]
+    PhaseAscending,
+    #[doc = "Sort by phase in decreasing order."]
+    #[serde(rename = "phase_descending")]
+    #[display("phase_descending")]
+    PhaseDescending,
     #[doc = "Sort by updated_at in increasing order."]
     #[serde(rename = "updated_at_ascending")]
     #[display("updated_at_ascending")]
@@ -6869,6 +6881,9 @@ impl tabled::Tabled for Customer {
 pub struct CustomerBalance {
     #[doc = "The date and time the balance was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The date and time the monthly API credits are next scheduled to refresh.\n\nWhen a refresh is due but has not been applied yet, this is the due timestamp in the past. Clients can use that to show the refresh as pending rather than incorrectly advancing by a month.\n\nThis is `null` when the customer does not have an active standard billing schedule, such as before their billing account is established or while a contract owns billing."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub monthly_api_credits_refresh_at: Option<chrono::DateTime<chrono::Utc>>,
     #[doc = "The number of monthly API credits remaining in the balance. This is the number of credits remaining in the balance.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
     pub monthly_api_credits_remaining: u64,
     #[doc = "The monetary value of the monthly API credits remaining in the balance. This gets re-upped every month, but if the credits are not used for a month they do not carry over to the next month.\n\nBoth the monetary value and the number of credits are returned, but they reflect the same value in the database."]
@@ -6902,10 +6917,15 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
+            if let Some(monthly_api_credits_refresh_at) = &self.monthly_api_credits_refresh_at {
+                format!("{:?}", monthly_api_credits_refresh_at).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.monthly_api_credits_remaining).into(),
             format!("{:?}", self.monthly_api_credits_remaining_monetary_value).into(),
             format!("{:?}", self.stable_api_credits_remaining).into(),
@@ -6932,6 +6952,7 @@ impl tabled::Tabled for CustomerBalance {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "created_at".into(),
+            "monthly_api_credits_refresh_at".into(),
             "monthly_api_credits_remaining".into(),
             "monthly_api_credits_remaining_monetary_value".into(),
             "stable_api_credits_remaining".into(),

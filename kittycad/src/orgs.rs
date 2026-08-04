@@ -2,6 +2,56 @@ use anyhow::Result;
 
 use crate::Client;
 #[derive(Clone, Debug)]
+pub struct ListDatasetConversionsParams {
+    pub filter: Option<String>,
+    pub id: uuid::Uuid,
+    pub limit: Option<u32>,
+    pub page_token: Option<String>,
+    pub phase: Option<String>,
+    pub q: Option<String>,
+    pub sort_by: Option<crate::types::ConversionSortMode>,
+}
+
+impl ListDatasetConversionsParams {
+    pub fn new(id: uuid::Uuid) -> Self {
+        Self {
+            filter: Default::default(),
+            id,
+            limit: Default::default(),
+            page_token: Default::default(),
+            phase: Default::default(),
+            q: Default::default(),
+            sort_by: Default::default(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct SearchDatasetConversionsParams {
+    pub filter: Option<String>,
+    pub id: uuid::Uuid,
+    pub limit: Option<u32>,
+    pub page_token: Option<String>,
+    pub phase: Option<String>,
+    pub q: Option<String>,
+    pub sort_by: Option<crate::types::ConversionSortMode>,
+}
+
+impl SearchDatasetConversionsParams {
+    pub fn new(id: uuid::Uuid) -> Self {
+        Self {
+            filter: Default::default(),
+            id,
+            limit: Default::default(),
+            page_token: Default::default(),
+            phase: Default::default(),
+            q: Default::default(),
+            sort_by: Default::default(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Orgs {
     pub client: Client,
 }
@@ -496,17 +546,22 @@ impl Orgs {
         }
     }
 
-    #[doc = "List the file conversions that have been processed for a given dataset owned by the caller's org.\n\nThis endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`).\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::ConversionSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_list_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .list_dataset_conversions(\n            Some(\"some-string\".to_string()),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::ConversionSortMode::StatusDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_dataset_conversions_stream(\n        Some(\"some-string\".to_string()),\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n        Some(kittycad::types::ConversionSortMode::StatusDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List the file conversions that have been processed for a given dataset owned by the caller's org.\n\nThis endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`). Use `q` to search by conversion id or file path and `phase` to narrow the pipeline stage.\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `phase: Option<String>`: Optional conversion phase filter.\n- `q: Option<String>`: Optional search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_list_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .list_dataset_conversions(kittycad::orgs::ListDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream =\n        orgs.list_dataset_conversions_stream(kittycad::orgs::ListDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_dataset_conversions<'a>(
         &'a self,
-        filter: Option<String>,
-        id: uuid::Uuid,
-        limit: Option<u32>,
-        page_token: Option<String>,
-        sort_by: Option<crate::types::ConversionSortMode>,
+        params: ListDatasetConversionsParams,
     ) -> Result<crate::types::OrgDatasetFileConversionSummaryResultsPage, crate::types::error::Error>
     {
+        let ListDatasetConversionsParams {
+            filter,
+            id,
+            limit,
+            page_token,
+            phase,
+            q,
+            sort_by,
+        } = params;
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
@@ -527,6 +582,14 @@ impl Orgs {
 
         if let Some(p) = page_token {
             query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = phase {
+            query_params.push(("phase", p));
+        }
+
+        if let Some(p) = q {
+            query_params.push(("q", p));
         }
 
         if let Some(p) = sort_by {
@@ -553,15 +616,12 @@ impl Orgs {
         }
     }
 
-    #[doc = "List the file conversions that have been processed for a given dataset owned by the caller's org.\n\nThis endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`).\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `sort_by: Option<crate::types::ConversionSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_list_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .list_dataset_conversions(\n            Some(\"some-string\".to_string()),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::ConversionSortMode::StatusDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_dataset_conversions_stream(\n        Some(\"some-string\".to_string()),\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n        Some(kittycad::types::ConversionSortMode::StatusDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List the file conversions that have been processed for a given dataset owned by the caller's org.\n\nThis endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`). Use `q` to search by conversion id or file path and `phase` to narrow the pipeline stage.\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `phase: Option<String>`: Optional conversion phase filter.\n- `q: Option<String>`: Optional search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_list_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .list_dataset_conversions(kittycad::orgs::ListDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream =\n        orgs.list_dataset_conversions_stream(kittycad::orgs::ListDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_dataset_conversions_stream<'a>(
         &'a self,
-        filter: Option<String>,
-        id: uuid::Uuid,
-        limit: Option<u32>,
-        sort_by: Option<crate::types::ConversionSortMode>,
+        params: ListDatasetConversionsParams,
     ) -> impl futures::Stream<
         Item = Result<crate::types::OrgDatasetFileConversionSummary, crate::types::error::Error>,
     > + Unpin
@@ -569,6 +629,18 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let mut params = params;
+        params.page_token = Default::default();
+        let params_for_call = params.clone();
+        let ListDatasetConversionsParams {
+            filter,
+            id,
+            limit,
+            phase,
+            q,
+            sort_by,
+            ..
+        } = params;
         let pagination_url_path =
             ("org/datasets/{id}/conversions".replace("{id}", &format!("{}", id))).to_string();
         let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
@@ -580,11 +652,19 @@ impl Orgs {
             pagination_query_params.push(("limit", format!("{}", p)));
         }
 
+        if let Some(p) = phase.as_ref() {
+            pagination_query_params.push(("phase", p.clone()));
+        }
+
+        if let Some(p) = q.as_ref() {
+            pagination_query_params.push(("q", p.clone()));
+        }
+
         if let Some(p) = sort_by.as_ref() {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self . list_dataset_conversions (filter , id , limit , None , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
+        self . list_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
     }
 
     #[doc = "Fetch the metadata and converted output for a single dataset conversion.\n\nUnlike list/search endpoints, this returns the full conversion payload: latest output text plus decoded snapshot image payloads for original, raw-KCL, and salon-KCL stages.\n\n**Parameters:**\n\n- `conversion_id: uuid::Uuid`: Conversion identifier. (required)\n- `id: uuid::Uuid`: Dataset identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_get_dataset_conversion() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionDetails = client\n        .orgs()\n        .get_dataset_conversion(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -748,17 +828,22 @@ impl Orgs {
         }
     }
 
-    #[doc = "Search dataset conversions by conversion ID or file path.\n\nSupports exact conversion-ID matching and fuzzy file-path matching.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `q: Option<String>`: Search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`: Requested sort mode for matched conversions.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_search_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .search_dataset_conversions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::ConversionSortMode::StatusDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_search_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.search_dataset_conversions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n        Some(\"some-string\".to_string()),\n        Some(kittycad::types::ConversionSortMode::StatusDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "Search dataset conversions by conversion ID or file path.\n\nSupports exact conversion-ID matching and fuzzy file-path matching.\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `phase: Option<String>`: Optional conversion phase filter.\n- `q: Option<String>`: Search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`: Requested sort mode for matched conversions.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_search_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .search_dataset_conversions(kittycad::orgs::SearchDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_search_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream =\n        orgs.search_dataset_conversions_stream(kittycad::orgs::SearchDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn search_dataset_conversions<'a>(
         &'a self,
-        id: uuid::Uuid,
-        limit: Option<u32>,
-        page_token: Option<String>,
-        q: Option<String>,
-        sort_by: Option<crate::types::ConversionSortMode>,
+        params: SearchDatasetConversionsParams,
     ) -> Result<crate::types::OrgDatasetFileConversionSummaryResultsPage, crate::types::error::Error>
     {
+        let SearchDatasetConversionsParams {
+            filter,
+            id,
+            limit,
+            page_token,
+            phase,
+            q,
+            sort_by,
+        } = params;
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
@@ -769,12 +854,20 @@ impl Orgs {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
+        if let Some(p) = filter {
+            query_params.push(("filter", p));
+        }
+
         if let Some(p) = limit {
             query_params.push(("limit", format!("{}", p)));
         }
 
         if let Some(p) = page_token {
             query_params.push(("page_token", p));
+        }
+
+        if let Some(p) = phase {
+            query_params.push(("phase", p));
         }
 
         if let Some(p) = q {
@@ -805,15 +898,12 @@ impl Orgs {
         }
     }
 
-    #[doc = "Search dataset conversions by conversion ID or file path.\n\nSupports exact conversion-ID matching and fuzzy file-path matching.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `q: Option<String>`: Search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`: Requested sort mode for matched conversions.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_search_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .search_dataset_conversions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::ConversionSortMode::StatusDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_search_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.search_dataset_conversions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n        Some(\"some-string\".to_string()),\n        Some(kittycad::types::ConversionSortMode::StatusDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "Search dataset conversions by conversion ID or file path.\n\nSupports exact conversion-ID matching and fuzzy file-path matching.\n\n**Parameters:**\n\n- `filter: Option<String>`: Optional filter string for conversions (example: `status:success`).\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n- `phase: Option<String>`: Optional conversion phase filter.\n- `q: Option<String>`: Search text matched against conversion id or file path.\n- `sort_by: Option<crate::types::ConversionSortMode>`: Requested sort mode for matched conversions.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_orgs_search_dataset_conversions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgDatasetFileConversionSummaryResultsPage = client\n        .orgs()\n        .search_dataset_conversions(kittycad::orgs::SearchDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_search_dataset_conversions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream =\n        orgs.search_dataset_conversions_stream(kittycad::orgs::SearchDatasetConversionsParams {\n            filter: Some(\"some-string\".to_string()),\n            id: uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            limit: Some(4 as u32),\n            page_token: Some(\"some-string\".to_string()),\n            phase: Some(\"some-string\".to_string()),\n            q: Some(\"some-string\".to_string()),\n            sort_by: Some(kittycad::types::ConversionSortMode::PhaseAscending),\n        });\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn search_dataset_conversions_stream<'a>(
         &'a self,
-        id: uuid::Uuid,
-        limit: Option<u32>,
-        q: Option<String>,
-        sort_by: Option<crate::types::ConversionSortMode>,
+        params: SearchDatasetConversionsParams,
     ) -> impl futures::Stream<
         Item = Result<crate::types::OrgDatasetFileConversionSummary, crate::types::error::Error>,
     > + Unpin
@@ -821,12 +911,32 @@ impl Orgs {
         use futures::{StreamExt, TryFutureExt, TryStreamExt};
 
         use crate::types::paginate::Pagination;
+        let mut params = params;
+        params.page_token = Default::default();
+        let params_for_call = params.clone();
+        let SearchDatasetConversionsParams {
+            filter,
+            id,
+            limit,
+            phase,
+            q,
+            sort_by,
+            ..
+        } = params;
         let pagination_url_path = ("org/datasets/{id}/search/conversions"
             .replace("{id}", &format!("{}", id)))
         .to_string();
         let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = filter.as_ref() {
+            pagination_query_params.push(("filter", p.clone()));
+        }
+
         if let Some(p) = limit.as_ref() {
             pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = phase.as_ref() {
+            pagination_query_params.push(("phase", p.clone()));
         }
 
         if let Some(p) = q.as_ref() {
@@ -837,7 +947,7 @@ impl Orgs {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self . search_dataset_conversions (id , limit , None , q , sort_by) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
+        self . search_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () . boxed ()
     }
 
     #[doc = "Run semantic search across chunked conversion outputs for a dataset.\n\nThis embeds \
