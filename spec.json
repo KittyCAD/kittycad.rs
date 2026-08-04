@@ -10025,7 +10025,7 @@
           "orgs"
         ],
         "summary": "List the file conversions that have been processed for a given dataset owned by the caller's org.",
-        "description": "This endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`).",
+        "description": "This endpoint returns lightweight conversion summaries only (including `phase`), and intentionally omits converted KCL output and snapshot image payloads for speed. Use the optional `filter` query parameter to filter results (example: `?filter=status:success`). Use `q` to search by conversion id or file path and `phase` to narrow the pipeline stage.",
         "operationId": "list_org_dataset_conversions",
         "parameters": [
           {
@@ -10068,6 +10068,24 @@
             "in": "query",
             "name": "filter",
             "description": "Optional filter string for conversions (example: `status:success`).",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "description": "Optional search text matched against conversion id or file path.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phase",
+            "description": "Optional conversion phase filter.",
             "schema": {
               "nullable": true,
               "type": "string"
@@ -10886,6 +10904,24 @@
             "description": "Requested sort mode for matched conversions.",
             "schema": {
               "$ref": "#/components/schemas/ConversionSortMode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Optional filter string for conversions (example: `status:success`).",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phase",
+            "description": "Optional conversion phase filter.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
             }
           }
         ],
@@ -36181,6 +36217,13 @@
             ]
           },
           {
+            "description": "The user exhausted their included credits without opting into pay-as-you-go charges.",
+            "type": "string",
+            "enum": [
+              "pay_as_you_go_disabled"
+            ]
+          },
+          {
             "description": "The user repeatedly upgraded and downgraded to recycle free-plan credits.",
             "type": "string",
             "enum": [
@@ -37412,6 +37455,20 @@
             ]
           },
           {
+            "description": "Sort by phase in increasing order.",
+            "type": "string",
+            "enum": [
+              "phase_ascending"
+            ]
+          },
+          {
+            "description": "Sort by phase in decreasing order.",
+            "type": "string",
+            "enum": [
+              "phase_descending"
+            ]
+          },
+          {
             "description": "Sort by updated_at in increasing order.",
             "type": "string",
             "enum": [
@@ -37983,6 +38040,13 @@
           "created_at": {
             "title": "DateTime",
             "description": "The date and time the balance was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "monthly_api_credits_refresh_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The date and time the monthly API credits are next scheduled to refresh.\n\nWhen a refresh is due but has not been applied yet, this is the due timestamp in the past. Clients can use that to show the refresh as pending rather than incorrectly advancing by a month.\n\nThis is `null` when the customer does not have an active standard billing schedule, such as before their billing account is established or while a contract owns billing.",
             "type": "string",
             "format": "date-time"
           },
