@@ -346,12 +346,13 @@ async fn test_list_dataset_conversions_stream_preserves_query_params() {
     client.set_base_url(base_url);
 
     let orgs = client.orgs();
-    let mut stream = orgs.list_dataset_conversions_stream(
-        Some("status=success".to_string()),
-        dataset_id,
-        Some(1),
-        Some(crate::types::ConversionSortMode::StatusDescending),
-    );
+    let mut params = crate::orgs::ListDatasetConversionsParams::new(dataset_id);
+    params.filter = Some("status=success".to_string());
+    params.limit = Some(1);
+    params.phase = Some("modeling".to_string());
+    params.q = Some("part.kcl".to_string());
+    params.sort_by = Some(crate::types::ConversionSortMode::StatusDescending);
+    let mut stream = orgs.list_dataset_conversions_stream(params);
 
     let mut ids = Vec::new();
     while let Some(item) = stream.try_next().await.unwrap() {
@@ -376,12 +377,16 @@ async fn test_list_dataset_conversions_stream_preserves_query_params() {
 
     assert_query_pair(&first_url, "filter", "status=success");
     assert_query_pair(&first_url, "limit", "1");
+    assert_query_pair(&first_url, "phase", "modeling");
+    assert_query_pair(&first_url, "q", "part.kcl");
     assert_query_pair(&first_url, "sort_by", "status_descending");
     assert_no_query_pair(&first_url, "page_token");
     assert_no_query_pair(&first_url, "next_page");
 
     assert_query_pair(&second_url, "filter", "status=success");
     assert_query_pair(&second_url, "limit", "1");
+    assert_query_pair(&second_url, "phase", "modeling");
+    assert_query_pair(&second_url, "q", "part.kcl");
     assert_query_pair(&second_url, "sort_by", "status_descending");
     assert_query_pair(&second_url, "page_token", "token-1");
     assert_no_query_pair(&second_url, "next_page");
