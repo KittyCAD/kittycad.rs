@@ -349,6 +349,7 @@ async fn test_list_dataset_conversions_stream_preserves_query_params() {
     let mut params = crate::orgs::ListDatasetConversionsParams::new(dataset_id);
     params.filter = Some("status=success".to_string());
     params.limit = Some(1);
+    params.page_token = Some("caller-token".to_string());
     params.phase = Some("modeling".to_string());
     params.q = Some("part.kcl".to_string());
     params.sort_by = Some(crate::types::ConversionSortMode::StatusDescending);
