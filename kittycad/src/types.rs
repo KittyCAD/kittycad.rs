@@ -13837,10 +13837,12 @@ pub enum MlCopilotServerMessage {
         tool_name: String,
     },
     #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. \
-             Includes server messages and client `User` messages.\n\nInvariants: - Includes \
-             server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. \
-             }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Also includes client `User` \
-             messages. - The following are NEVER included: `SessionData`, `ConversationId`, \
+             Includes server messages and client `User` messages.\n\nInvariants: - Client replay \
+             includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, \
+             `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay \
+             also includes client `User` messages. - Backend replay includes client `User` \
+             messages plus selected reasoning, edit metadata, recovery output, and final \
+             responses. - The following are NEVER included: `SessionData`, `ConversationId`, \
              `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - \
              `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
              backend and is filtered from client replay. - Ordering is stable: messages are \
