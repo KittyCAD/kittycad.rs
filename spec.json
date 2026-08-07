@@ -43731,6 +43731,19 @@
             "additionalProperties": false
           },
           {
+            "description": "Backend-only token usage and cost for one completed Zookeeper turn.\n\nSent just before `EndOfStream`. API records it in `meta.usage` on the turn's `EndOfStream` message row, alongside the `meta.billing` revenue figures, and never forwards it to clients or replays it as a chat message. It exists so spend can be compared against what the turn was billed; it is not customer-facing.",
+            "type": "object",
+            "properties": {
+              "zookeeper_turn_usage": {
+                "$ref": "#/components/schemas/ZookeeperTurnUsage"
+              }
+            },
+            "required": [
+              "zookeeper_turn_usage"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Backend-only completed tool result used for portable Zookeeper recovery.\n\nAPI persists this message and includes it only in replay sent to the text-to-CAD backend. It is never forwarded to browser clients.",
             "type": "object",
             "properties": {
@@ -43768,7 +43781,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
@@ -63600,6 +63613,300 @@
               "status"
             ]
           }
+        ]
+      },
+      "ZookeeperTurnUsage": {
+        "description": "Token usage and cost for one completed Zookeeper turn.\n\nA turn is many model calls: the streamed agent loop, helper agents, conversation compaction, Auto-mode routing, and any retried attempts. This is the sum of all of them, with breakdowns by model and by stage.",
+        "type": "object",
+        "properties": {
+          "api_call_id": {
+            "nullable": true,
+            "description": "API call the turn belongs to, as the backend knows it.",
+            "type": "string"
+          },
+          "cache_write_input_tokens": {
+            "description": "Prompt tokens written to the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cached_input_tokens": {
+            "description": "Prompt tokens served from the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "conversation_id": {
+            "nullable": true,
+            "description": "Conversation the turn belongs to, as the backend knows it.",
+            "type": "string"
+          },
+          "cost_micro_usd": {
+            "description": "Cost in millionths of a US dollar, rounded half-up.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cost_usd": {
+            "description": "Exact cost as a decimal string, e.g. \"0.02184000\".",
+            "default": "",
+            "type": "string"
+          },
+          "fully_priced": {
+            "description": "Whether every request was priced.",
+            "default": false,
+            "type": "boolean"
+          },
+          "input_tokens": {
+            "description": "Prompt tokens, including the cached and cache-write subsets below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "models": {
+            "description": "Usage split by model.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZookeeperTurnUsageModel"
+            }
+          },
+          "output_tokens": {
+            "description": "Completion tokens, including the reasoning subset below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "priced_requests": {
+            "description": "Requests whose model had a known price.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "reasoning_tokens": {
+            "description": "Completion tokens spent on reasoning.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "requests": {
+            "description": "Number of model requests.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "schema_version": {
+            "description": "Payload shape identifier, e.g. \"zookeeper_turn_usage.v1\".",
+            "default": "",
+            "type": "string"
+          },
+          "stages": {
+            "description": "Usage split by the part of the turn that spent it.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZookeeperTurnUsageStage"
+            }
+          },
+          "total_tokens": {
+            "description": "Input plus output tokens.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "uncached_input_tokens": {
+            "description": "Prompt tokens billed at the full input rate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "unpriced_requests": {
+            "description": "Requests whose model had no known price; their tokens are counted but contribute no cost, so totals are a floor rather than an estimate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ZookeeperTurnUsageModel": {
+        "description": "Per-model usage within a Zookeeper turn.",
+        "type": "object",
+        "properties": {
+          "cache_write_input_tokens": {
+            "description": "Prompt tokens written to the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cached_input_tokens": {
+            "description": "Prompt tokens served from the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cost_micro_usd": {
+            "description": "Cost in millionths of a US dollar, rounded half-up.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cost_usd": {
+            "description": "Exact cost as a decimal string, e.g. \"0.02184000\".",
+            "default": "",
+            "type": "string"
+          },
+          "fully_priced": {
+            "description": "Whether every request was priced.",
+            "default": false,
+            "type": "boolean"
+          },
+          "input_tokens": {
+            "description": "Prompt tokens, including the cached and cache-write subsets below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "model": {
+            "description": "Model name as the provider reported it.",
+            "type": "string"
+          },
+          "output_tokens": {
+            "description": "Completion tokens, including the reasoning subset below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "priced_requests": {
+            "description": "Requests whose model had a known price.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "pricing_source": {
+            "description": "Where the price came from, e.g. \"litellm\", \"litellm_alias\", \"override\", or \"unknown\".",
+            "default": "",
+            "type": "string"
+          },
+          "reasoning_tokens": {
+            "description": "Completion tokens spent on reasoning.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "requests": {
+            "description": "Number of model requests.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_tokens": {
+            "description": "Input plus output tokens.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "uncached_input_tokens": {
+            "description": "Prompt tokens billed at the full input rate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "unpriced_requests": {
+            "description": "Requests whose model had no known price; their tokens are counted but contribute no cost, so totals are a floor rather than an estimate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "model"
+        ]
+      },
+      "ZookeeperTurnUsageStage": {
+        "description": "Per-stage usage within a Zookeeper turn.",
+        "type": "object",
+        "properties": {
+          "cache_write_input_tokens": {
+            "description": "Prompt tokens written to the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cached_input_tokens": {
+            "description": "Prompt tokens served from the provider's prompt cache.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cost_micro_usd": {
+            "description": "Cost in millionths of a US dollar, rounded half-up.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "cost_usd": {
+            "description": "Exact cost as a decimal string, e.g. \"0.02184000\".",
+            "default": "",
+            "type": "string"
+          },
+          "fully_priced": {
+            "description": "Whether every request was priced.",
+            "default": false,
+            "type": "boolean"
+          },
+          "input_tokens": {
+            "description": "Prompt tokens, including the cached and cache-write subsets below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "output_tokens": {
+            "description": "Completion tokens, including the reasoning subset below.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "priced_requests": {
+            "description": "Requests whose model had a known price.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "reasoning_tokens": {
+            "description": "Completion tokens spent on reasoning.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "requests": {
+            "description": "Number of model requests.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "stage": {
+            "description": "Which part of the turn spent the tokens, e.g. \"agent_stream\", \"auto_router\", \"compaction\", \"sub_agent\", or \"prompt_validation\".",
+            "type": "string"
+          },
+          "total_tokens": {
+            "description": "Input plus output tokens.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "uncached_input_tokens": {
+            "description": "Prompt tokens billed at the full input rate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          },
+          "unpriced_requests": {
+            "description": "Requests whose model had no known price; their tokens are counted but contribute no cost, so totals are a floor rather than an estimate.",
+            "default": 0,
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "stage"
         ]
       },
       "ZoomToFit": {
