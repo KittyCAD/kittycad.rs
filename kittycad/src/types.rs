@@ -13493,11 +13493,17 @@ pub enum MlCopilotClientMessage {
         additional_files: Option<Vec<MlCopilotFile>>,
         #[doc = "The content of the user's message."]
         content: String,
+        #[doc = "Stable identifier used to correlate this user request across services."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        correlation_id: Option<uuid::Uuid>,
         #[doc = "The current files in the project, if any. This can be used to provide context \
                  for the AI. This should be sent in binary format, if the files are not text \
                  files, like an imported binary file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
+        #[doc = "API call ID for the active Engine modeling session, when available."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        engine_api_call_id: Option<uuid::Uuid>,
         #[doc = "The user can force specific tools to be used for this message."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         forced_tools: Option<Vec<MlCopilotTool>>,
@@ -13821,6 +13827,69 @@ pub enum MlCopilotServerMessage {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         stage: Option<String>,
     },
+    #[doc = "Backend-only token usage and cost for one completed Zookeeper turn.\n\nSent just \
+             before `EndOfStream`. API records it in `meta.usage` on the turn's `EndOfStream` \
+             message row, alongside the `meta.billing` revenue figures, and never forwards it to \
+             clients or replays it as a chat message. It exists so spend can be compared against \
+             what the turn was billed; it is not customer-facing."]
+    #[serde(rename = "zookeeper_turn_usage")]
+    ZookeeperTurnUsage {
+        #[doc = "API call the turn belongs to, as the backend knows it."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        api_call_id: Option<String>,
+        #[doc = "Prompt tokens written to the provider's prompt cache."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cache_write_input_tokens: Option<i64>,
+        #[doc = "Prompt tokens served from the provider's prompt cache."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cached_input_tokens: Option<i64>,
+        #[doc = "Conversation the turn belongs to, as the backend knows it."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        conversation_id: Option<String>,
+        #[doc = "Cost in millionths of a US dollar, rounded half-up."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cost_micro_usd: Option<i64>,
+        #[doc = "Exact cost as a decimal string, e.g. \"0.02184000\"."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        cost_usd: Option<String>,
+        #[doc = "Whether every request was priced."]
+        #[serde(default)]
+        fully_priced: bool,
+        #[doc = "Prompt tokens, including the cached and cache-write subsets below."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        input_tokens: Option<i64>,
+        #[doc = "Usage split by model."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        models: Option<Vec<ZookeeperTurnUsageModel>>,
+        #[doc = "Completion tokens, including the reasoning subset below."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        output_tokens: Option<i64>,
+        #[doc = "Requests whose model had a known price."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        priced_requests: Option<i64>,
+        #[doc = "Completion tokens spent on reasoning."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        reasoning_tokens: Option<i64>,
+        #[doc = "Number of model requests."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        requests: Option<i64>,
+        #[doc = "Payload shape identifier, e.g. \"zookeeper_turn_usage.v1\"."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        schema_version: Option<String>,
+        #[doc = "Usage split by the part of the turn that spent it."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        stages: Option<Vec<ZookeeperTurnUsageStage>>,
+        #[doc = "Input plus output tokens."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        total_tokens: Option<i64>,
+        #[doc = "Prompt tokens billed at the full input rate."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        uncached_input_tokens: Option<i64>,
+        #[doc = "Requests whose model had no known price; their tokens are counted but contribute \
+                 no cost, so totals are a floor rather than an estimate."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        unpriced_requests: Option<i64>,
+    },
     #[doc = "Backend-only completed tool result used for portable Zookeeper recovery.\n\nAPI \
              persists this message and includes it only in replay sent to the text-to-CAD \
              backend. It is never forwarded to browser clients."]
@@ -13843,8 +13912,8 @@ pub enum MlCopilotServerMessage {
              also includes client `User` messages. - Backend replay includes client `User` \
              messages plus selected reasoning, edit metadata, recovery output, and final \
              responses. - The following are NEVER included: `SessionData`, `ConversationId`, \
-             `Delta`, `BackendShutdown`, or `ZookeeperAutoRouterMetadata`. - \
-             `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
+             `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, or `ZookeeperTurnUsage`. \
+             - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
              backend and is filtered from client replay. - Ordering is stable: messages are \
              ordered by prompt creation time within the conversation, then by the per-prompt \
              `seq` value (monotonically increasing as seen in the original stream).\n\nWire \
@@ -30551,6 +30620,507 @@ pub enum ZookeeperEditPatchFile {
         #[doc = "File contents before Zookeeper deleted the file."]
         previous_contents: String,
     },
+}
+
+#[doc = "Token usage and cost for one completed Zookeeper turn.\n\nA turn is many model calls: the \
+         streamed agent loop, helper agents, conversation compaction, Auto-mode routing, and any \
+         retried attempts. This is the sum of all of them, with breakdowns by model and by stage."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZookeeperTurnUsage {
+    #[doc = "API call the turn belongs to, as the backend knows it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub api_call_id: Option<String>,
+    #[doc = "Prompt tokens written to the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cache_write_input_tokens: Option<i64>,
+    #[doc = "Prompt tokens served from the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cached_input_tokens: Option<i64>,
+    #[doc = "Conversation the turn belongs to, as the backend knows it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<String>,
+    #[doc = "Cost in millionths of a US dollar, rounded half-up."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_micro_usd: Option<i64>,
+    #[doc = "Exact cost as a decimal string, e.g. \"0.02184000\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_usd: Option<String>,
+    #[doc = "Whether every request was priced."]
+    #[serde(default)]
+    pub fully_priced: bool,
+    #[doc = "Prompt tokens, including the cached and cache-write subsets below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_tokens: Option<i64>,
+    #[doc = "Usage split by model."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub models: Option<Vec<ZookeeperTurnUsageModel>>,
+    #[doc = "Completion tokens, including the reasoning subset below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_tokens: Option<i64>,
+    #[doc = "Requests whose model had a known price."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priced_requests: Option<i64>,
+    #[doc = "Completion tokens spent on reasoning."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_tokens: Option<i64>,
+    #[doc = "Number of model requests."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requests: Option<i64>,
+    #[doc = "Payload shape identifier, e.g. \"zookeeper_turn_usage.v1\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schema_version: Option<String>,
+    #[doc = "Usage split by the part of the turn that spent it."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub stages: Option<Vec<ZookeeperTurnUsageStage>>,
+    #[doc = "Input plus output tokens."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_tokens: Option<i64>,
+    #[doc = "Prompt tokens billed at the full input rate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uncached_input_tokens: Option<i64>,
+    #[doc = "Requests whose model had no known price; their tokens are counted but contribute no \
+             cost, so totals are a floor rather than an estimate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unpriced_requests: Option<i64>,
+}
+
+impl std::fmt::Display for ZookeeperTurnUsage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZookeeperTurnUsage {
+    const LENGTH: usize = 18;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(api_call_id) = &self.api_call_id {
+                format!("{:?}", api_call_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cache_write_input_tokens) = &self.cache_write_input_tokens {
+                format!("{:?}", cache_write_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cached_input_tokens) = &self.cached_input_tokens {
+                format!("{:?}", cached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{:?}", conversation_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_micro_usd) = &self.cost_micro_usd {
+                format!("{:?}", cost_micro_usd).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_usd) = &self.cost_usd {
+                format!("{:?}", cost_usd).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.fully_priced).into(),
+            if let Some(input_tokens) = &self.input_tokens {
+                format!("{:?}", input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(models) = &self.models {
+                format!("{:?}", models).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(output_tokens) = &self.output_tokens {
+                format!("{:?}", output_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(priced_requests) = &self.priced_requests {
+                format!("{:?}", priced_requests).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(reasoning_tokens) = &self.reasoning_tokens {
+                format!("{:?}", reasoning_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(requests) = &self.requests {
+                format!("{:?}", requests).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(schema_version) = &self.schema_version {
+                format!("{:?}", schema_version).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(stages) = &self.stages {
+                format!("{:?}", stages).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(total_tokens) = &self.total_tokens {
+                format!("{:?}", total_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(uncached_input_tokens) = &self.uncached_input_tokens {
+                format!("{:?}", uncached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(unpriced_requests) = &self.unpriced_requests {
+                format!("{:?}", unpriced_requests).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "api_call_id".into(),
+            "cache_write_input_tokens".into(),
+            "cached_input_tokens".into(),
+            "conversation_id".into(),
+            "cost_micro_usd".into(),
+            "cost_usd".into(),
+            "fully_priced".into(),
+            "input_tokens".into(),
+            "models".into(),
+            "output_tokens".into(),
+            "priced_requests".into(),
+            "reasoning_tokens".into(),
+            "requests".into(),
+            "schema_version".into(),
+            "stages".into(),
+            "total_tokens".into(),
+            "uncached_input_tokens".into(),
+            "unpriced_requests".into(),
+        ]
+    }
+}
+
+#[doc = "Per-model usage within a Zookeeper turn."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZookeeperTurnUsageModel {
+    #[doc = "Prompt tokens written to the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cache_write_input_tokens: Option<i64>,
+    #[doc = "Prompt tokens served from the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cached_input_tokens: Option<i64>,
+    #[doc = "Cost in millionths of a US dollar, rounded half-up."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_micro_usd: Option<i64>,
+    #[doc = "Exact cost as a decimal string, e.g. \"0.02184000\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_usd: Option<String>,
+    #[doc = "Whether every request was priced."]
+    #[serde(default)]
+    pub fully_priced: bool,
+    #[doc = "Prompt tokens, including the cached and cache-write subsets below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_tokens: Option<i64>,
+    #[doc = "Model name as the provider reported it."]
+    pub model: String,
+    #[doc = "Completion tokens, including the reasoning subset below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_tokens: Option<i64>,
+    #[doc = "Requests whose model had a known price."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priced_requests: Option<i64>,
+    #[doc = "Where the price came from, e.g. \"litellm\", \"litellm_alias\", \"override\", or \
+             \"unknown\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pricing_source: Option<String>,
+    #[doc = "Completion tokens spent on reasoning."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_tokens: Option<i64>,
+    #[doc = "Number of model requests."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requests: Option<i64>,
+    #[doc = "Input plus output tokens."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_tokens: Option<i64>,
+    #[doc = "Prompt tokens billed at the full input rate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uncached_input_tokens: Option<i64>,
+    #[doc = "Requests whose model had no known price; their tokens are counted but contribute no \
+             cost, so totals are a floor rather than an estimate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unpriced_requests: Option<i64>,
+}
+
+impl std::fmt::Display for ZookeeperTurnUsageModel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZookeeperTurnUsageModel {
+    const LENGTH: usize = 15;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cache_write_input_tokens) = &self.cache_write_input_tokens {
+                format!("{:?}", cache_write_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cached_input_tokens) = &self.cached_input_tokens {
+                format!("{:?}", cached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_micro_usd) = &self.cost_micro_usd {
+                format!("{:?}", cost_micro_usd).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_usd) = &self.cost_usd {
+                format!("{:?}", cost_usd).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.fully_priced).into(),
+            if let Some(input_tokens) = &self.input_tokens {
+                format!("{:?}", input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            self.model.clone().into(),
+            if let Some(output_tokens) = &self.output_tokens {
+                format!("{:?}", output_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(priced_requests) = &self.priced_requests {
+                format!("{:?}", priced_requests).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(pricing_source) = &self.pricing_source {
+                format!("{:?}", pricing_source).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(reasoning_tokens) = &self.reasoning_tokens {
+                format!("{:?}", reasoning_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(requests) = &self.requests {
+                format!("{:?}", requests).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(total_tokens) = &self.total_tokens {
+                format!("{:?}", total_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(uncached_input_tokens) = &self.uncached_input_tokens {
+                format!("{:?}", uncached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(unpriced_requests) = &self.unpriced_requests {
+                format!("{:?}", unpriced_requests).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cache_write_input_tokens".into(),
+            "cached_input_tokens".into(),
+            "cost_micro_usd".into(),
+            "cost_usd".into(),
+            "fully_priced".into(),
+            "input_tokens".into(),
+            "model".into(),
+            "output_tokens".into(),
+            "priced_requests".into(),
+            "pricing_source".into(),
+            "reasoning_tokens".into(),
+            "requests".into(),
+            "total_tokens".into(),
+            "uncached_input_tokens".into(),
+            "unpriced_requests".into(),
+        ]
+    }
+}
+
+#[doc = "Per-stage usage within a Zookeeper turn."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ZookeeperTurnUsageStage {
+    #[doc = "Prompt tokens written to the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cache_write_input_tokens: Option<i64>,
+    #[doc = "Prompt tokens served from the provider's prompt cache."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cached_input_tokens: Option<i64>,
+    #[doc = "Cost in millionths of a US dollar, rounded half-up."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_micro_usd: Option<i64>,
+    #[doc = "Exact cost as a decimal string, e.g. \"0.02184000\"."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_usd: Option<String>,
+    #[doc = "Whether every request was priced."]
+    #[serde(default)]
+    pub fully_priced: bool,
+    #[doc = "Prompt tokens, including the cached and cache-write subsets below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub input_tokens: Option<i64>,
+    #[doc = "Completion tokens, including the reasoning subset below."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub output_tokens: Option<i64>,
+    #[doc = "Requests whose model had a known price."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub priced_requests: Option<i64>,
+    #[doc = "Completion tokens spent on reasoning."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_tokens: Option<i64>,
+    #[doc = "Number of model requests."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requests: Option<i64>,
+    #[doc = "Which part of the turn spent the tokens, e.g. \"agent_stream\", \"auto_router\", \
+             \"compaction\", \"sub_agent\", or \"prompt_validation\"."]
+    pub stage: String,
+    #[doc = "Input plus output tokens."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_tokens: Option<i64>,
+    #[doc = "Prompt tokens billed at the full input rate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub uncached_input_tokens: Option<i64>,
+    #[doc = "Requests whose model had no known price; their tokens are counted but contribute no \
+             cost, so totals are a floor rather than an estimate."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub unpriced_requests: Option<i64>,
+}
+
+impl std::fmt::Display for ZookeeperTurnUsageStage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ZookeeperTurnUsageStage {
+    const LENGTH: usize = 14;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(cache_write_input_tokens) = &self.cache_write_input_tokens {
+                format!("{:?}", cache_write_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cached_input_tokens) = &self.cached_input_tokens {
+                format!("{:?}", cached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_micro_usd) = &self.cost_micro_usd {
+                format!("{:?}", cost_micro_usd).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(cost_usd) = &self.cost_usd {
+                format!("{:?}", cost_usd).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.fully_priced).into(),
+            if let Some(input_tokens) = &self.input_tokens {
+                format!("{:?}", input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(output_tokens) = &self.output_tokens {
+                format!("{:?}", output_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(priced_requests) = &self.priced_requests {
+                format!("{:?}", priced_requests).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(reasoning_tokens) = &self.reasoning_tokens {
+                format!("{:?}", reasoning_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(requests) = &self.requests {
+                format!("{:?}", requests).into()
+            } else {
+                String::new().into()
+            },
+            self.stage.clone().into(),
+            if let Some(total_tokens) = &self.total_tokens {
+                format!("{:?}", total_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(uncached_input_tokens) = &self.uncached_input_tokens {
+                format!("{:?}", uncached_input_tokens).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(unpriced_requests) = &self.unpriced_requests {
+                format!("{:?}", unpriced_requests).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "cache_write_input_tokens".into(),
+            "cached_input_tokens".into(),
+            "cost_micro_usd".into(),
+            "cost_usd".into(),
+            "fully_priced".into(),
+            "input_tokens".into(),
+            "output_tokens".into(),
+            "priced_requests".into(),
+            "reasoning_tokens".into(),
+            "requests".into(),
+            "stage".into(),
+            "total_tokens".into(),
+            "uncached_input_tokens".into(),
+            "unpriced_requests".into(),
+        ]
+    }
 }
 
 #[doc = "The response from the `ZoomToFit` command."]
