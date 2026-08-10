@@ -19105,6 +19105,10 @@ pub enum OrgDatasetStatus {
     #[serde(rename = "active")]
     #[display("active")]
     Active,
+    #[doc = "Dataset conversion processing is paused by an administrator."]
+    #[serde(rename = "paused")]
+    #[display("paused")]
+    Paused,
     #[doc = "Dataset is being deleted and should not be mutated or used."]
     #[serde(rename = "deleting")]
     #[display("deleting")]
