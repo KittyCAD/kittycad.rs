@@ -54591,6 +54591,13 @@
             ]
           },
           {
+            "description": "Dataset conversion processing is paused by an administrator.",
+            "type": "string",
+            "enum": [
+              "paused"
+            ]
+          },
+          {
             "description": "Dataset is being deleted and should not be mutated or used.",
             "type": "string",
             "enum": [
