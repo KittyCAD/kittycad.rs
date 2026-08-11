@@ -13827,6 +13827,14 @@ pub enum MlCopilotServerMessage {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         stage: Option<String>,
     },
+    #[doc = "Backend-only completed OpenAI response checkpoint.\n\nAPI persists this on the \
+             active prompt and includes the latest completed checkpoint only in replay sent to \
+             the text-to-CAD backend. It is never forwarded to browser clients."]
+    #[serde(rename = "zookeeper_open_ai_response_checkpoint")]
+    ZookeeperOpenAiResponseCheckpoint {
+        #[doc = "OpenAI Responses API response identifier."]
+        response_id: String,
+    },
     #[doc = "Backend-only token usage and cost for one completed Zookeeper turn.\n\nSent just \
              before `EndOfStream`. API records it in `meta.usage` on the turn's `EndOfStream` \
              message row, alongside the `meta.billing` revenue figures, and never forwards it to \
@@ -13911,10 +13919,13 @@ pub enum MlCopilotServerMessage {
              `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay \
              also includes client `User` messages. - Backend replay includes client `User` \
              messages plus selected reasoning, edit metadata, recovery output, and final \
-             responses. - The following are NEVER included: `SessionData`, `ConversationId`, \
-             `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, or `ZookeeperTurnUsage`. \
-             - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
-             backend and is filtered from client replay. - Ordering is stable: messages are \
+             responses. - The following are NEVER included from persisted chat rows: \
+             `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, \
+             `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, or \
+             `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay \
+             sent to the text-to-CAD backend and is filtered from client replay. - The latest \
+             completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata \
+             only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are \
              ordered by prompt creation time within the conversation, then by the per-prompt \
              `seq` value (monotonically increasing as seen in the original stream).\n\nWire \
              format: - Each element is canonical serialized bytes (typically JSON) for either a \
