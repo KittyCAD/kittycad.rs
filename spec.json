@@ -43749,6 +43749,28 @@
             "additionalProperties": false
           },
           {
+            "description": "Backend-only completed OpenAI response checkpoint.\n\nAPI persists this on the active prompt and includes the latest completed checkpoint only in replay sent to the text-to-CAD backend. It is never forwarded to browser clients.",
+            "type": "object",
+            "properties": {
+              "zookeeper_open_ai_response_checkpoint": {
+                "type": "object",
+                "properties": {
+                  "response_id": {
+                    "description": "OpenAI Responses API response identifier.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "response_id"
+                ]
+              }
+            },
+            "required": [
+              "zookeeper_open_ai_response_checkpoint"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Backend-only token usage and cost for one completed Zookeeper turn.\n\nSent just before `EndOfStream`. API records it in `meta.usage` on the turn's `EndOfStream` message row, alongside the `meta.billing` revenue figures, and never forwards it to clients or replays it as a chat message. It exists so spend can be compared against what the turn was billed; it is not customer-facing.",
             "type": "object",
             "properties": {
@@ -43799,7 +43821,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included from persisted chat rows: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - The latest completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
