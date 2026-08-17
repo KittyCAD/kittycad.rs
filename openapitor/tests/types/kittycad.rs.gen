@@ -10147,6 +10147,10 @@ pub enum Feature {
     #[serde(rename = "factory_portal")]
     #[display("factory_portal")]
     FactoryPortal,
+    #[doc = "KCL CEK machine executor."]
+    #[serde(rename = "kcl_cek_executor")]
+    #[display("kcl_cek_executor")]
+    KclCekExecutor,
     #[doc = "New KCL lexer and parser."]
     #[serde(rename = "kcl_new_lexer_parser")]
     #[display("kcl_new_lexer_parser")]
@@ -10187,6 +10191,10 @@ pub enum Feature {
     #[serde(rename = "modeling_dialogs")]
     #[display("modeling_dialogs")]
     ModelingDialogs,
+    #[doc = "Enables the named views user interface in Zoo Design Studio."]
+    #[serde(rename = "named_views_ui")]
+    #[display("named_views_ui")]
+    NamedViewsUi,
     #[doc = "Enables plugins in Zoo Design Studio."]
     #[serde(rename = "plugins")]
     #[display("plugins")]

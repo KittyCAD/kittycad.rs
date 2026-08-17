@@ -40327,6 +40327,13 @@
             ]
           },
           {
+            "description": "KCL CEK machine executor.",
+            "type": "string",
+            "enum": [
+              "kcl_cek_executor"
+            ]
+          },
+          {
             "description": "New KCL lexer and parser.",
             "type": "string",
             "enum": [
@@ -40394,6 +40401,13 @@
             "type": "string",
             "enum": [
               "modeling_dialogs"
+            ]
+          },
+          {
+            "description": "Enables the named views user interface in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "named_views_ui"
             ]
           },
           {
