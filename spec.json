@@ -42002,6 +42002,15 @@
                 "default": false,
                 "type": "boolean"
               },
+              "target_representation": {
+                "description": "What representation should be used for this file after it's imported?",
+                "default": "brep",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/StepImportTargetRepresentation"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -53928,6 +53937,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "lookup_enabled": {
+            "description": "Whether this dataset may be used for MCP and semantic-search lookups.",
+            "type": "boolean"
+          },
           "name": {
             "description": "User-provided display name. This is mutable; lookup by ID instead.",
             "type": "string"
@@ -53975,6 +53988,7 @@
           "access_role_arn",
           "created_at",
           "id",
+          "lookup_enabled",
           "name",
           "org_id",
           "require_raw_kcl_similarity_score_for_success",
@@ -58416,6 +58430,25 @@
       "StartPath": {
         "description": "The response from the `StartPath` endpoint.",
         "type": "object"
+      },
+      "StepImportTargetRepresentation": {
+        "description": "After importing, how should this model's data be represented?",
+        "oneOf": [
+          {
+            "description": "Mesh of 2D geometry",
+            "type": "string",
+            "enum": [
+              "mesh"
+            ]
+          },
+          {
+            "description": "Boundary representation",
+            "type": "string",
+            "enum": [
+              "brep"
+            ]
+          }
+        ]
       },
       "StepPresentation": {
         "description": "Describes the presentation style of the EXPRESS exchange format.",
