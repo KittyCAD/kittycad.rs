@@ -11689,6 +11689,9 @@ pub enum InputFormat3D {
         #[doc = "Splits all closed faces into two open faces.\n\nDefaults to `false` but is implicitly `true` when importing into the engine."]
         #[serde(default)]
         split_closed_faces: bool,
+        #[doc = "What representation should be used for this file after it's imported?"]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target_representation: Option<StepImportTargetRepresentation>,
     },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
@@ -17700,6 +17703,8 @@ pub struct OrgDataset {
     #[doc = "Timestamp for the last sync error."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_sync_error_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "Whether this dataset may be used for MCP and semantic-search lookups."]
+    pub lookup_enabled: bool,
     #[doc = "User-provided display name. This is mutable; lookup by ID instead."]
     pub name: String,
     #[doc = "The ID of the org owning the dataset."]
@@ -17728,7 +17733,7 @@ impl std::fmt::Display for OrgDataset {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDataset {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             self.access_role_arn.clone().into(),
@@ -17749,6 +17754,7 @@ impl tabled::Tabled for OrgDataset {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.lookup_enabled).into(),
             self.name.clone().into(),
             format!("{:?}", self.org_id).into(),
             format!("{:?}", self.require_raw_kcl_similarity_score_for_success).into(),
@@ -17767,6 +17773,7 @@ impl tabled::Tabled for OrgDataset {
             "id".into(),
             "last_sync_error".into(),
             "last_sync_error_at".into(),
+            "lookup_enabled".into(),
             "name".into(),
             "org_id".into(),
             "require_raw_kcl_similarity_score_for_success".into(),
@@ -23945,6 +23952,31 @@ impl tabled::Tabled for StartPath {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
     }
+}
+
+#[doc = "After importing, how should this model's data be represented?"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum StepImportTargetRepresentation {
+    #[doc = "Mesh of 2D geometry"]
+    #[serde(rename = "mesh")]
+    #[display("mesh")]
+    Mesh,
+    #[doc = "Boundary representation"]
+    #[serde(rename = "brep")]
+    #[display("brep")]
+    Brep,
 }
 
 #[doc = "Describes the presentation style of the EXPRESS exchange format."]
