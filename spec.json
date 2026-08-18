@@ -9202,6 +9202,15 @@
           },
           {
             "in": "query",
+            "name": "lookup_enabled",
+            "description": "When set, only return datasets with the matching lookup setting.",
+            "schema": {
+              "nullable": true,
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "sort_by",
             "schema": {
               "$ref": "#/components/schemas/CreatedAtSortMode"
