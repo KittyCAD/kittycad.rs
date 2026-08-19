@@ -20339,6 +20339,8 @@ pub struct ProjectAccessResponse {
     pub can_delete: bool,
     #[doc = "Whether the caller may replace project content or metadata."]
     pub can_edit: bool,
+    #[doc = "Whether the caller may move the project into or out of an organization library."]
+    pub can_manage_organization: bool,
     #[doc = "Owning organization when this is an organization project."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<uuid::Uuid>,
@@ -20358,11 +20360,12 @@ impl std::fmt::Display for ProjectAccessResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectAccessResponse {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.can_delete).into(),
             format!("{:?}", self.can_edit).into(),
+            format!("{:?}", self.can_manage_organization).into(),
             if let Some(organization_id) = &self.organization_id {
                 format!("{:?}", organization_id).into()
             } else {
@@ -20376,6 +20379,7 @@ impl tabled::Tabled for ProjectAccessResponse {
         vec![
             "can_delete".into(),
             "can_edit".into(),
+            "can_manage_organization".into(),
             "organization_id".into(),
             "scope".into(),
         ]
