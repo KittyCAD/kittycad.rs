@@ -20891,6 +20891,83 @@ impl tabled::Tabled for PrivacySettings {
     }
 }
 
+#[doc = "Effective capabilities for an authenticated project response."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectAccessResponse {
+    #[doc = "Whether the caller may delete the project."]
+    pub can_delete: bool,
+    #[doc = "Whether the caller may replace project content or metadata."]
+    pub can_edit: bool,
+    #[doc = "Owning organization when this is an organization project."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub organization_id: Option<uuid::Uuid>,
+    #[doc = "Ownership scope controlling project visibility."]
+    pub scope: ProjectAccessScope,
+}
+
+impl std::fmt::Display for ProjectAccessResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectAccessResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.can_delete).into(),
+            format!("{:?}", self.can_edit).into(),
+            if let Some(organization_id) = &self.organization_id {
+                format!("{:?}", organization_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.scope).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "can_delete".into(),
+            "can_edit".into(),
+            "organization_id".into(),
+            "scope".into(),
+        ]
+    }
+}
+
+#[doc = "Ownership scope for an authenticated project response."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ProjectAccessScope {
+    #[doc = "The project is owned personally by its creator."]
+    #[serde(rename = "personal")]
+    #[display("personal")]
+    Personal,
+    #[doc = "The project is owned by an organization."]
+    #[serde(rename = "organization")]
+    #[display("organization")]
+    Organization,
+}
+
 #[doc = "Archive formats supported by project download endpoints."]
 #[derive(
     serde :: Serialize,
@@ -21177,6 +21254,8 @@ impl tabled::Tabled for ProjectPublicationInfoResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ProjectResponse {
+    #[doc = "Effective project capabilities for the authenticated caller."]
+    pub access: ProjectAccessResponse,
     #[doc = "Selected category identifiers associated with the project."]
     pub category_ids: Vec<uuid::Uuid>,
     #[doc = "When the project row was created."]
@@ -21220,9 +21299,10 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.access).into(),
             format!("{:?}", self.category_ids).into(),
             format!("{:?}", self.created_at).into(),
             self.description.clone().into(),
@@ -21246,6 +21326,7 @@ impl tabled::Tabled for ProjectResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "access".into(),
             "category_ids".into(),
             "created_at".into(),
             "description".into(),
@@ -21320,6 +21401,8 @@ impl tabled::Tabled for ProjectShareLinkResponse {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct ProjectSummaryResponse {
+    #[doc = "Effective project capabilities for the authenticated caller."]
+    pub access: ProjectAccessResponse,
     #[doc = "Selected category identifiers associated with the project."]
     pub category_ids: Vec<uuid::Uuid>,
     #[doc = "When the project row was created."]
@@ -21361,9 +21444,10 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 14;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            format!("{:?}", self.access).into(),
             format!("{:?}", self.category_ids).into(),
             format!("{:?}", self.created_at).into(),
             self.description.clone().into(),
@@ -21386,6 +21470,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "access".into(),
             "category_ids".into(),
             "created_at".into(),
             "description".into(),
