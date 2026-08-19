@@ -55582,6 +55582,61 @@
           "can_train_on_data"
         ]
       },
+      "ProjectAccessResponse": {
+        "description": "Effective capabilities for an authenticated project response.",
+        "type": "object",
+        "properties": {
+          "can_delete": {
+            "description": "Whether the caller may delete the project.",
+            "type": "boolean"
+          },
+          "can_edit": {
+            "description": "Whether the caller may replace project content or metadata.",
+            "type": "boolean"
+          },
+          "organization_id": {
+            "nullable": true,
+            "description": "Owning organization when this is an organization project.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "scope": {
+            "description": "Ownership scope controlling project visibility.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectAccessScope"
+              }
+            ]
+          }
+        },
+        "required": [
+          "can_delete",
+          "can_edit",
+          "scope"
+        ]
+      },
+      "ProjectAccessScope": {
+        "description": "Ownership scope for an authenticated project response.",
+        "oneOf": [
+          {
+            "description": "The project is owned personally by its creator.",
+            "type": "string",
+            "enum": [
+              "personal"
+            ]
+          },
+          {
+            "description": "The project is owned by an organization.",
+            "type": "string",
+            "enum": [
+              "organization"
+            ]
+          }
+        ]
+      },
       "ProjectArchiveFormat": {
         "description": "Archive formats supported by project download endpoints.",
         "oneOf": [
@@ -55783,6 +55838,14 @@
         "description": "Owner-visible project detail payload.",
         "type": "object",
         "properties": {
+          "access": {
+            "description": "Effective project capabilities for the authenticated caller.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectAccessResponse"
+              }
+            ]
+          },
           "category_ids": {
             "description": "Selected category identifiers associated with the project.",
             "type": "array",
@@ -55868,6 +55931,7 @@
           }
         },
         "required": [
+          "access",
           "category_ids",
           "created_at",
           "description",
@@ -55929,6 +55993,14 @@
         "description": "Owner-visible project summary payload.",
         "type": "object",
         "properties": {
+          "access": {
+            "description": "Effective project capabilities for the authenticated caller.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProjectAccessResponse"
+              }
+            ]
+          },
           "category_ids": {
             "description": "Selected category identifiers associated with the project.",
             "type": "array",
@@ -56007,6 +56079,7 @@
           }
         },
         "required": [
+          "access",
           "category_ids",
           "created_at",
           "description",
