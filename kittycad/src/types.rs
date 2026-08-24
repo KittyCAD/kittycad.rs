@@ -13465,6 +13465,48 @@ pub enum MirrorAcross {
     },
 }
 
+#[doc = "Stable machine-readable reasons that an account cannot open a Copilot websocket until its \
+         billing or support state changes."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotAccessDeniedCode {
+    #[doc = "The account has no payment method on file."]
+    #[serde(rename = "missing_payment_method")]
+    #[display("missing_payment_method")]
+    MissingPaymentMethod,
+    #[doc = "The account's payment method failed."]
+    #[serde(rename = "payment_method_failed")]
+    #[display("payment_method_failed")]
+    PaymentMethodFailed,
+    #[doc = "The account reached its configured billing threshold."]
+    #[serde(rename = "billing_threshold_reached")]
+    #[display("billing_threshold_reached")]
+    BillingThresholdReached,
+    #[doc = "The account exhausted its credits without enabling pay-as-you-go."]
+    #[serde(rename = "pay_as_you_go_disabled")]
+    #[display("pay_as_you_go_disabled")]
+    PayAsYouGoDisabled,
+    #[doc = "The account was blocked after repeated plan changes recycled credits."]
+    #[serde(rename = "upgrade_downgrade_abuse")]
+    #[display("upgrade_downgrade_abuse")]
+    UpgradeDowngradeAbuse,
+    #[doc = "Zoo support explicitly blocked the account."]
+    #[serde(rename = "admin")]
+    #[display("admin")]
+    Admin,
+}
+
 #[doc = "The types of messages that can be sent by the client to the server."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13736,6 +13778,17 @@ pub enum MlCopilotServerMessage {
     Error {
         #[doc = "The error message."]
         detail: String,
+    },
+    #[doc = "A permanent account or billing denial that must be resolved outside this websocket \
+             before retrying."]
+    #[serde(rename = "access_denied")]
+    AccessDenied {
+        #[doc = "Stable machine-readable denial code."]
+        code: MlCopilotAccessDeniedCode,
+        #[doc = "Human-readable explanation suitable for display to the user."]
+        detail: String,
+        #[doc = "Whether reconnecting without an external account change can help."]
+        retryable: bool,
     },
     #[doc = "Log / banner text."]
     #[serde(rename = "info")]

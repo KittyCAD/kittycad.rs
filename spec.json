@@ -42765,6 +42765,53 @@
           }
         ]
       },
+      "MlCopilotAccessDeniedCode": {
+        "description": "Stable machine-readable reasons that an account cannot open a Copilot websocket until its billing or support state changes.",
+        "oneOf": [
+          {
+            "description": "The account has no payment method on file.",
+            "type": "string",
+            "enum": [
+              "missing_payment_method"
+            ]
+          },
+          {
+            "description": "The account's payment method failed.",
+            "type": "string",
+            "enum": [
+              "payment_method_failed"
+            ]
+          },
+          {
+            "description": "The account reached its configured billing threshold.",
+            "type": "string",
+            "enum": [
+              "billing_threshold_reached"
+            ]
+          },
+          {
+            "description": "The account exhausted its credits without enabling pay-as-you-go.",
+            "type": "string",
+            "enum": [
+              "pay_as_you_go_disabled"
+            ]
+          },
+          {
+            "description": "The account was blocked after repeated plan changes recycled credits.",
+            "type": "string",
+            "enum": [
+              "upgrade_downgrade_abuse"
+            ]
+          },
+          {
+            "description": "Zoo support explicitly blocked the account.",
+            "type": "string",
+            "enum": [
+              "admin"
+            ]
+          }
+        ]
+      },
       "MlCopilotClientMessage": {
         "description": "The types of messages that can be sent by the client to the server.",
         "oneOf": [
@@ -43254,6 +43301,42 @@
             },
             "required": [
               "error"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "A permanent account or billing denial that must be resolved outside this websocket before retrying.",
+            "type": "object",
+            "properties": {
+              "access_denied": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "description": "Stable machine-readable denial code.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MlCopilotAccessDeniedCode"
+                      }
+                    ]
+                  },
+                  "detail": {
+                    "description": "Human-readable explanation suitable for display to the user.",
+                    "type": "string"
+                  },
+                  "retryable": {
+                    "description": "Whether reconnecting without an external account change can help.",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "code",
+                  "detail",
+                  "retryable"
+                ]
+              }
+            },
+            "required": [
+              "access_denied"
             ],
             "additionalProperties": false
           },
