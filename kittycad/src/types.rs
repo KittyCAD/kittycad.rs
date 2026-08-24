@@ -13487,11 +13487,20 @@ pub enum MlCopilotClientMessage {
     #[doc = "Updates the active project context without creating a new prompt."]
     #[serde(rename = "project_context")]
     ProjectContext {
+        #[doc = "The project-relative file open in the client's active editor, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        active_file: Option<String>,
+        #[doc = "Stable identifier used to correlate this project context update across services."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        correlation_id: Option<uuid::Uuid>,
         #[doc = "The current files in the project, if any. This can be used to provide context \
                  for the AI. This should be sent in binary format if the files are not text \
                  files, like an imported binary file."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         current_files: Option<std::collections::HashMap<String, Vec<u8>>>,
+        #[doc = "API call ID for the active Engine modeling session, when available."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        engine_api_call_id: Option<uuid::Uuid>,
         #[doc = "The project name, if any."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
@@ -13499,6 +13508,9 @@ pub enum MlCopilotClientMessage {
     #[doc = "The user message, which contains the content of the user's input."]
     #[serde(rename = "user")]
     User {
+        #[doc = "The project-relative file open in the client's active editor, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        active_file: Option<String>,
         #[doc = "The user can send additional files like images or PDFs to provide more context."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         additional_files: Option<Vec<MlCopilotFile>>,
@@ -13518,9 +13530,12 @@ pub enum MlCopilotClientMessage {
         #[doc = "The user can force specific tools to be used for this message."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         forced_tools: Option<Vec<MlCopilotTool>>,
-        #[doc = "Pick a mode for the agent to operate in. Defaults to a fast mode."]
+        #[doc = "Pick a mode for the agent to operate in. Defaults to the service's configured \
+                 mode. Mode identifiers are discovered at runtime through `list_modes`, so this \
+                 stays open to backend-configured values that may not yet exist in the generated \
+                 client enum."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
-        mode: Option<MlCopilotMode>,
+        mode: Option<String>,
         #[doc = "Override the default or mode model with another."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         model: Option<MlCopilotSupportedModels>,
@@ -13626,43 +13641,6 @@ impl tabled::Tabled for MlCopilotFile {
             "name".into(),
         ]
     }
-}
-
-#[doc = "The mode to have the agent work in."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum MlCopilotMode {
-    #[doc = "Use a combination of models and reasoning effort for fast results."]
-    #[serde(rename = "fast")]
-    #[display("fast")]
-    Fast,
-    #[doc = "Use a model and effort that results in thoughtful responses."]
-    #[serde(rename = "thoughtful")]
-    #[display("thoughtful")]
-    Thoughtful,
-    #[doc = "Let the system automatically choose the model and reasoning effort."]
-    #[serde(rename = "auto")]
-    #[display("auto")]
-    Auto,
-    #[doc = "Use the private Zoo Pro model for internal Zookeeper workflows."]
-    #[serde(rename = "zookeeper_pro")]
-    #[display("zookeeper_pro")]
-    ZookeeperPro,
-    #[doc = "Use the Zoo Ultra model for internal Zookeeper workflows."]
-    #[serde(rename = "zookeeper_ultra")]
-    #[display("zookeeper_ultra")]
-    ZookeeperUltra,
 }
 
 #[doc = "A client-facing ML copilot mode option."]
