@@ -28,24 +28,7 @@ impl Modeling {
         Self { client }
     }
 
-    #[doc = "Open a websocket which accepts modeling commands.\n\nPass those commands to the \
-             engine via websocket, and pass responses back to the client. Basically, this is a \
-             websocket proxy between the frontend/client and the engine.\n\n**Parameters:**\n\n- \
-             `api_call_id: Option<String>`: API Call ID for distributed tracing\n- `fps: \
-             Option<u32>`: Frames per second of the video feed.\n- \
-             `order_independent_transparency: Option<bool>`: Enables nicer visuals for transparent \
-             surfaces. This slows down rendering, so it's off by default.\n- `pool: \
-             Option<String>`: An optional identifier for a pool of engine instances. The 'default' \
-             pool is used when none is specified.\n- `post_effect: \
-             Option<crate::types::PostEffectType>`: Engine Post effects (such as SSAO)\n- `pr: \
-             Option<u64>`: Optional Pull Request number to route traffic.\n- `replay: \
-             Option<String>`: If given, when the session ends, the modeling commands sent during \
-             the session will be written out to this filename. For debugging.\n- `show_grid: \
-             Option<bool>`: If true, will show the grid at the start of the session.\n- \
-             `unlocked_framerate: Option<bool>`: If true, engine will render video frames as fast \
-             as it can.\n- `video_res_height: Option<u32>`: Height of the video feed. Must be a \
-             multiple of 4.\n- `video_res_width: Option<u32>`: Width of the video feed. Must be a \
-             multiple of 4.\n- `webrtc: Option<bool>`: If true, will start a webrtc connection."]
+    #[doc = "Opens a WebSocket to a Zoo KittyCAD engine instance.\n\n**Note**: Currently it's recommended to set `webrtc=true` in the WebSocket query string, otherwise some features, such as opacity setting, will cause the engine to fail.\n\nDue to the long-lived nature of the instances, it's possible the resources on have been used and not freed entirely, or the instance is in a bad state. Thus it's good practice to expect to have to potentially reconnect at any moment -even almost immediately after the first connection!\n\nAuthorization happens via a pseudo HTTP header over the WebSocket: `{ type: \"headers\", headers: { \"Authorization\": \"Bearer xxxxxxxxx\" }}`\n\nThe very next thing recommended is to setup a ping-pong interval. The current timeout is 10s and has no documented guarantee, so use a conservative number below that. 5s should be sufficient. A ping-pong interval is sending `{ type: 'ping\" }` when `{ request_id, success, resp: { type: \"pong\", data: {} } }` message is received.\n\nYou're ready to start sending modeling commands!\n\nIf you want to understand how to connect to the WebRTC video stream, https://github.com/KittyCAD/kittycad.ts/blob/main/src/webrtc.ts is a nice example to learn from.\n\n**Parameters:**\n\n- `api_call_id: Option<String>`: API Call ID for distributed tracing\n- `fps: Option<u32>`: Frames per second of the video feed.\n- `order_independent_transparency: Option<bool>`: Enables nicer visuals for transparent surfaces. This slows down rendering, so it's off by default.\n- `pool: Option<String>`: An optional identifier for a pool of engine instances. The 'default' pool is used when none is specified.\n- `post_effect: Option<crate::types::PostEffectType>`: Engine Post effects (such as SSAO)\n- `pr: Option<u64>`: Optional Pull Request number to route traffic.\n- `replay: Option<String>`: If given, when the session ends, the modeling commands sent during the session will be written out to this filename. For debugging.\n- `show_grid: Option<bool>`: If true, will show the grid at the start of the session.\n- `unlocked_framerate: Option<bool>`: If true, engine will render video frames as fast as it can.\n- `video_res_height: Option<u32>`: Height of the video feed. Must be a multiple of 4.\n- `video_res_width: Option<u32>`: Width of the video feed. Must be a multiple of 4.\n- `webrtc: Option<bool>`: If true, will start a webrtc connection."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn commands_ws<'a>(
