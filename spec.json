@@ -32056,8 +32056,8 @@
         "tags": [
           "ml"
         ],
-        "summary": "Open a websocket to prompt the ML copilot.",
-        "description": "This endpoint accepts typed query parameters via `MlCopilotQuery`. See the field documentation on that struct for details, including replay behavior and wire format.",
+        "summary": "Open a websocket to a Zookeeper agent instance.",
+        "description": "Remember to authenticate before sending messages. [For WebSockets it's a little different.](/docs/developer-tools/api/authentication?lang=curl#websockets)\n\nAs with all Zoo WebSockets, you must implement a ping-pong interval / heartbeat to keep the connection open. This involves a simple `{ type: \"ping\" }` every ~5s and **check that a `{ pong: {} } ` is received**.\n\nFor the \"standard experience\" where the agent continues off conversations, you'll want to set the `replay` query string param to `true` and record \"conversation ids\", which are then passed as the other query string parameter.\n\nA list of past conversations can be fetch from [/ml/conversations](/docs/developer-tools/api/ml/list-conversations?lang=curl).\n\nThe general use-case is to fire off `{ type: \"user\", content: \"my prompt goes here\" }` messages and interpret the various message types that return.\n\nNotable behavior: **ONLY KCL IS RETURNED.** It's a common misunderstanding that Zookeeper returns models in formats such as STEP and STL directly. This is incorrect. All outputs are in KCL, which can then be fed into the [Engine API](/docs/developer-tools/engine-api) (specifically the `exec_kcl_project` command) or the [Zoo CLI](/docs/developer-tools/cli/manual) (`zoo kcl snapshot ...`).\n\nIn the future we may add a more direct method, but you can always rely on those.",
         "operationId": "ml_copilot_ws",
         "parameters": [
           {
