@@ -13877,6 +13877,23 @@ pub enum MlCopilotServerMessage {
         #[doc = "OpenAI Responses API response identifier."]
         response_id: String,
     },
+    #[doc = "Backend-only OpenAI checkpoint for an unfinished Zookeeper turn.\n\nAPI persists the \
+             latest checkpoint on the active prompt and includes it only in replay sent to the \
+             text-to-CAD backend. It is never forwarded to browser clients."]
+    #[serde(rename = "zookeeper_open_ai_intermediate_response_checkpoint")]
+    ZookeeperOpenAiIntermediateResponseCheckpoint {
+        #[doc = "Tool calls emitted by this response whose outputs must be supplied on \
+                 continuation."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        expected_tool_call_ids: Option<Vec<String>>,
+        #[doc = "Digest of the project files against which this response was produced.\n\nOlder \
+                 checkpoints omit this field and remain useful for portable replay, but cannot \
+                 authorize exact intermediate continuation."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_files_digest: Option<String>,
+        #[doc = "OpenAI Responses API response identifier."]
+        response_id: String,
+    },
     #[doc = "Backend-only token usage and cost for one completed Zookeeper turn.\n\nSent just \
              before `EndOfStream`. API records it in `meta.usage` on the turn's `EndOfStream` \
              message row, alongside the `meta.billing` revenue figures, and never forwards it to \
@@ -13949,9 +13966,16 @@ pub enum MlCopilotServerMessage {
         call_id: String,
         #[doc = "Bounded readable output derived from the completed tool result."]
         output: String,
+        #[doc = "Whether the output above was shortened before it reached API."]
+        #[serde(default)]
+        output_truncated: bool,
         #[doc = "Whether the tool changed the current project."]
         #[serde(default)]
         project_updated: bool,
+        #[doc = "OpenAI response that emitted this tool call. Older producers may omit it; such \
+                 output remains useful for portable replay but not native resume."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        response_id: Option<String>,
         #[doc = "Name of the completed tool."]
         tool_name: String,
     },
@@ -13963,14 +13987,17 @@ pub enum MlCopilotServerMessage {
              messages plus selected reasoning, edit metadata, recovery output, and final \
              responses. - The following are NEVER included from persisted chat rows: \
              `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, \
-             `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, or \
-             `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay \
-             sent to the text-to-CAD backend and is filtered from client replay. - The latest \
-             completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata \
-             only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are \
-             ordered by prompt creation time within the conversation, then by the per-prompt \
-             `seq` value (monotonically increasing as seen in the original stream).\n\nWire \
-             format: - Each element is canonical serialized bytes (typically JSON) for either a \
+             `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, \
+             `ZookeeperOpenAiIntermediateResponseCheckpoint`, or `ZookeeperTurnUsage`. - \
+             `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD \
+             backend and is filtered from client replay. - The latest completed \
+             `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for \
+             replay sent to the text-to-CAD backend. - The active unfinished prompt's latest \
+             `ZookeeperOpenAiIntermediateResponseCheckpoint` is synthesized only for replay sent \
+             to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt \
+             creation time within the conversation, then by the per-prompt `seq` value \
+             (monotonically increasing as seen in the original stream).\n\nWire format: - Each \
+             element is canonical serialized bytes (typically JSON) for either a \
              `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an \
              initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the \
              server sends a single WebSocket Binary frame containing a MsgPack-encoded document \
