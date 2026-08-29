@@ -2578,7 +2578,7 @@ pub enum AsyncApiCallOutput {
     #[doc = "File center of mass."]
     #[serde(rename = "file_center_of_mass")]
     FileCenterOfMass {
-        #[doc = "The resulting center of mass."]
+        #[doc = "The resulting center of mass in the KittyCAD coordinate system (+Z up, -Y forward)."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         center_of_mass: Option<Point3D>,
         #[doc = "The time and date the API call was completed."]
@@ -10207,6 +10207,10 @@ pub enum Feature {
     #[serde(rename = "segments_based_regions")]
     #[display("segments_based_regions")]
     SegmentsBasedRegions,
+    #[doc = "Allows legacy sketches to be edited using point-and-click in Zoo Design Studio."]
+    #[serde(rename = "legacy_sketch_mode")]
+    #[display("legacy_sketch_mode")]
+    LegacySketchMode,
     #[doc = "Enables sketch solve experimental features in Zoo Design Studio."]
     #[serde(rename = "sketch_experimental_features")]
     #[display("sketch_experimental_features")]
@@ -10242,7 +10246,7 @@ pub enum Feature {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FileCenterOfMass {
-    #[doc = "The resulting center of mass."]
+    #[doc = "The resulting center of mass in the KittyCAD coordinate system (+Z up, -Y forward)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub center_of_mass: Option<Point3D>,
     #[doc = "The time and date the API call was completed."]
