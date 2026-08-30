@@ -2069,7 +2069,7 @@
           "file"
         ],
         "summary": "Get CAD file center of mass.",
-        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the cartesian coordinate in world space measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
+        "description": "We assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the cartesian coordinate in the KittyCAD coordinate system (+Z up, -Y forward) using the requested measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.",
         "operationId": "create_file_center_of_mass",
         "parameters": [
           {
@@ -33899,7 +33899,7 @@
             "properties": {
               "center_of_mass": {
                 "nullable": true,
-                "description": "The resulting center of mass.",
+                "description": "The resulting center of mass in the KittyCAD coordinate system (+Z up, -Y forward).",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/Point3d"
@@ -40133,6 +40133,13 @@
             ]
           },
           {
+            "description": "Allows legacy sketches to be edited using point-and-click in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "legacy_sketch_mode"
+            ]
+          },
+          {
             "description": "Enables sketch solve experimental features in Zoo Design Studio.",
             "type": "string",
             "enum": [
@@ -40189,7 +40196,7 @@
         "properties": {
           "center_of_mass": {
             "nullable": true,
-            "description": "The resulting center of mass.",
+            "description": "The resulting center of mass in the KittyCAD coordinate system (+Z up, -Y forward).",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point3d"
