@@ -40014,6 +40014,13 @@
             ]
           },
           {
+            "description": "Quarantine engine-manager sessions when an engine is observed misbehaving.",
+            "type": "string",
+            "enum": [
+              "engine_manager_quarantine"
+            ]
+          },
+          {
             "description": "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio.",
             "type": "string",
             "enum": [

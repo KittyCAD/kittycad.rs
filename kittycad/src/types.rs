@@ -10294,6 +10294,10 @@ pub enum Feature {
     #[serde(rename = "email_with_s_e_s")]
     #[display("email_with_s_e_s")]
     EmailWithSES,
+    #[doc = "Quarantine engine-manager sessions when an engine is observed misbehaving."]
+    #[serde(rename = "engine_manager_quarantine")]
+    #[display("engine_manager_quarantine")]
+    EngineManagerQuarantine,
     #[doc = "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio."]
     #[serde(rename = "enable_z0006_lint")]
     #[display("enable_z0006_lint")]
