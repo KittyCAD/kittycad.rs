@@ -14348,14 +14348,15 @@ pub struct ModelingAppSubscriptionTier {
     #[serde(default)]
     pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
-             modeling app per month. Credit replenishment remains calendar-month based while \
-             anniversary billing is rolled out. This is equivalent to the monetary value divided \
-             by the price of an API credit."]
+             modeling app for each monthly account-anniversary period. The boundary is evaluated \
+             in UTC and does not change with monthly versus annual subscription payment cadence. \
+             This is equivalent to the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
-             the modeling app per month. Credit replenishment remains calendar-month based while \
-             anniversary billing is rolled out."]
+             the modeling app for each monthly account-anniversary period. The boundary is \
+             evaluated in UTC and does not change with monthly versus annual subscription payment \
+             cadence."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
@@ -29799,14 +29800,15 @@ pub struct ZooProductSubscription {
     #[serde(default)]
     pub ml_custom_models: bool,
     #[doc = "The amount of pay-as-you-go API credits the individual or org gets outside the \
-             modeling app per month. Credit replenishment remains calendar-month based while \
-             anniversary billing is rolled out. This is equivalent to the monetary value divided \
-             by the price of an API credit."]
+             modeling app for each monthly account-anniversary period. The boundary is evaluated \
+             in UTC and does not change with monthly versus annual subscription payment cadence. \
+             This is equivalent to the monetary value divided by the price of an API credit."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits: Option<u64>,
     #[doc = "The monetary value of pay-as-you-go API credits the individual or org gets outside \
-             the modeling app per month. Credit replenishment remains calendar-month based while \
-             anniversary billing is rolled out."]
+             the modeling app for each monthly account-anniversary period. The boundary is \
+             evaluated in UTC and does not change with monthly versus annual subscription payment \
+             cadence."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub monthly_pay_as_you_go_api_credits_monetary_value: Option<f64>,
     #[doc = "The name of the tier."]
