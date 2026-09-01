@@ -44168,7 +44168,7 @@
             "type": "boolean"
           },
           "monthly_pay_as_you_go_api_credits": {
-            "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out. This is equivalent to the monetary value divided by the price of an API credit.",
+            "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app for each monthly account-anniversary period. The boundary is evaluated in UTC and does not change with monthly versus annual subscription payment cadence. This is equivalent to the monetary value divided by the price of an API credit.",
             "default": 0,
             "type": "integer",
             "format": "uint64",
@@ -44176,7 +44176,7 @@
           },
           "monthly_pay_as_you_go_api_credits_monetary_value": {
             "title": "double",
-            "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out.",
+            "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app for each monthly account-anniversary period. The boundary is evaluated in UTC and does not change with monthly versus annual subscription payment cadence.",
             "default": 0.0,
             "type": "number",
             "format": "money-usd"
@@ -62791,7 +62791,7 @@
                 "type": "boolean"
               },
               "monthly_pay_as_you_go_api_credits": {
-                "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out. This is equivalent to the monetary value divided by the price of an API credit.",
+                "description": "The amount of pay-as-you-go API credits the individual or org gets outside the modeling app for each monthly account-anniversary period. The boundary is evaluated in UTC and does not change with monthly versus annual subscription payment cadence. This is equivalent to the monetary value divided by the price of an API credit.",
                 "default": 0,
                 "type": "integer",
                 "format": "uint64",
@@ -62799,7 +62799,7 @@
               },
               "monthly_pay_as_you_go_api_credits_monetary_value": {
                 "title": "double",
-                "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app per month. Credit replenishment remains calendar-month based while anniversary billing is rolled out.",
+                "description": "The monetary value of pay-as-you-go API credits the individual or org gets outside the modeling app for each monthly account-anniversary period. The boundary is evaluated in UTC and does not change with monthly versus annual subscription payment cadence.",
                 "default": 0.0,
                 "type": "number",
                 "format": "money-usd"
