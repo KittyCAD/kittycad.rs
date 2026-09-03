@@ -2869,6 +2869,58 @@ pub enum AsyncApiCallOutput {
     },
 }
 
+#[doc = "Coordinates for fetching a persisted attachment on demand."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AttachmentRef {
+    #[doc = "Stable digest of the attachment bytes, formatted as `sha256:<lowercase hex>`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content_hash: Option<String>,
+    #[doc = "Position of this attachment in the message's attachment array."]
+    pub index: u32,
+    #[doc = "Prompt containing the persisted message row."]
+    pub prompt_id: uuid::Uuid,
+    #[doc = "Sequence number of the persisted message row."]
+    pub seq: i32,
+}
+
+impl std::fmt::Display for AttachmentRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AttachmentRef {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(content_hash) = &self.content_hash {
+                format!("{:?}", content_hash).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.index).into(),
+            format!("{:?}", self.prompt_id).into(),
+            format!("{:?}", self.seq).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "content_hash".into(),
+            "index".into(),
+            "prompt_id".into(),
+            "seq".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `/auth/api-key` endpoint."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10195,6 +10247,10 @@ pub enum Feature {
     #[serde(rename = "validate_tax_info")]
     #[display("validate_tax_info")]
     ValidateTaxInfo,
+    #[doc = "Enables drawing features across Zoo applications."]
+    #[serde(rename = "drawings")]
+    #[display("drawings")]
+    Drawings,
     #[doc = "Enables modeling dialogs in Zoo Design Studio."]
     #[serde(rename = "modeling_dialogs")]
     #[display("modeling_dialogs")]
@@ -13330,6 +13386,9 @@ pub enum MlCopilotClientMessage {
         #[doc = "The project name, if any."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
+        #[doc = "Revision and idempotency metadata for `current_files`. Its absence identifies a legacy unfenced message, not an initial revision."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_snapshot: Option<MlCopilotProjectSnapshotMetadata>,
     },
     #[doc = "The user message, which contains the content of the user's input."]
     #[serde(rename = "user")]
@@ -13363,12 +13422,25 @@ pub enum MlCopilotClientMessage {
         #[doc = "The project name, if any. This can be used to associate the message with a specific project."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         project_name: Option<String>,
+        #[doc = "Revision and idempotency metadata for `current_files`. Its absence identifies a legacy unfenced message, not an initial revision."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        project_snapshot: Option<MlCopilotProjectSnapshotMetadata>,
         #[doc = "Change the default or mode reasoning effort."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         reasoning_effort: Option<MlReasoningEffort>,
         #[doc = "The source ranges the user suggested to change. If empty, the content (prompt) will be used and is required."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         source_ranges: Option<Vec<SourceRangePrompt>>,
+    },
+    #[doc = "Request persisted attachments from conversation history over the active websocket."]
+    #[serde(rename = "fetch_attachments")]
+    FetchAttachments {
+        #[doc = "In-row attachment indices to retrieve."]
+        indices: Vec<u32>,
+        #[doc = "Prompt containing the persisted message row."]
+        prompt_id: uuid::Uuid,
+        #[doc = "Sequence number of the persisted message row."]
+        seq: i32,
     },
     #[doc = "The system message, which can be used to set the context or instructions for the AI."]
     #[serde(rename = "system")]
@@ -13402,6 +13474,9 @@ pub enum MlCopilotClientMessage {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct MlCopilotFile {
+    #[doc = "Reference for fetching this attachment on demand."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub attachment_ref: Option<AttachmentRef>,
     #[doc = "The file contents as binary data."]
     #[serde(
         serialize_with = "serde_bytes::serialize",
@@ -13432,9 +13507,14 @@ impl std::fmt::Display for MlCopilotFile {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for MlCopilotFile {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 6;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(attachment_ref) = &self.attachment_ref {
+                format!("{:?}", attachment_ref).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.data).into(),
             if let Some(data_ref) = &self.data_ref {
                 format!("{:?}", data_ref).into()
@@ -13453,6 +13533,7 @@ impl tabled::Tabled for MlCopilotFile {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "attachment_ref".into(),
             "data".into(),
             "data_ref".into(),
             "metadata".into(),
@@ -13512,6 +13593,155 @@ impl tabled::Tabled for MlCopilotModeOption {
             "label".into(),
         ]
     }
+}
+
+#[doc = "Canonical project revision accepted by API."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlCopilotProjectRevision {
+    #[doc = "Stable namespaced project identifier shared by every revision of the project."]
+    pub project_id: String,
+    #[doc = "Opaque identifier for the accepted project state. Every accepted write gets a fresh value, even when its contents equal an older revision. Clients must not infer file equality or ancestry from this value."]
+    pub revision: String,
+    #[doc = "Opaque API-issued token that must accompany subsequent writes to this revision."]
+    pub writer_fence: String,
+}
+
+impl std::fmt::Display for MlCopilotProjectRevision {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlCopilotProjectRevision {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.project_id.clone().into(),
+            self.revision.clone().into(),
+            self.writer_fence.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "project_id".into(),
+            "revision".into(),
+            "writer_fence".into(),
+        ]
+    }
+}
+
+#[doc = "Revision metadata for the complete `current_files` map in a client message."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlCopilotProjectSnapshotMetadata {
+    #[doc = "Canonical revision and writer fence on which `current_files` is based. Its `project_id` must match the outer `project_id`. Omit this only when establishing the first canonical revision; omission must not replace an existing revision."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub base_revision: Option<MlCopilotProjectRevision>,
+    #[doc = "Stable, namespaced project identifier. Cloud projects use `cloud:<project UUID>` and API validates project access. Local projects use `local:<durable app project ID>` and API scopes the value to the authenticated principal."]
+    pub project_id: String,
+    #[doc = "Idempotency key for this complete project snapshot, scoped to `project_id`."]
+    pub snapshot_id: String,
+}
+
+impl std::fmt::Display for MlCopilotProjectSnapshotMetadata {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlCopilotProjectSnapshotMetadata {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(base_revision) = &self.base_revision {
+                format!("{:?}", base_revision).into()
+            } else {
+                String::new().into()
+            },
+            self.project_id.clone().into(),
+            self.snapshot_id.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "base_revision".into(),
+            "project_id".into(),
+            "snapshot_id".into(),
+        ]
+    }
+}
+
+#[doc = "Outcome of comparing a client project snapshot with canonical state."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotProjectSnapshotStatus {
+    #[doc = "The snapshot was based on current state and became canonical."]
+    #[serde(rename = "accepted")]
+    #[display("accepted")]
+    Accepted,
+    #[doc = "Non-overlapping client changes were merged into canonical state."]
+    #[serde(rename = "merged")]
+    #[display("merged")]
+    Merged,
+    #[doc = "A clean snapshot based on an older revision was not accepted."]
+    #[serde(rename = "rejected_stale")]
+    #[display("rejected_stale")]
+    RejectedStale,
+    #[doc = "Client changes overlap canonical changes and require explicit resolution."]
+    #[serde(rename = "conflict")]
+    #[display("conflict")]
+    Conflict,
+}
+
+#[doc = "Controls whether replayed attachments are sent inline or fetched on demand."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotReplayAttachmentMode {
+    #[doc = "Include full attachment bytes in replayed files."]
+    #[serde(rename = "full")]
+    #[display("full")]
+    Full,
+    #[doc = "Omit attachment bytes and include only socket fetch metadata."]
+    #[serde(rename = "metadata_only")]
+    #[display("metadata_only")]
+    MetadataOnly,
 }
 
 #[doc = "The types of messages that can be sent by the server to the client."]
@@ -13588,6 +13818,30 @@ pub enum MlCopilotServerMessage {
     ProjectUpdated {
         #[doc = "Map of file paths to their latest contents. The file contents are not encoded since kcl files are not binary."]
         files: std::collections::HashMap<String, String>,
+    },
+    #[doc = "Revision-aware notification that the canonical project was updated. API emits this only after the new canonical revision is durable."]
+    #[serde(rename = "project_revision_updated")]
+    ProjectRevisionUpdated {
+        #[doc = "Complete canonical project contents."]
+        files: std::collections::HashMap<String, Vec<u8>>,
+        #[doc = "Canonical revision represented by `files`."]
+        project_revision: MlCopilotProjectRevision,
+    },
+    #[doc = "Result of validating a revision-aware client project snapshot. `Accepted` and `Merged` are emitted only after the new canonical revision is durable."]
+    #[serde(rename = "project_snapshot_result")]
+    ProjectSnapshotResult {
+        #[doc = "Complete canonical contents after processing the snapshot. Present when the client must apply or reconcile a different state. `Some({})` explicitly represents an empty canonical project."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        canonical_files: Option<std::collections::HashMap<String, Vec<u8>>>,
+        #[doc = "Paths that could not be merged automatically."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        conflicting_paths: Option<Vec<String>>,
+        #[doc = "Canonical revision after processing the snapshot."]
+        project_revision: MlCopilotProjectRevision,
+        #[doc = "Idempotency key from the submitted snapshot."]
+        snapshot_id: String,
+        #[doc = "How the submitted snapshot affected canonical state."]
+        status: MlCopilotProjectSnapshotStatus,
     },
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
@@ -13731,7 +13985,7 @@ pub enum MlCopilotServerMessage {
         #[doc = "Name of the completed tool."]
         tool_name: String,
     },
-    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included from persisted chat rows: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, `ZookeeperOpenAiIntermediateResponseCheckpoint`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - The latest completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for replay sent to the text-to-CAD backend. - The active unfinished prompt's latest `ZookeeperOpenAiIntermediateResponseCheckpoint` is synthesized only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
+    #[doc = "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included from persisted chat rows: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, `ZookeeperOpenAiIntermediateResponseCheckpoint`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - The latest completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for replay sent to the text-to-CAD backend. - The active unfinished prompt's latest `ZookeeperOpenAiIntermediateResponseCheckpoint` is synthesized only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - Client-facing replays may omit large attachment bytes and instead place socket fetch metadata in `MlCopilotFile.metadata`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`."]
     #[serde(rename = "replay")]
     Replay {
         #[doc = "Canonical bytes (usually JSON) for each message, ordered by prompt creation time, then message sequence number."]
@@ -13761,6 +14015,18 @@ pub enum MlCopilotServerMessage {
     Files {
         #[doc = "The list of files being sent."]
         files: Vec<MlCopilotFile>,
+    },
+    #[doc = "Persisted attachments fetched over the websocket on demand."]
+    #[serde(rename = "attachments")]
+    Attachments {
+        #[doc = "Fetched files, in the same order as the requested indices."]
+        files: Vec<MlCopilotFile>,
+        #[doc = "Prompt containing the persisted message row."]
+        prompt_id: uuid::Uuid,
+        #[doc = "Authoritative role that owns the file attachment, read from the stored row."]
+        role: MlMessageRole,
+        #[doc = "Sequence number of the persisted message row."]
+        seq: i32,
     },
 }
 
@@ -13918,6 +14184,31 @@ pub enum MlFeedback {
     #[serde(rename = "rejected")]
     #[display("rejected")]
     Rejected,
+}
+
+#[doc = "The role of the author of a chat message."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlMessageRole {
+    #[doc = "Client-authored input."]
+    #[serde(rename = "client")]
+    #[display("client")]
+    Client,
+    #[doc = "Server-authored message."]
+    #[serde(rename = "server")]
+    #[display("server")]
+    Server,
 }
 
 #[doc = "Specify the amount of effort used in reasoning. Read the following for more info: https://platform.openai.com/docs/guides/reasoning#how-reasoning-works"]
