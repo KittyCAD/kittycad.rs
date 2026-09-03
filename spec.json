@@ -40000,6 +40000,13 @@
             ]
           },
           {
+            "description": "Route non-WebRTC modeling sessions to the CPU-only engine pool.",
+            "type": "string",
+            "enum": [
+              "cpu_engine_pool"
+            ]
+          },
+          {
             "description": "Disable signup through email or OAuth.",
             "type": "string",
             "enum": [

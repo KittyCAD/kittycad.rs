@@ -10131,6 +10131,10 @@ pub enum Feature {
     #[serde(rename = "billing")]
     #[display("billing")]
     Billing,
+    #[doc = "Route non-WebRTC modeling sessions to the CPU-only engine pool."]
+    #[serde(rename = "cpu_engine_pool")]
+    #[display("cpu_engine_pool")]
+    CpuEnginePool,
     #[doc = "Disable signup through email or OAuth."]
     #[serde(rename = "disallow_self_signup")]
     #[display("disallow_self_signup")]
