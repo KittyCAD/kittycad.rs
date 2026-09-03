@@ -32081,6 +32081,14 @@
           },
           {
             "in": "query",
+            "name": "replay_attachment_mode",
+            "description": "Controls whether replayed attachment payloads are sent in full or replaced with metadata that can be used with `FetchAttachments`.",
+            "schema": {
+              "$ref": "#/components/schemas/MlCopilotReplayAttachmentMode"
+            }
+          },
+          {
+            "in": "query",
             "name": "pr",
             "description": "Optional Pull Request number to route traffic.",
             "schema": {
@@ -34828,6 +34836,41 @@
               "user_id"
             ]
           }
+        ]
+      },
+      "AttachmentRef": {
+        "description": "Coordinates for fetching a persisted attachment on demand.",
+        "type": "object",
+        "properties": {
+          "content_hash": {
+            "nullable": true,
+            "description": "Stable digest of the attachment bytes, formatted as `sha256:<lowercase hex>`.",
+            "type": "string"
+          },
+          "index": {
+            "description": "Position of this attachment in the message's attachment array.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "prompt_id": {
+            "description": "Prompt containing the persisted message row.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "seq": {
+            "description": "Sequence number of the persisted message row.",
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "required": [
+          "index",
+          "prompt_id",
+          "seq"
         ]
       },
       "AuthApiKeyResponse": {
@@ -40112,6 +40155,13 @@
             ]
           },
           {
+            "description": "Enables drawing features across Zoo applications.",
+            "type": "string",
+            "enum": [
+              "drawings"
+            ]
+          },
+          {
             "description": "Enables modeling dialogs in Zoo Design Studio.",
             "type": "string",
             "enum": [
@@ -42933,6 +42983,15 @@
                 "description": "The project name, if any.",
                 "type": "string"
               },
+              "project_snapshot": {
+                "nullable": true,
+                "description": "Revision and idempotency metadata for `current_files`. Its absence identifies a legacy unfenced message, not an initial revision.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -43020,6 +43079,15 @@
                 "description": "The project name, if any. This can be used to associate the message with a specific project.",
                 "type": "string"
               },
+              "project_snapshot": {
+                "nullable": true,
+                "description": "Revision and idempotency metadata for `current_files`. Its absence identifies a legacy unfenced message, not an initial revision.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+                  }
+                ]
+              },
               "reasoning_effort": {
                 "nullable": true,
                 "description": "Change the default or mode reasoning effort.",
@@ -43045,6 +43113,46 @@
             },
             "required": [
               "content",
+              "type"
+            ]
+          },
+          {
+            "description": "Request persisted attachments from conversation history over the active websocket.",
+            "type": "object",
+            "properties": {
+              "indices": {
+                "description": "In-row attachment indices to retrieve.",
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "uint32",
+                  "minimum": 0
+                }
+              },
+              "prompt_id": {
+                "description": "Prompt containing the persisted message row.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "seq": {
+                "description": "Sequence number of the persisted message row.",
+                "type": "integer",
+                "format": "int32"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "fetch_attachments"
+                ]
+              }
+            },
+            "required": [
+              "indices",
+              "prompt_id",
+              "seq",
               "type"
             ]
           },
@@ -43125,6 +43233,15 @@
         "description": "A file that can be transferred between the client and server.",
         "type": "object",
         "properties": {
+          "attachment_ref": {
+            "nullable": true,
+            "description": "Reference for fetching this attachment on demand.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AttachmentRef"
+              }
+            ]
+          },
           "data": {
             "description": "The file contents as binary data.",
             "type": "array",
@@ -43193,6 +43310,108 @@
           "icon",
           "id",
           "label"
+        ]
+      },
+      "MlCopilotProjectRevision": {
+        "description": "Canonical project revision accepted by API.",
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "description": "Stable namespaced project identifier shared by every revision of the project.",
+            "type": "string"
+          },
+          "revision": {
+            "description": "Opaque identifier for the accepted project state. Every accepted write gets a fresh value, even when its contents equal an older revision. Clients must not infer file equality or ancestry from this value.",
+            "type": "string"
+          },
+          "writer_fence": {
+            "description": "Opaque API-issued token that must accompany subsequent writes to this revision.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "revision",
+          "writer_fence"
+        ]
+      },
+      "MlCopilotProjectSnapshotMetadata": {
+        "description": "Revision metadata for the complete `current_files` map in a client message.",
+        "type": "object",
+        "properties": {
+          "base_revision": {
+            "nullable": true,
+            "description": "Canonical revision and writer fence on which `current_files` is based. Its `project_id` must match the outer `project_id`. Omit this only when establishing the first canonical revision; omission must not replace an existing revision.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlCopilotProjectRevision"
+              }
+            ]
+          },
+          "project_id": {
+            "description": "Stable, namespaced project identifier. Cloud projects use `cloud:<project UUID>` and API validates project access. Local projects use `local:<durable app project ID>` and API scopes the value to the authenticated principal.",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "description": "Idempotency key for this complete project snapshot, scoped to `project_id`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "project_id",
+          "snapshot_id"
+        ]
+      },
+      "MlCopilotProjectSnapshotStatus": {
+        "description": "Outcome of comparing a client project snapshot with canonical state.",
+        "oneOf": [
+          {
+            "description": "The snapshot was based on current state and became canonical.",
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          {
+            "description": "Non-overlapping client changes were merged into canonical state.",
+            "type": "string",
+            "enum": [
+              "merged"
+            ]
+          },
+          {
+            "description": "A clean snapshot based on an older revision was not accepted.",
+            "type": "string",
+            "enum": [
+              "rejected_stale"
+            ]
+          },
+          {
+            "description": "Client changes overlap canonical changes and require explicit resolution.",
+            "type": "string",
+            "enum": [
+              "conflict"
+            ]
+          }
+        ]
+      },
+      "MlCopilotReplayAttachmentMode": {
+        "description": "Controls whether replayed attachments are sent inline or fetched on demand.",
+        "oneOf": [
+          {
+            "description": "Include full attachment bytes in replayed files.",
+            "type": "string",
+            "enum": [
+              "full"
+            ]
+          },
+          {
+            "description": "Omit attachment bytes and include only socket fetch metadata.",
+            "type": "string",
+            "enum": [
+              "metadata_only"
+            ]
+          }
         ]
       },
       "MlCopilotServerMessage": {
@@ -43459,6 +43678,105 @@
             "additionalProperties": false
           },
           {
+            "description": "Revision-aware notification that the canonical project was updated. API emits this only after the new canonical revision is durable.",
+            "type": "object",
+            "properties": {
+              "project_revision_updated": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "description": "Complete canonical project contents.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "format": "uint8",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "project_revision": {
+                    "description": "Canonical revision represented by `files`.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MlCopilotProjectRevision"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "files",
+                  "project_revision"
+                ]
+              }
+            },
+            "required": [
+              "project_revision_updated"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Result of validating a revision-aware client project snapshot. `Accepted` and `Merged` are emitted only after the new canonical revision is durable.",
+            "type": "object",
+            "properties": {
+              "project_snapshot_result": {
+                "type": "object",
+                "properties": {
+                  "canonical_files": {
+                    "nullable": true,
+                    "description": "Complete canonical contents after processing the snapshot. Present when the client must apply or reconcile a different state. `Some({})` explicitly represents an empty canonical project.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "format": "uint8",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "conflicting_paths": {
+                    "description": "Paths that could not be merged automatically.",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "project_revision": {
+                    "description": "Canonical revision after processing the snapshot.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MlCopilotProjectRevision"
+                      }
+                    ]
+                  },
+                  "snapshot_id": {
+                    "description": "Idempotency key from the submitted snapshot.",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "How the submitted snapshot affected canonical state.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MlCopilotProjectSnapshotStatus"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "project_revision",
+                  "snapshot_id",
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "project_snapshot_result"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Assistant reasoning / chain-of-thought (if you expose it).",
             "type": "object",
             "properties": {
@@ -43678,7 +43996,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included from persisted chat rows: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, `ZookeeperOpenAiIntermediateResponseCheckpoint`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - The latest completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for replay sent to the text-to-CAD backend. - The active unfinished prompt's latest `ZookeeperOpenAiIntermediateResponseCheckpoint` is synthesized only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
+            "description": "Replay containing raw bytes for previously-saved messages for a conversation. Includes server messages and client `User` messages.\n\nInvariants: - Client replay includes server messages: `Info`, `Error`, `Reasoning(..)`, `ToolOutput { .. }`, `Files { .. }`, `ProjectUpdated { .. }`, and `EndOfStream { .. }`. - Client replay also includes client `User` messages. - Backend replay includes client `User` messages plus selected reasoning, edit metadata, recovery output, and final responses. - The following are NEVER included from persisted chat rows: `SessionData`, `ConversationId`, `Delta`, `BackendShutdown`, `ZookeeperAutoRouterMetadata`, `ZookeeperOpenAiResponseCheckpoint`, `ZookeeperOpenAiIntermediateResponseCheckpoint`, or `ZookeeperTurnUsage`. - `ZookeeperRecoveryToolOutput` is included only in replay sent to the text-to-CAD backend and is filtered from client replay. - The latest completed `ZookeeperOpenAiResponseCheckpoint` is synthesized from prompt metadata only for replay sent to the text-to-CAD backend. - The active unfinished prompt's latest `ZookeeperOpenAiIntermediateResponseCheckpoint` is synthesized only for replay sent to the text-to-CAD backend. - Ordering is stable: messages are ordered by prompt creation time within the conversation, then by the per-prompt `seq` value (monotonically increasing as seen in the original stream).\n\nWire format: - Each element is canonical serialized bytes (typically JSON) for either a `MlCopilotServerMessage` or a `MlCopilotClientMessage::User`. - Client-facing replays may omit large attachment bytes and instead place socket fetch metadata in `MlCopilotFile.metadata`. - When delivered as an initial replay over the websocket (upon `?replay=true&conversation_id=<uuid>`), the server sends a single WebSocket Binary frame containing a MsgPack-encoded document of this enum: `Replay { messages }`.",
             "type": "object",
             "properties": {
               "replay": {
@@ -43775,6 +44093,55 @@
             },
             "required": [
               "files"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Persisted attachments fetched over the websocket on demand.",
+            "type": "object",
+            "properties": {
+              "attachments": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "description": "Fetched files, in the same order as the requested indices.",
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/MlCopilotFile"
+                    }
+                  },
+                  "prompt_id": {
+                    "description": "Prompt containing the persisted message row.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Uuid"
+                      }
+                    ]
+                  },
+                  "role": {
+                    "description": "Authoritative role that owns the file attachment, read from the stored row.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/MlMessageRole"
+                      }
+                    ]
+                  },
+                  "seq": {
+                    "description": "Sequence number of the persisted message row.",
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "required": [
+                  "files",
+                  "prompt_id",
+                  "role",
+                  "seq"
+                ]
+              }
+            },
+            "required": [
+              "attachments"
             ],
             "additionalProperties": false
           }
@@ -43950,6 +44317,25 @@
             "type": "string",
             "enum": [
               "rejected"
+            ]
+          }
+        ]
+      },
+      "MlMessageRole": {
+        "description": "The role of the author of a chat message.",
+        "oneOf": [
+          {
+            "description": "Client-authored input.",
+            "type": "string",
+            "enum": [
+              "client"
+            ]
+          },
+          {
+            "description": "Server-authored message.",
+            "type": "string",
+            "enum": [
+              "server"
             ]
           }
         ]
