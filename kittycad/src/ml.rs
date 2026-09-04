@@ -712,7 +712,10 @@ impl Ml {
              those.\n\n**Parameters:**\n\n- `conversation_id: Option<uuid::Uuid>`: Conversation to \
              replay (UUID). Required when `replay` is `true`.\n- `pr: Option<u64>`: Optional Pull \
              Request number to route traffic.\n- `replay: Option<bool>`: If `true`, emit MsgPack \
-             Replay for the specified conversation and continue."]
+             Replay for the specified conversation and continue.\n- `replay_attachment_mode: \
+             Option<crate::types::MlCopilotReplayAttachmentMode>`: Controls whether replayed \
+             attachment payloads are sent in full or replaced with metadata that can be used with \
+             `FetchAttachments`."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn copilot_ws<'a>(
@@ -720,6 +723,7 @@ impl Ml {
         conversation_id: Option<uuid::Uuid>,
         pr: Option<u64>,
         replay: Option<bool>,
+        replay_attachment_mode: Option<crate::types::MlCopilotReplayAttachmentMode>,
     ) -> Result<(reqwest::Upgraded, http::HeaderMap), crate::types::error::Error> {
         let mut req = self.client.client_http1_only.request(
             http::Method::GET,
@@ -737,6 +741,10 @@ impl Ml {
 
         if let Some(p) = replay {
             query_params.push(("replay", format!("{}", p)));
+        }
+
+        if let Some(p) = replay_attachment_mode {
+            query_params.push(("replay_attachment_mode", format!("{}", p)));
         }
 
         req = req.query(&query_params);
