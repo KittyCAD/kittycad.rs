@@ -80,7 +80,9 @@ impl Users {
     #[doc = "Delete your user.\n\nThis endpoint requires authentication by any Zoo user. It \
              deletes the authenticated user from Zoo's database.\n\nThis call will only succeed if \
              all invoices associated with the user have been paid in full and there is no \
-             outstanding balance.\n\n```rust,no_run\nasync fn example_users_delete_self() -> \
+             outstanding balance. Personal Factory jobs must be completed or canceled before \
+             deleting your account. In-progress jobs owned by an organization do not prevent \
+             account deletion.\n\n```rust,no_run\nasync fn example_users_delete_self() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
              client.users().delete_self().await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]

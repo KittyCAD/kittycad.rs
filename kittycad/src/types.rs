@@ -10195,6 +10195,143 @@ impl tabled::Tabled for FactoryCustomerCatalogOption {
     }
 }
 
+#[doc = "Customer-visible summary of a manufacturing job."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobSummary {
+    #[doc = "When the job was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The job's current version, when one exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_version_id: Option<uuid::Uuid>,
+    #[doc = "Stable customer-facing job identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Current manufacturing workflow status."]
+    pub status: String,
+    #[doc = "When the job was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for FactoryCustomerJobSummary {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobSummary {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            if let Some(current_version_id) = &self.current_version_id {
+                format!("{:?}", current_version_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            self.status.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "current_version_id".into(),
+            "id".into(),
+            "status".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobSummaryResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<FactoryCustomerJobSummary>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for FactoryCustomerJobSummaryResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for FactoryCustomerJobSummaryResultsPage {
+    type Item = FactoryCustomerJobSummary;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobSummaryResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
 #[doc = "Response returned when a Factory job is created. Only customer-facing ids are exposed: \
          the job id (the customer's reference) and its current version id. The internal Help Desk \
          thread id is deliberately NOT returned (internal-only per the ERD)."]
