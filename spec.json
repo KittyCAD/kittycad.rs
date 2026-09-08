@@ -10865,6 +10865,217 @@
         }
       }
     },
+    "/org/factory/jobs": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "List Factory jobs owned by your organization.",
+        "description": "Any current organization member can list its jobs, including archived jobs. Ownership uses the job's stored organization, so a submitter leaving or deleting their account does not move the job. Former members lose access. Results are paginated, newest first by default, with the job id breaking ties. Internal communication, financial details, and file storage locations are omitted.",
+        "operationId": "list_org_factory_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobSummaryResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_list_org_factory_jobs",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/org/members": {
       "get": {
         "tags": [
@@ -22913,6 +23124,130 @@
       }
     },
     "/user/factory/jobs": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "List your personal Factory jobs.",
+        "description": "Returns jobs owned by your account, including archived jobs. Jobs with an organization owner belong to that organization, even when your account is also associated with them; use `GET /org/factory/jobs` to list those jobs. Results are paginated, newest first by default, with the job id breaking ties. Internal communication, financial details, and file storage locations are omitted.",
+        "operationId": "list_user_factory_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobSummaryResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
       "post": {
         "tags": [
           "factory",
@@ -39939,6 +40274,72 @@
         },
         "required": [
           "name"
+        ]
+      },
+      "FactoryCustomerJobSummary": {
+        "description": "Customer-visible summary of a manufacturing job.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "When the job was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "current_version_id": {
+            "nullable": true,
+            "description": "The job's current version, when one exists.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "id": {
+            "description": "Stable customer-facing job identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "status": {
+            "description": "Current manufacturing workflow status.",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "When the job was last updated.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "status",
+          "updated_at"
+        ]
+      },
+      "FactoryCustomerJobSummaryResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FactoryCustomerJobSummary"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "FactoryJobResponse": {
