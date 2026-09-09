@@ -74,11 +74,6 @@ pub mod api_calls;
 /// FROM: <https://zoo.dev/docs/api/api-tokens>
 #[cfg(feature = "requests")]
 pub mod api_tokens;
-/// Endpoints for third party app grant flows.
-///
-/// FROM: <https://zoo.dev/docs/api/apps>
-#[cfg(feature = "requests")]
-pub mod apps;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
 /// FROM: <https://zoo.dev/docs/api/executor>
@@ -140,11 +135,6 @@ pub mod projects;
 /// FROM: <https://zoo.dev/docs/api/service-accounts>
 #[cfg(feature = "requests")]
 pub mod service_accounts;
-/// Operations involving our swag store.
-///
-/// FROM: <https://zoo.dev/docs/api/store>
-#[cfg(feature = "requests")]
-pub mod store;
 #[cfg(test)]
 mod tests;
 pub mod types;
@@ -422,13 +412,6 @@ impl Client {
         api_tokens::ApiTokens::new(self.clone())
     }
 
-    /// Endpoints for third party app grant flows.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/apps>
-    pub fn apps(&self) -> apps::Apps {
-        apps::Apps::new(self.clone())
-    }
-
     /// Endpoints that allow for code execution or creation of code execution environments.
     ///
     /// FROM: <https://zoo.dev/docs/api/executor>
@@ -511,13 +494,6 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/service-accounts>
     pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
         service_accounts::ServiceAccounts::new(self.clone())
-    }
-
-    /// Operations involving our swag store.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/store>
-    pub fn store(&self) -> store::Store {
-        store::Store::new(self.clone())
     }
 
     /// Unit conversion operations.
