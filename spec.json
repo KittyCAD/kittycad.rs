@@ -396,381 +396,6 @@
         }
       }
     },
-    "/apps/github/callback": {
-      "get": {
-        "tags": [
-          "apps",
-          "hidden"
-        ],
-        "summary": "Listen for callbacks to GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
-        "operationId": "apps_github_callback",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {}
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/apps/github/consent": {
-      "get": {
-        "tags": [
-          "apps",
-          "hidden"
-        ],
-        "summary": "Get the consent URL for GitHub app authentication.",
-        "description": "This is different than OAuth 2.0 authentication for users. This endpoint grants access for Zoo to access user's repos.\n\nThe user doesn't need Zoo OAuth authorization for this endpoint, this is purely for the GitHub permissions to access repos.",
-        "operationId": "apps_github_consent",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AppClientInfo"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/apps/github/webhook": {
-      "post": {
-        "tags": [
-          "apps",
-          "hidden"
-        ],
-        "summary": "Listen for GitHub webhooks.",
-        "description": "These come from the GitHub app.",
-        "operationId": "apps_github_webhook",
-        "requestBody": {
-          "content": {
-            "application/octet-stream": {
-              "schema": {
-                "type": "string",
-                "format": "binary"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_apps_github_webhook",
-        "responses": {
-          "204": {
-            "description": "resource updated",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/async/operations/{id}": {
       "get": {
         "tags": [
@@ -3772,112 +3397,6 @@
                 "required": true,
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/internal/discord/api-token/{discord_id}": {
-      "get": {
-        "tags": [
-          "meta",
-          "hidden"
-        ],
-        "summary": "Get an API token for a user by their discord id.",
-        "description": "This endpoint allows us to run API calls from our discord bot on behalf of a user. The user must have a discord account linked to their Zoo Account via oauth2 for this to work.\n\nYou must be a Zoo admin to use this endpoint.",
-        "operationId": "internal_get_api_token_for_discord_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "discord_id",
-            "description": "The user's discord ID.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiToken"
                 }
               }
             }
@@ -16023,1002 +15542,6 @@
         }
       }
     },
-    "/orgs/{id}/billing/contract": {
-      "get": {
-        "tags": [
-          "orgs",
-          "hidden"
-        ],
-        "summary": "Get the billing contract for an organization.",
-        "description": "This endpoint requires Zoo admin authentication. It returns the active contract for the organization, or the latest draft when no active contract exists.",
-        "operationId": "get_billing_contract_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BillingContractView"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "orgs",
-          "hidden"
-        ],
-        "summary": "Create or replace the billing contract for an organization.",
-        "description": "This endpoint requires Zoo admin authentication. It upserts the contract definition used for admin-managed enterprise billing.",
-        "operationId": "upsert_billing_contract_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BillingContractUpsert"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/BillingContractView"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_billing_contract_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/orgs/{id}/oauth2/apps": {
-      "get": {
-        "tags": [
-          "oauth2",
-          "hidden"
-        ],
-        "summary": "List OAuth 2.0 apps owned by an organization.",
-        "description": "This endpoint requires Zoo admin authentication. It returns the target organization's active OAuth apps for admin dashboard inspection.",
-        "operationId": "list_oauth2_apps_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "sort_by",
-            "schema": {
-              "$ref": "#/components/schemas/CreatedAtSortMode"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuth2AppResponseResultsPage"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-dropshot-pagination": {
-          "required": []
-        }
-      }
-    },
-    "/orgs/{id}/payment/balance": {
-      "get": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Get balance for an org.",
-        "description": "This endpoint requires authentication by a Zoo employee. It gets the balance information for the specified org.",
-        "operationId": "get_payment_balance_for_any_org",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerBalance"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Update balance for an org.",
-        "description": "This endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.",
-        "operationId": "update_payment_balance_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          },
-          {
-            "in": "query",
-            "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePaymentBalance"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerBalance"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_payment_balance_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/orgs/{id}/payment/subscriptions": {
-      "put": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Update the subscription for any org (admin override).",
-        "description": "This endpoint requires authentication by a Zoo admin. It updates the subscription for the specified org.",
-        "operationId": "update_org_subscription_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptionsOrgRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ZooProductSubscriptions"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_update_subscription_for_any_org",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The organization ID.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "tags": [
@@ -18180,406 +16703,6 @@
                 "schema": {}
               }
             }
-          }
-        }
-      }
-    },
-    "/store/coupon": {
-      "post": {
-        "tags": [
-          "store",
-          "hidden"
-        ],
-        "summary": "Create a new store coupon.",
-        "description": "This endpoint requires authentication by a Zoo employee. It creates a new store coupon.",
-        "operationId": "create_store_coupon",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StoreCouponParams"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "successful creation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DiscountCode"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_store_coupon",
-        "responses": {
-          "204": {
-            "description": "resource updated",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/subscription-plans/{slug}/prices": {
-      "post": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Create or update a price for a subscription plan.",
-        "description": "You must be a Zoo admin to perform this request.",
-        "operationId": "upsert_subscription_plan_price",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PriceUpsertRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SubscriptionPlanPriceRecord"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_upsert_subscription_plan_price",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "slug",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
           }
         }
       }
@@ -30303,112 +28426,6 @@
         }
       }
     },
-    "/users/{id}/admin/details": {
-      "get": {
-        "tags": [
-          "users",
-          "hidden"
-        ],
-        "summary": "Get admin-only details for a user.",
-        "description": "Zoo admins can retrieve extended information about any user, while non-admins receive a 404 to avoid leaking the existence of the resource.",
-        "operationId": "user_admin_details_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserAdminDetails"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
     "/users/{id}/api-calls": {
       "get": {
         "tags": [
@@ -30542,686 +28559,6 @@
         },
         "x-dropshot-pagination": {
           "required": []
-        }
-      }
-    },
-    "/users/{id}/oauth2/apps": {
-      "get": {
-        "tags": [
-          "oauth2",
-          "hidden"
-        ],
-        "summary": "List OAuth 2.0 apps owned by a user.",
-        "description": "This endpoint requires Zoo admin authentication. It returns the target user's active OAuth apps so the admin dashboard can inspect them without impersonating the user.",
-        "operationId": "list_oauth2_apps_for_any_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          },
-          {
-            "in": "query",
-            "name": "sort_by",
-            "schema": {
-              "$ref": "#/components/schemas/CreatedAtSortMode"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/OAuth2AppResponseResultsPage"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-dropshot-pagination": {
-          "required": []
-        }
-      }
-    },
-    "/users/{id}/payment/balance": {
-      "get": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Get balance for an user.",
-        "description": "This endpoint requires authentication by a Zoo employee. It gets the balance information for the specified user.",
-        "operationId": "get_payment_balance_for_any_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          },
-          {
-            "in": "query",
-            "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerBalance"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "payments",
-          "hidden"
-        ],
-        "summary": "Update balance for an user.",
-        "description": "This endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.",
-        "operationId": "update_payment_balance_for_any_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          },
-          {
-            "in": "query",
-            "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePaymentBalance"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CustomerBalance"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_payment_balance_for_any_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      }
-    },
-    "/users/{id}/payment/subscriptions": {
-      "put": {
-        "tags": [
-          "users",
-          "hidden"
-        ],
-        "summary": "Update a subscription for a user.",
-        "description": "You must be a Zoo admin to perform this request.",
-        "operationId": "update_subscription_for_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ZooProductSubscriptionsUserRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ZooProductSubscriptions"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        }
-      },
-      "options": {
-        "tags": [
-          "hidden"
-        ],
-        "summary": "OPTIONS endpoint.",
-        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_update_subscription_for_user",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The user's identifier (uuid or email).",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/UserIdentifier"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "successful operation, no content",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
         }
       }
     },
@@ -32529,7 +29866,7 @@
           "modeling"
         ],
         "summary": "Opens a WebSocket to a Zoo KittyCAD engine instance.",
-        "description": "Set `geometry_only=true` only when the session will never render images or video. `webrtc=false` disables video transport but leaves image rendering available.\n\nDue to the long-lived nature of the instances, it's possible the resources on have been used and not freed entirely, or the instance is in a bad state. Thus it's good practice to expect to have to potentially reconnect at any moment -even almost immediately after the first connection!\n\nAuthorization happens via a pseudo HTTP header over the WebSocket: `{ type: \"headers\", headers: { \"Authorization\": \"Bearer xxxxxxxxx\" }}`\n\nThe very next thing recommended is to setup a ping-pong interval. The current timeout is 10s and has no documented guarantee, so use a conservative number below that. 5s should be sufficient. A ping-pong interval is sending `{ type: 'ping\" }` when `{ request_id, success, resp: { type: \"pong\", data: {} } }` message is received.\n\nYou're ready to start sending modeling commands!\n\nIf you want to understand how to connect to the WebRTC video stream, https://github.com/KittyCAD/kittycad.ts/blob/main/src/webrtc.ts is a nice example to learn from.",
+        "description": "**Note**: Currently it's recommended to set `webrtc=true` in the WebSocket query string, otherwise some features, such as opacity setting, will cause the engine to fail.\n\nDue to the long-lived nature of the instances, it's possible the resources on have been used and not freed entirely, or the instance is in a bad state. Thus it's good practice to expect to have to potentially reconnect at any moment -even almost immediately after the first connection!\n\nAuthorization happens via a pseudo HTTP header over the WebSocket: `{ type: \"headers\", headers: { \"Authorization\": \"Bearer xxxxxxxxx\" }}`\n\nThe very next thing recommended is to setup a ping-pong interval. The current timeout is 10s and has no documented guarantee, so use a conservative number below that. 5s should be sufficient. A ping-pong interval is sending `{ type: 'ping\" }` when `{ request_id, success, resp: { type: \"pong\", data: {} } }` message is received.\n\nYou're ready to start sending modeling commands!\n\nIf you want to understand how to connect to the WebRTC video stream, https://github.com/KittyCAD/kittycad.ts/blob/main/src/webrtc.ts is a nice example to learn from.",
         "operationId": "modeling_commands_ws",
         "parameters": [
           {
@@ -32588,6 +29925,14 @@
           },
           {
             "in": "query",
+            "name": "geometry_only",
+            "description": "If true, the engine will be ran without any graphical rendering capability. This may reduce the ability of some endpoints such as snapshot.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
             "name": "pool",
             "description": "An optional identifier for a pool of engine instances. The 'default' pool is used when none is specified.",
             "schema": {
@@ -32631,10 +29976,10 @@
           },
           {
             "in": "query",
-            "name": "geometry_only",
-            "description": "Disable all image and video rendering for this session. Defaults to false. Must be combined with webrtc=false. This is independent of CPU pool availability.",
+            "name": "kcl_version",
+            "description": "Which KCL+Engine version should the engine use? Clients use this to opt into updated algorithms and behaviours.",
             "schema": {
-              "type": "boolean"
+              "$ref": "#/components/schemas/KclVersion"
             }
           },
           {
@@ -32786,75 +30131,6 @@
         "required": [
           "email",
           "role"
-        ]
-      },
-      "Address": {
-        "description": "An address for a user.",
-        "type": "object",
-        "properties": {
-          "city": {
-            "description": "The city component.",
-            "type": "string"
-          },
-          "country": {
-            "description": "The country component. This is a two-letter ISO country code.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CountryCode"
-              }
-            ]
-          },
-          "created_at": {
-            "title": "DateTime",
-            "description": "The time and date the address was created.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "description": "The unique identifier of the address.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "state": {
-            "description": "The state component.",
-            "type": "string"
-          },
-          "street1": {
-            "description": "The first street component.",
-            "type": "string"
-          },
-          "street2": {
-            "description": "The second street component.",
-            "type": "string"
-          },
-          "updated_at": {
-            "title": "DateTime",
-            "description": "The time and date the address was last updated.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "user_id": {
-            "description": "The user ID that this address belongs to.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "zip": {
-            "description": "The zip component.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "country",
-          "created_at",
-          "id",
-          "updated_at",
-          "user_id"
         ]
       },
       "AddressDetails": {
@@ -33415,7 +30691,7 @@
         "properties": {
           "dimension": {
             "nullable": true,
-            "description": "The explicitly defined dimension.  Only required if the measurement is not automatically calculated.",
+            "description": "The explicitly defined dimension. Only required if the measurement is not automatically calculated.",
             "type": "number",
             "format": "double"
           },
@@ -33429,14 +30705,12 @@
             ]
           },
           "tolerance": {
+            "nullable": true,
             "description": "The tolerance of the dimension",
             "type": "number",
             "format": "double"
           }
-        },
-        "required": [
-          "tolerance"
-        ]
+        }
       },
       "AnnotationMbdControlFrame": {
         "description": "Parameters for defining an MBD Geometric control frame",
@@ -33490,7 +30764,7 @@
             "maxLength": 1
           },
           "tolerance": {
-            "description": "Tolerance value - the total tolerance of the geometric control.  The unit is based on the drawing standard.",
+            "description": "Tolerance value - the total tolerance of the geometric control. The unit is based on the drawing standard.",
             "type": "number",
             "format": "double"
           }
@@ -33554,6 +30828,11 @@
             "description": "Width of the annotation's line",
             "type": "number",
             "format": "float"
+          },
+          "name": {
+            "nullable": true,
+            "description": "Human-friendly identifier for this annotation. Included in some exports and metadata of the model. This is _not_ displayed visually in, the annotation, it's only metadata.",
+            "type": "string"
           },
           "position": {
             "nullable": true,
@@ -34110,16 +31389,6 @@
           "updated_at",
           "user_id"
         ]
-      },
-      "AppClientInfo": {
-        "description": "Information about a third party app client.",
-        "type": "object",
-        "properties": {
-          "url": {
-            "description": "The URL for consent.",
-            "type": "string"
-          }
-        }
       },
       "AsyncApiCallOutput": {
         "description": "The output from the async API call.",
@@ -35340,509 +32609,6 @@
         "description": "The response from the 'BeginExecution'.",
         "type": "object"
       },
-      "BillingCadence": {
-        "description": "How often a contract is expected to bill or renew operationally.",
-        "oneOf": [
-          {
-            "description": "The contract is managed on an annual cycle.",
-            "type": "string",
-            "enum": [
-              "annual"
-            ]
-          },
-          {
-            "description": "The contract is managed on a quarterly cycle.",
-            "type": "string",
-            "enum": [
-              "quarterly"
-            ]
-          },
-          {
-            "description": "The contract is managed on a monthly cycle.",
-            "type": "string",
-            "enum": [
-              "monthly"
-            ]
-          },
-          {
-            "description": "The contract does not follow a fixed automated cadence.",
-            "type": "string",
-            "enum": [
-              "manual"
-            ]
-          }
-        ]
-      },
-      "BillingCommitmentScope": {
-        "description": "How commitment funds are shared across contract items.",
-        "oneOf": [
-          {
-            "description": "One shared commitment pool may fund multiple contract items.",
-            "type": "string",
-            "enum": [
-              "pooled"
-            ]
-          },
-          {
-            "description": "Each contract item effectively manages its own commitment budget.",
-            "type": "string",
-            "enum": [
-              "per_item"
-            ]
-          }
-        ]
-      },
-      "BillingContractItemInput": {
-        "description": "Serialized line-item payload for a contract definition.",
-        "type": "object",
-        "properties": {
-          "active": {
-            "description": "Whether the item should participate in billing decisions immediately.",
-            "default": true,
-            "type": "boolean"
-          },
-          "billing_unit_granularity": {
-            "nullable": true,
-            "description": "Optional normalization rule used before rating usage.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingUnitGranularity"
-              }
-            ]
-          },
-          "code": {
-            "description": "Canonical item code so later metering can find the right price row.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingItemCode"
-              }
-            ]
-          },
-          "display_name": {
-            "description": "Human-readable name shown in finance tooling.",
-            "type": "string"
-          },
-          "fixed_fee_amount": {
-            "nullable": true,
-            "title": "double",
-            "description": "Fixed fee charged for the item when the kind is `fixed_fee`.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "is_commitment_eligible": {
-            "description": "Whether usage from this item may burn down contract commitment.",
-            "default": false,
-            "type": "boolean"
-          },
-          "kind": {
-            "description": "Pricing model for this item.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingItemKind"
-              }
-            ]
-          },
-          "rate_tiers": {
-            "description": "Pricing tiers for usage-rated items.",
-            "default": [],
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingRateTierInput"
-            }
-          },
-          "unit": {
-            "description": "Base measurement unit for pricing and usage.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingUnit"
-              }
-            ]
-          }
-        },
-        "required": [
-          "code",
-          "display_name",
-          "kind",
-          "unit"
-        ]
-      },
-      "BillingContractItemView": {
-        "description": "Serialized line item returned from a stored contract.",
-        "type": "object",
-        "properties": {
-          "active": {
-            "description": "Whether the item is active.",
-            "type": "boolean"
-          },
-          "billing_unit_granularity": {
-            "nullable": true,
-            "description": "Optional normalization rule for usage.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingUnitGranularity"
-              }
-            ]
-          },
-          "code": {
-            "description": "Canonical item code.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingItemCode"
-              }
-            ]
-          },
-          "display_name": {
-            "description": "Human-readable item name.",
-            "type": "string"
-          },
-          "fixed_fee_amount": {
-            "nullable": true,
-            "title": "double",
-            "description": "Fixed fee charged for the item when applicable.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "id": {
-            "description": "Database identifier for the contract item row.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "is_commitment_eligible": {
-            "description": "Whether this item can consume commitment.",
-            "type": "boolean"
-          },
-          "kind": {
-            "description": "Pricing model for the item.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingItemKind"
-              }
-            ]
-          },
-          "rate_tiers": {
-            "description": "Usage tiers for the item.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingRateTierView"
-            }
-          },
-          "unit": {
-            "description": "Measurement unit for the item.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingUnit"
-              }
-            ]
-          }
-        },
-        "required": [
-          "active",
-          "code",
-          "display_name",
-          "id",
-          "is_commitment_eligible",
-          "kind",
-          "rate_tiers",
-          "unit"
-        ]
-      },
-      "BillingContractStatus": {
-        "description": "Lifecycle state for a billing contract.",
-        "oneOf": [
-          {
-            "description": "Contract terms are still being assembled and should not drive billing yet.",
-            "type": "string",
-            "enum": [
-              "draft"
-            ]
-          },
-          {
-            "description": "Contract is committed for a future start date and should not drive billing yet.",
-            "type": "string",
-            "enum": [
-              "scheduled"
-            ]
-          },
-          {
-            "description": "Contract is in force and may be used for rating and funding decisions.",
-            "type": "string",
-            "enum": [
-              "active"
-            ]
-          },
-          {
-            "description": "Contract finished its intended term and is no longer accruing new periods.",
-            "type": "string",
-            "enum": [
-              "closed"
-            ]
-          },
-          {
-            "description": "Contract was intentionally terminated before completing its intended term.",
-            "type": "string",
-            "enum": [
-              "canceled"
-            ]
-          }
-        ]
-      },
-      "BillingContractUpsert": {
-        "description": "Complete contract payload used to create or replace an org's contract.",
-        "type": "object",
-        "properties": {
-          "billing_cadence": {
-            "description": "Operational cadence used for finance workflows.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingCadence"
-              }
-            ]
-          },
-          "commitment_scope": {
-            "description": "Whether commitment is shared or item-scoped.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingCommitmentScope"
-              }
-            ]
-          },
-          "currency": {
-            "description": "Contract currency shared by every money field in this definition.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "discount_description": {
-            "nullable": true,
-            "description": "Free-form finance note for discounts or negotiated pricing.",
-            "type": "string"
-          },
-          "effective_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the contract starts to apply.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "external_customer_id": {
-            "nullable": true,
-            "description": "Provider-owned customer reference, when one already exists.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingExternalCustomerId"
-              }
-            ]
-          },
-          "items": {
-            "description": "Billable items attached to the contract.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingContractItemInput"
-            }
-          },
-          "name": {
-            "description": "Human-readable contract label.",
-            "type": "string"
-          },
-          "notes": {
-            "nullable": true,
-            "description": "Internal notes about the contract.",
-            "type": "string"
-          },
-          "periods": {
-            "description": "Period schedule for the contract term.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingPeriodInput"
-            }
-          },
-          "provider": {
-            "description": "Downstream provider responsible for collecting the invoice.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingProvider"
-              }
-            ]
-          },
-          "rollover_policy": {
-            "description": "What should happen to unused commitment when a period ends.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingRolloverPolicy"
-              }
-            ]
-          },
-          "status": {
-            "description": "Lifecycle state for the new contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingContractStatus"
-              }
-            ]
-          },
-          "term_end_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the contract term ends.",
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "billing_cadence",
-          "commitment_scope",
-          "currency",
-          "effective_at",
-          "items",
-          "name",
-          "periods",
-          "provider",
-          "rollover_policy",
-          "status",
-          "term_end_at"
-        ]
-      },
-      "BillingContractView": {
-        "description": "Serialized contract snapshot returned from the database.",
-        "type": "object",
-        "properties": {
-          "account_id": {
-            "description": "Billing account identifier that owns the contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "billing_cadence": {
-            "description": "Operational cadence for finance workflows.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingCadence"
-              }
-            ]
-          },
-          "commitment_scope": {
-            "description": "Whether commitment is shared or item-scoped.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingCommitmentScope"
-              }
-            ]
-          },
-          "contract_id": {
-            "description": "Billing contract identifier.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "currency": {
-            "description": "Currency shared by every money field in the contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Currency"
-              }
-            ]
-          },
-          "discount_description": {
-            "nullable": true,
-            "description": "Discount note associated with the contract.",
-            "type": "string"
-          },
-          "effective_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the contract started applying.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "external_customer_id": {
-            "nullable": true,
-            "description": "Provider-owned customer reference, when one exists.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingExternalCustomerId"
-              }
-            ]
-          },
-          "items": {
-            "description": "Billable items attached to the contract.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingContractItemView"
-            }
-          },
-          "name": {
-            "description": "Human-readable contract label.",
-            "type": "string"
-          },
-          "notes": {
-            "nullable": true,
-            "description": "Internal notes for the contract.",
-            "type": "string"
-          },
-          "periods": {
-            "description": "Period schedule for the contract.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BillingPeriodView"
-            }
-          },
-          "provider": {
-            "description": "Downstream invoice provider.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingProvider"
-              }
-            ]
-          },
-          "rollover_policy": {
-            "description": "What happens to unused commitment when a period ends.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingRolloverPolicy"
-              }
-            ]
-          },
-          "status": {
-            "description": "Lifecycle state for the contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingContractStatus"
-              }
-            ]
-          },
-          "term_end_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the contract term ends.",
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "account_id",
-          "billing_cadence",
-          "commitment_scope",
-          "contract_id",
-          "currency",
-          "effective_at",
-          "items",
-          "name",
-          "periods",
-          "provider",
-          "rollover_policy",
-          "status",
-          "term_end_at"
-        ]
-      },
-      "BillingExternalCustomerId": {
-        "description": "Provider-owned customer reference for downstream invoicing systems.",
-        "type": "string"
-      },
       "BillingInfo": {
         "description": "The billing information for payments.",
         "type": "object",
@@ -35868,404 +32634,6 @@
             "format": "phone"
           }
         }
-      },
-      "BillingItemCode": {
-        "description": "Canonical product or service code for a contract item.",
-        "oneOf": [
-          {
-            "description": "Fixed or recurring enterprise support entitlement.",
-            "type": "string",
-            "enum": [
-              "enterprise_support"
-            ]
-          },
-          {
-            "description": "Full deployment environment or similar managed environment charge.",
-            "type": "string",
-            "enum": [
-              "fde"
-            ]
-          },
-          {
-            "description": "GovCloud-specific management or hosting charge.",
-            "type": "string",
-            "enum": [
-              "govcloud_management"
-            ]
-          },
-          {
-            "description": "Billing for the first successful conversion of a file version.",
-            "type": "string",
-            "enum": [
-              "file_ingestion_conversion"
-            ]
-          },
-          {
-            "description": "Contract-rated API usage credits.",
-            "type": "string",
-            "enum": [
-              "licensed_api_credits"
-            ]
-          }
-        ]
-      },
-      "BillingItemKind": {
-        "description": "Pricing model used by a contract item.",
-        "oneOf": [
-          {
-            "description": "A flat amount that does not vary with measured usage.",
-            "type": "string",
-            "enum": [
-              "fixed_fee"
-            ]
-          },
-          {
-            "description": "Usage is rated by one or more explicit pricing tiers.",
-            "type": "string",
-            "enum": [
-              "usage_tiered"
-            ]
-          },
-          {
-            "description": "Usage burns down a commitment bucket before any overage path.",
-            "type": "string",
-            "enum": [
-              "usage_commitment_bucket"
-            ]
-          }
-        ]
-      },
-      "BillingPeriodIndex": {
-        "description": "Non-negative index of a billing period inside a contract.",
-        "type": "integer",
-        "format": "int32"
-      },
-      "BillingPeriodInput": {
-        "description": "Serialized billing period payload for a contract definition.",
-        "type": "object",
-        "properties": {
-          "commitment_amount": {
-            "title": "double",
-            "description": "New commitment funded for this period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "period_end_at": {
-            "title": "DateTime",
-            "description": "Exclusive period end timestamp.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "period_index": {
-            "description": "Sequence index for the period inside the contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingPeriodIndex"
-              }
-            ]
-          },
-          "period_start_at": {
-            "title": "DateTime",
-            "description": "Inclusive period start timestamp.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "rollover_in_amount": {
-            "nullable": true,
-            "title": "double",
-            "description": "Commitment carried in from an earlier period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "rollover_out_amount": {
-            "nullable": true,
-            "title": "double",
-            "description": "Commitment intentionally rolled out to a later period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "status": {
-            "nullable": true,
-            "description": "Operational status for the period.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingPeriodStatus"
-              }
-            ]
-          }
-        },
-        "required": [
-          "commitment_amount",
-          "period_end_at",
-          "period_index",
-          "period_start_at"
-        ]
-      },
-      "BillingPeriodStatus": {
-        "description": "Operational status for a contract billing period.",
-        "oneOf": [
-          {
-            "description": "Period is active and may still accrue usage or adjustments.",
-            "type": "string",
-            "enum": [
-              "open"
-            ]
-          },
-          {
-            "description": "Period is finalized and should be treated as read-only for billing purposes.",
-            "type": "string",
-            "enum": [
-              "closed"
-            ]
-          }
-        ]
-      },
-      "BillingPeriodView": {
-        "description": "Serialized billing period returned from a stored contract.",
-        "type": "object",
-        "properties": {
-          "commitment_amount": {
-            "title": "double",
-            "description": "New commitment funded for this period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "id": {
-            "description": "Database identifier for the period row.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "period_end_at": {
-            "title": "DateTime",
-            "description": "Exclusive period end timestamp.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "period_index": {
-            "description": "Sequence index for the period inside the contract.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingPeriodIndex"
-              }
-            ]
-          },
-          "period_start_at": {
-            "title": "DateTime",
-            "description": "Inclusive period start timestamp.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "rollover_in_amount": {
-            "title": "double",
-            "description": "Commitment carried in from a previous period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "rollover_out_amount": {
-            "title": "double",
-            "description": "Commitment intentionally rolled out to a later period.",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "status": {
-            "description": "Operational status for the period.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingPeriodStatus"
-              }
-            ]
-          }
-        },
-        "required": [
-          "commitment_amount",
-          "id",
-          "period_end_at",
-          "period_index",
-          "period_start_at",
-          "rollover_in_amount",
-          "rollover_out_amount",
-          "status"
-        ]
-      },
-      "BillingProvider": {
-        "description": "Billing provider that owns downstream invoice or statement delivery.",
-        "oneOf": [
-          {
-            "description": "Charges are ultimately collected through Stripe.",
-            "type": "string",
-            "enum": [
-              "stripe"
-            ]
-          },
-          {
-            "description": "Charges are collected outside Stripe, usually by finance or contract workflow.",
-            "type": "string",
-            "enum": [
-              "manual_invoice"
-            ]
-          }
-        ]
-      },
-      "BillingQuantity": {
-        "description": "Non-negative quantity used for tier boundaries and later usage counts.",
-        "type": "integer",
-        "format": "int64"
-      },
-      "BillingRateTierInput": {
-        "description": "Serialized rate tier payload for a usage-rated contract item.",
-        "type": "object",
-        "properties": {
-          "tier_end_exclusive": {
-            "nullable": true,
-            "description": "Exclusive upper bound for the tier, or `None` when the tier is open-ended.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingQuantity"
-              }
-            ]
-          },
-          "tier_start_inclusive": {
-            "description": "First billable quantity in this tier.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingQuantity"
-              }
-            ]
-          },
-          "unit_price": {
-            "title": "double",
-            "description": "Price to charge for each unit that lands in this tier.",
-            "type": "number",
-            "format": "money-usd"
-          }
-        },
-        "required": [
-          "tier_start_inclusive",
-          "unit_price"
-        ]
-      },
-      "BillingRateTierView": {
-        "description": "Serialized rate tier returned from a stored contract.",
-        "type": "object",
-        "properties": {
-          "id": {
-            "description": "Database identifier for the tier row.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "tier_end_exclusive": {
-            "nullable": true,
-            "description": "Exclusive upper bound for the tier, or `None` when the tier is open-ended.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingQuantity"
-              }
-            ]
-          },
-          "tier_start_inclusive": {
-            "description": "First billable quantity in this tier.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BillingQuantity"
-              }
-            ]
-          },
-          "unit_price": {
-            "title": "double",
-            "description": "Price charged for each unit in the tier.",
-            "type": "number",
-            "format": "money-usd"
-          }
-        },
-        "required": [
-          "id",
-          "tier_start_inclusive",
-          "unit_price"
-        ]
-      },
-      "BillingRolloverPolicy": {
-        "description": "What happens to unused commitment when a contract period closes.",
-        "oneOf": [
-          {
-            "description": "Unused commitment expires at the end of the period.",
-            "type": "string",
-            "enum": [
-              "none"
-            ]
-          },
-          {
-            "description": "Unused year-one commitment may roll once into year two, but not beyond.",
-            "type": "string",
-            "enum": [
-              "year1_to_year2_once"
-            ]
-          }
-        ]
-      },
-      "BillingUnit": {
-        "description": "Base unit that measured usage or pricing is expressed in.",
-        "oneOf": [
-          {
-            "description": "Quantity is counted in files.",
-            "type": "string",
-            "enum": [
-              "file"
-            ]
-          },
-          {
-            "description": "Quantity is counted in whole or rounded minutes.",
-            "type": "string",
-            "enum": [
-              "minute"
-            ]
-          },
-          {
-            "description": "Quantity is counted in seconds.",
-            "type": "string",
-            "enum": [
-              "second"
-            ]
-          },
-          {
-            "description": "Quantity is counted in years.",
-            "type": "string",
-            "enum": [
-              "year"
-            ]
-          },
-          {
-            "description": "Quantity is counted once per billing period.",
-            "type": "string",
-            "enum": [
-              "period"
-            ]
-          }
-        ]
-      },
-      "BillingUnitGranularity": {
-        "description": "Optional finer-grained measurement rule for a billed unit.",
-        "oneOf": [
-          {
-            "description": "Usage should be normalized or rounded at the minute level.",
-            "type": "string",
-            "enum": [
-              "minute"
-            ]
-          },
-          {
-            "description": "Usage should be normalized or rounded at the second level.",
-            "type": "string",
-            "enum": [
-              "second"
-            ]
-          }
-        ]
       },
       "BlendType": {
         "description": "What kind of blend to do",
@@ -37165,7 +33533,7 @@
           },
           "rtc_stun_rtt_sec": {
             "nullable": true,
-            "description": "Total duration of pauses in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime",
+            "description": "Estimated round trip time, measured in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime",
             "type": "number",
             "format": "float"
           },
@@ -38649,32 +35017,6 @@
           "coupon"
         ]
       },
-      "DiscountCode": {
-        "description": "A discount code for a store.",
-        "type": "object",
-        "properties": {
-          "code": {
-            "description": "The code for the discount.",
-            "type": "string"
-          },
-          "expires_at": {
-            "nullable": true,
-            "description": "The date the discount code expires.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "percent_off": {
-            "description": "The percent off for the discount.",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "code",
-          "percent_off"
-        ]
-      },
       "DistanceType": {
         "description": "The type of distance Distances can vary depending on the objects used as input.",
         "oneOf": [
@@ -39670,7 +36012,7 @@
             ]
           },
           {
-            "description": "Client sent a Websocket message intended for WebRTC but it was configured as a WebRTC connection.",
+            "description": "Client sent a Websocket message intended for WebRTC, but did not configure the server to establish WebRTC.",
             "type": "string",
             "enum": [
               "message_type_not_accepted_for_web_r_t_c"
@@ -40452,7 +36794,7 @@
             ]
           },
           {
-            "description": "Route non-WebRTC modeling sessions to the CPU-only engine pool.",
+            "description": "Allows explicitly selecting the CPU-only engine pool for non-WebRTC modeling sessions.",
             "type": "string",
             "enum": [
               "cpu_engine_pool"
@@ -40477,6 +36819,13 @@
             "type": "string",
             "enum": [
               "engine_manager_quarantine"
+            ]
+          },
+          {
+            "description": "Grants access to the internal execution jobs API.",
+            "type": "string",
+            "enum": [
+              "execution_jobs"
             ]
           },
           {
@@ -40638,6 +36987,13 @@
             "type": "string",
             "enum": [
               "zookeeper_ultra_mode"
+            ]
+          },
+          {
+            "description": "Enables experimental execution of client-advertised commands from Zookeeper.",
+            "type": "string",
+            "enum": [
+              "zookeeper_client_commands"
             ]
           },
           {
@@ -41733,7 +38089,7 @@
         ]
       },
       "ImportFile": {
-        "description": "File to import into the current model. If you are sending binary data for a file, be sure to send the WebSocketRequest as binary/bson, not text/json.",
+        "description": "File to import into the current scene.",
         "type": "object",
         "properties": {
           "data": {
@@ -42918,6 +39274,32 @@
           }
         ]
       },
+      "KclVersion": {
+        "description": "Which KCL versions does Zoo support?",
+        "oneOf": [
+          {
+            "description": "Original KCL released in 2025",
+            "type": "string",
+            "enum": [
+              "1.0"
+            ]
+          },
+          {
+            "description": "KCL v2 is the same as KCL v1, except that it supports the `region` function.",
+            "type": "string",
+            "enum": [
+              "2.0"
+            ]
+          },
+          {
+            "description": "KCL v3 is currently in development.",
+            "type": "string",
+            "enum": [
+              "3.0-preview"
+            ]
+          }
+        ]
+      },
       "LengthUnit": {
         "type": "number",
         "format": "double"
@@ -43292,6 +39674,73 @@
           }
         ]
       },
+      "MlCopilotClientCommand": {
+        "description": "One client-owned command that Zookeeper may discover and request over the current copilot WebSocket connection.\n\nCommand definitions are connection-scoped capabilities, not durable user data. Clients replace the complete catalog whenever its revision changes.",
+        "type": "object",
+        "properties": {
+          "description": {
+            "description": "Description used when Zookeeper searches the client catalog.",
+            "type": "string"
+          },
+          "id": {
+            "description": "Stable identifier used to invoke the command, for example `modeling.export`.",
+            "type": "string"
+          },
+          "input_schema": {
+            "description": "JSON Schema describing the command arguments."
+          },
+          "title": {
+            "description": "Short human-readable command name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "description",
+          "id",
+          "input_schema",
+          "title"
+        ]
+      },
+      "MlCopilotClientCommandStatus": {
+        "description": "Lifecycle state reported by a client for a requested command.",
+        "oneOf": [
+          {
+            "description": "The client accepted the request and execution is still in progress.",
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          {
+            "description": "The command completed successfully.",
+            "type": "string",
+            "enum": [
+              "succeeded"
+            ]
+          },
+          {
+            "description": "The client or user declined the request before execution completed.",
+            "type": "string",
+            "enum": [
+              "rejected"
+            ]
+          },
+          {
+            "description": "The command failed during execution.",
+            "type": "string",
+            "enum": [
+              "failed"
+            ]
+          },
+          {
+            "description": "Execution was cancelled after it started.",
+            "type": "string",
+            "enum": [
+              "cancelled"
+            ]
+          }
+        ]
+      },
       "MlCopilotClientMessage": {
         "description": "The types of messages that can be sent by the client to the server.",
         "oneOf": [
@@ -43633,6 +40082,88 @@
               }
             },
             "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Replace the commands advertised by this client connection.\n\nAPI and Zookeeper do not persist or replay this catalog. A client must advertise it again after every reconnect.",
+            "type": "object",
+            "properties": {
+              "commands": {
+                "description": "Complete set of commands available at this revision.",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/MlCopilotClientCommand"
+                }
+              },
+              "protocol_version": {
+                "description": "Version of the client-command wire protocol understood by the client.",
+                "type": "integer",
+                "format": "uint16",
+                "minimum": 0
+              },
+              "revision": {
+                "description": "Monotonically increasing catalog revision for this connection.",
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "update_client_command_schema"
+                ]
+              }
+            },
+            "required": [
+              "commands",
+              "protocol_version",
+              "revision",
+              "type"
+            ]
+          },
+          {
+            "description": "Report progress or a terminal result for a requested client command.",
+            "type": "object",
+            "properties": {
+              "catalog_revision": {
+                "description": "Catalog revision against which the request was validated.",
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0
+              },
+              "error": {
+                "nullable": true,
+                "description": "Optional error or rejection detail.",
+                "type": "string"
+              },
+              "request_id": {
+                "description": "Correlation identifier supplied in `ClientCommandRequest`.",
+                "type": "string"
+              },
+              "result": {
+                "nullable": true,
+                "description": "Optional JSON-compatible result from a successful command."
+              },
+              "status": {
+                "description": "Current execution state.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotClientCommandStatus"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "client_command_response"
+                ]
+              }
+            },
+            "required": [
+              "catalog_revision",
+              "request_id",
+              "status",
               "type"
             ]
           }
@@ -44182,6 +40713,44 @@
             },
             "required": [
               "project_snapshot_result"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Ask the connected client to execute one of its advertised commands.\n\nThis request is transient and is never persisted or replayed by API.",
+            "type": "object",
+            "properties": {
+              "client_command_request": {
+                "type": "object",
+                "properties": {
+                  "arguments": {
+                    "description": "Arguments validated by the client against its advertised schema."
+                  },
+                  "catalog_revision": {
+                    "description": "Catalog revision used when Zookeeper selected the command.",
+                    "type": "integer",
+                    "format": "uint64",
+                    "minimum": 0
+                  },
+                  "command_id": {
+                    "description": "Identifier from the advertised client command catalog.",
+                    "type": "string"
+                  },
+                  "request_id": {
+                    "description": "Unique request identifier used to correlate client responses.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "arguments",
+                  "catalog_revision",
+                  "command_id",
+                  "request_id"
+                ]
+              }
+            },
+            "required": [
+              "client_command_request"
             ],
             "additionalProperties": false
           },
@@ -45197,7 +41766,7 @@
                 ]
               },
               "distance": {
-                "description": "How far off the plane to extrude",
+                "description": "How far off the plane to extrude This distance is relative to the target's plane, not an absolute coordinate. Symmetric extrusions will extrude outwards from both sides of the sketch to the length specified.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/LengthUnit"
@@ -46258,7 +42827,7 @@
             "type": "object",
             "properties": {
               "magnitude": {
-                "description": "Move the camera forward along the vector it's looking at, by this magnitudedefaultCameraZoom. Basically, how much should the camera move forward by.",
+                "description": "Move the camera forward along the vector it's looking at, by this magnitude. Basically, how much should the camera move forward by.",
                 "type": "number",
                 "format": "float"
               },
@@ -46308,7 +42877,7 @@
             ]
           },
           {
-            "description": "Export the scene to a file.",
+            "description": "Export the scene to a file.\n\nThe response is a MsgPack-encoded message in a WebSocket binary frame.",
             "type": "object",
             "properties": {
               "entity_ids": {
@@ -46341,7 +42910,7 @@
             ]
           },
           {
-            "description": "Export the scene to a file.",
+            "description": "Export the scene to a file.\n\nThe response is a MsgPack-encoded message in a WebSocket binary frame.",
             "type": "object",
             "properties": {
               "entity_ids": {
@@ -47734,7 +44303,7 @@
             "type": "object",
             "properties": {
               "edge_id": {
-                "description": "Which edge you want the opposite of.",
+                "description": "Which edge you want the next edge of.",
                 "type": "string",
                 "format": "uuid"
               },
@@ -47767,7 +44336,7 @@
             "type": "object",
             "properties": {
               "edge_id": {
-                "description": "Which edge you want the opposite of.",
+                "description": "Which edge you want the previous edge of.",
                 "type": "string",
                 "format": "uuid"
               },
@@ -48623,6 +45192,15 @@
                   }
                 ]
               },
+              "edge_3d_color": {
+                "nullable": true,
+                "description": "The default color to use for the edges of 3D bodies.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Color"
+                  }
+                ]
+              },
               "highlight_color": {
                 "nullable": true,
                 "description": "The default color to use for highlight",
@@ -49138,7 +45716,7 @@
             ]
           },
           {
-            "description": "Import files to the current model.",
+            "description": "Import CAD files to the current scene.\n\nSend a request containing binary file data as a MsgPack-encoded message in a WebSocket binary frame.\n\nNote: These imports are non-editable. In the future we may expose a proprietary-to-KCL function to resolve this. The main intention today is to use imports as design references.",
             "type": "object",
             "properties": {
               "files": {
@@ -49821,7 +46399,7 @@
             ]
           },
           {
-            "description": "Create a new solid from combining other smaller solids. In other words, every part of the input solids will be included in the output solid.",
+            "description": "Given a set of overlapping solids, create a new single solid.\n\nMost successful unions come from solids who's faces do not overlap aka non-coplanar.\n\nFailure cases: * A common failure is unsupported coincident faces try to be unioned.\n\nWarning cases: * When an element of the set doesn't overlap.\n\nNotable behaviors: * What appear to be coincident points will succeed and not give a \"no overlap\" warning, even if they're not. * Elements' top or bottom faces may not combine into one new face, which can seem like the union failed. You can tell they succeeded from side faces not extending into the original solids. * When exporting to STEP, if the above behavior is observed, will merged the faces.",
             "type": "object",
             "properties": {
               "separate_bodies": {
@@ -49905,7 +46483,7 @@
             ]
           },
           {
-            "description": "Create a new solid from subtracting several other solids. The 'target' is what will be cut from. The 'tool' is what will be cut out from 'target'.",
+            "description": "Given a target solid, subtract a set of \"tool solids\" to create a new solid.\n\nMost successful subtracts come from solids who's faces do not overlap aka non-coplanar.\n\nPrefer one `tool` over multiple when calling this feature.\n\nFailure cases: * A common failure is unsupported coplanar faces try to be unioned.\n\nWarning cases:\n\nNotable behaviors: If two tools occupy the same vertical range and overlap, like two cubes of the same height, the subtract of the first will cause the second tool to fail because the first leaves behind coplanar faces, causing an aforementioned failure case.\n\nUnlike `boolean_union`, if one tool in the set overlaps, any OTHER tool in the set that doesn't WILL NOT signal a non-overlap warning.",
             "type": "object",
             "properties": {
               "separate_bodies": {
@@ -54418,6 +50996,25 @@
               "data",
               "type"
             ]
+          },
+          {
+            "description": "Request that the client end this connection and establish a new session using normal authentication and authorization. This does not guarantee that a new session will be accepted.",
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "object"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "reconnect"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
           }
         ]
       },
@@ -56736,43 +53333,6 @@
           "noeffect"
         ]
       },
-      "PriceUpsertRequest": {
-        "description": "Create or update a price row for a subscription plan.",
-        "type": "object",
-        "properties": {
-          "active": {
-            "description": "Whether the price should be active.",
-            "default": true,
-            "type": "boolean"
-          },
-          "billing_model": {
-            "description": "Billing model (flat or per-user).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SubscriptionPlanBillingModel"
-              }
-            ]
-          },
-          "cadence": {
-            "description": "Cadence for billing (day, week, month, year).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PlanInterval"
-              }
-            ]
-          },
-          "unit_amount": {
-            "description": "Amount in USD.",
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "required": [
-          "billing_model",
-          "cadence",
-          "unit_amount"
-        ]
-      },
       "PrimitiveTopologyFallback": {
         "description": "Optional fallback when primary UUIDs are missing from the client artifact graph (e.g. stale or engine-only ids). Identifies the same topology via a **parent** entity UUID and a **primitive index** on that parent.\n\nSemantics by selection kind (aligned with engine BREP topology):\n\n- **Face / Edge (3D)**: `parent_id` is the owning [`EntityType::Solid3D`] body UUID; `primitive_index` matches the index returned by **EntityGetPrimitiveIndex** for that face or edge (and matches **EntityGetParentId** → parent + **EntityGetPrimitiveIndex** → index). - **Vertex (3D)**: same `parent_id` (solid); `primitive_index` is the BREP vertex index on that solid. - **Solid2dEdge**: `parent_id` is the **Solid2D** profile UUID; `primitive_index` is the curve index within that profile. - **Segment**: `parent_id` is the **Path** UUID; `primitive_index` is the curve index within that path.\n\nOther [`EntityReference`] variants may omit this field or leave it unset when not applicable.",
         "type": "object",
@@ -57484,7 +54044,7 @@
         }
       },
       "RawFile": {
-        "description": "A raw file with unencoded contents to be passed over binary websockets. When raw files come back for exports it is sent as binary/bson, not text/json.",
+        "description": "A raw file with unencoded contents.\n\nSee the command that emits this type for its response encoding.",
         "type": "object",
         "properties": {
           "contents": {
@@ -59214,21 +55774,6 @@
           }
         ]
       },
-      "StoreCouponParams": {
-        "description": "The parameters for a new store coupon.",
-        "type": "object",
-        "properties": {
-          "percent_off": {
-            "description": "The percentage off.",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0
-          }
-        },
-        "required": [
-          "percent_off"
-        ]
-      },
       "SubscriptionActionType": {
         "description": "Indicates which kind of Stripe intent requires customer action during subscription creation.",
         "oneOf": [
@@ -59265,99 +55810,6 @@
               "contract"
             ]
           }
-        ]
-      },
-      "SubscriptionPlanBillingModel": {
-        "description": "Billing model for a modeling-app plan price.",
-        "oneOf": [
-          {
-            "description": "A flat amount charged every interval.",
-            "type": "string",
-            "enum": [
-              "flat"
-            ]
-          },
-          {
-            "description": "A per-seat amount charged every interval.",
-            "type": "string",
-            "enum": [
-              "per_user"
-            ]
-          }
-        ]
-      },
-      "SubscriptionPlanPriceRecord": {
-        "description": "Diesel model representing a row in `subscription_plan_prices`.",
-        "type": "object",
-        "properties": {
-          "active": {
-            "description": "Whether this price is currently active.",
-            "type": "boolean"
-          },
-          "billing_model": {
-            "description": "Billing model persisted in the database (`flat`, `per_user`, or `enterprise`).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SubscriptionPlanBillingModel"
-              }
-            ]
-          },
-          "cadence": {
-            "description": "Billing cadence string (for example `month` or `year`).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PlanInterval"
-              }
-            ]
-          },
-          "created_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the price row was created.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "description": "Unique identifier for the plan price entry.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "stripe_price_id": {
-            "nullable": true,
-            "description": "Stripe price identifier, when synchronized.",
-            "type": "string"
-          },
-          "subscription_plan_id": {
-            "description": "Foreign key referencing the parent plan.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "unit_amount": {
-            "nullable": true,
-            "description": "Optional monetary amount associated with the price row.",
-            "type": "string",
-            "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
-          },
-          "updated_at": {
-            "title": "DateTime",
-            "description": "Timestamp when the price row was last updated.",
-            "type": "string",
-            "format": "date-time"
-          }
-        },
-        "required": [
-          "active",
-          "billing_model",
-          "cadence",
-          "created_at",
-          "id",
-          "subscription_plan_id",
-          "updated_at"
         ]
       },
       "SubscriptionTierFeature": {
@@ -60589,7 +57041,7 @@
             ]
           },
           {
-            "description": "Square yards <https://en.wikipedia.org/wiki/Square_mile>",
+            "description": "Square yards <https://en.wikipedia.org/wiki/Square_yard>",
             "type": "string",
             "enum": [
               "yd2"
@@ -62424,26 +58876,6 @@
           }
         }
       },
-      "UpdatePaymentBalance": {
-        "description": "Payload for updating a user's balance.",
-        "type": "object",
-        "properties": {
-          "monthly_api_credits_remaining_monetary_value": {
-            "nullable": true,
-            "title": "double",
-            "description": "The monetary value of the monthy API credits remaining in the balance. This gets re-upped every month,",
-            "type": "number",
-            "format": "money-usd"
-          },
-          "stable_api_credits_remaining_monetary_value": {
-            "nullable": true,
-            "title": "double",
-            "description": "The monetary value of stable API credits remaining in the balance. These do not get reset or re-upped every month. This is separate from the monthly credits. Credits will first pull from the monthly credits, then the stable credits. Stable just means that they do not get reset every month. A user will have stable credits if a Zoo employee granted them credits.",
-            "type": "number",
-            "format": "money-usd"
-          }
-        }
-      },
       "UpdateShortlinkRequest": {
         "description": "Request to update a shortlink.",
         "type": "object",
@@ -62539,195 +58971,6 @@
           "queued_conversions",
           "uploaded_files"
         ]
-      },
-      "UserAdminDetails": {
-        "description": "Extra admin-only details for a user.",
-        "type": "object",
-        "properties": {
-          "active_api_tokens_count": {
-            "description": "Count of valid API tokens.",
-            "type": "integer",
-            "format": "int64"
-          },
-          "active_device_tokens_count": {
-            "description": "Count of active (non-expired) device access tokens.",
-            "type": "integer",
-            "format": "int64"
-          },
-          "active_sessions_count": {
-            "description": "Count of active (non-expired) sessions.",
-            "type": "integer",
-            "format": "int64"
-          },
-          "address": {
-            "nullable": true,
-            "description": "Latest billing address stored for the user.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Address"
-              }
-            ]
-          },
-          "address_summary": {
-            "nullable": true,
-            "description": "Readable billing address summary.",
-            "type": "string"
-          },
-          "block": {
-            "nullable": true,
-            "description": "Block reason when the user is blocked.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/BlockReason"
-              }
-            ]
-          },
-          "block_message": {
-            "nullable": true,
-            "description": "Human-friendly block reason message.",
-            "type": "string"
-          },
-          "cad_user_info": {
-            "nullable": true,
-            "description": "CAD user info collected from website onboarding/CRM form.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/UserCadInfoAdminDetails"
-              }
-            ]
-          },
-          "never_block": {
-            "description": "Whether this user is permanently exempt from blocking.",
-            "type": "boolean"
-          },
-          "payment_methods": {
-            "description": "Known payment methods on file.",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaymentMethod"
-            }
-          },
-          "payment_methods_summary": {
-            "description": "Summaries of the known payment methods.",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "stripe_customer_id": {
-            "nullable": true,
-            "description": "Stripe customer identifier if one exists.",
-            "type": "string"
-          },
-          "stripe_dashboard_url": {
-            "nullable": true,
-            "description": "Direct link to the Stripe customer dashboard.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "active_api_tokens_count",
-          "active_device_tokens_count",
-          "active_sessions_count",
-          "never_block",
-          "payment_methods",
-          "payment_methods_summary"
-        ]
-      },
-      "UserCadInfoAdminDetails": {
-        "description": "CAD user info details for admin surfaces.",
-        "type": "object",
-        "properties": {
-          "cad_experience_level": {
-            "nullable": true,
-            "description": "CAD/API experience level.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CadExperienceLevel"
-              }
-            ]
-          },
-          "cad_industry": {
-            "nullable": true,
-            "description": "CAD industry selection.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CadIndustry"
-              }
-            ]
-          },
-          "cad_user_type": {
-            "nullable": true,
-            "description": "CAD user persona/type.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CadUserType"
-              }
-            ]
-          },
-          "company_size": {
-            "nullable": true,
-            "description": "Company size selection.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CompanySize"
-              }
-            ]
-          },
-          "design_workflow": {
-            "nullable": true,
-            "description": "Preferred design workflow.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CadDesignWorkflow"
-              }
-            ]
-          },
-          "has_used_zoo_design_studio_or_api_before": {
-            "nullable": true,
-            "description": "Whether the user has used Zoo Design Studio or the API before.",
-            "type": "boolean"
-          },
-          "how_did_you_find_us": {
-            "nullable": true,
-            "description": "Acquisition source selection.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CadDiscoverySource"
-              }
-            ]
-          },
-          "how_did_you_find_us_other": {
-            "nullable": true,
-            "description": "Free-text acquisition source when `other` was selected.",
-            "type": "string"
-          },
-          "location_city": {
-            "nullable": true,
-            "description": "Free-text city for the user's location.",
-            "type": "string"
-          },
-          "location_country": {
-            "nullable": true,
-            "description": "Free-text country for the user's location.",
-            "type": "string"
-          },
-          "location_state": {
-            "nullable": true,
-            "description": "Free-text state or region for the user's location.",
-            "type": "string"
-          },
-          "number_of_cad_users": {
-            "nullable": true,
-            "description": "Number of CAD users.",
-            "type": "string"
-          },
-          "what_are_you_building": {
-            "nullable": true,
-            "description": "Free-text description of what the user wants to build.",
-            "type": "string"
-          }
-        }
       },
       "UserFeatureEntry": {
         "description": "Enabled features surfaced to end users.",
