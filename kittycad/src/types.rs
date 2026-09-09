@@ -629,102 +629,6 @@ impl tabled::Tabled for AddOrgMember {
     }
 }
 
-#[doc = "An address for a user."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct Address {
-    #[doc = "The city component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-    #[doc = "The country component. This is a two-letter ISO country code."]
-    pub country: String,
-    #[doc = "The time and date the address was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The unique identifier of the address."]
-    pub id: uuid::Uuid,
-    #[doc = "The state component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub state: Option<String>,
-    #[doc = "The first street component."]
-    #[serde(rename = "street1", default, skip_serializing_if = "Option::is_none")]
-    pub street_1: Option<String>,
-    #[doc = "The second street component."]
-    #[serde(rename = "street2", default, skip_serializing_if = "Option::is_none")]
-    pub street_2: Option<String>,
-    #[doc = "The time and date the address was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "The user ID that this address belongs to."]
-    pub user_id: uuid::Uuid,
-    #[doc = "The zip component."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-impl std::fmt::Display for Address {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for Address {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(city) = &self.city {
-                format!("{:?}", city).into()
-            } else {
-                String::new().into()
-            },
-            self.country.clone().into(),
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.id).into(),
-            if let Some(state) = &self.state {
-                format!("{:?}", state).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(street_1) = &self.street_1 {
-                format!("{:?}", street_1).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(street_2) = &self.street_2 {
-                format!("{:?}", street_2).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.updated_at).into(),
-            format!("{:?}", self.user_id).into(),
-            if let Some(zip) = &self.zip {
-                format!("{:?}", zip).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "city".into(),
-            "country".into(),
-            "created_at".into(),
-            "id".into(),
-            "state".into(),
-            "street_1".into(),
-            "street_2".into(),
-            "updated_at".into(),
-            "user_id".into(),
-            "zip".into(),
-        ]
-    }
-}
-
 #[doc = "Address details."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -1486,7 +1390,7 @@ impl tabled::Tabled for AnnotationLineEndOptions {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct AnnotationMbdBasicDimension {
-    #[doc = "The explicitly defined dimension.  Only required if the measurement is not \
+    #[doc = "The explicitly defined dimension. Only required if the measurement is not \
              automatically calculated."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dimension: Option<f64>,
@@ -1494,7 +1398,8 @@ pub struct AnnotationMbdBasicDimension {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub symbol: Option<MbdSymbol>,
     #[doc = "The tolerance of the dimension"]
-    pub tolerance: f64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tolerance: Option<f64>,
 }
 
 impl std::fmt::Display for AnnotationMbdBasicDimension {
@@ -1522,7 +1427,11 @@ impl tabled::Tabled for AnnotationMbdBasicDimension {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.tolerance).into(),
+            if let Some(tolerance) = &self.tolerance {
+                format!("{:?}", tolerance).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -1554,8 +1463,8 @@ pub struct AnnotationMbdControlFrame {
     #[doc = "Tertiary datum"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tertiary_datum: Option<String>,
-    #[doc = "Tolerance value - the total tolerance of the geometric control.  The unit is based \
-             on the drawing standard."]
+    #[doc = "Tolerance value - the total tolerance of the geometric control. The unit is based on \
+             the drawing standard."]
     pub tolerance: f64,
 }
 
@@ -1640,6 +1549,11 @@ pub struct AnnotationOptions {
     #[doc = "Width of the annotation's line"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub line_width: Option<f64>,
+    #[doc = "Human-friendly identifier for this annotation. Included in some exports and metadata \
+             of the model. This is _not_ displayed visually in, the annotation, it's only \
+             metadata."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
     #[doc = "Position to put the annotation"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub position: Option<Point3D>,
@@ -1664,7 +1578,7 @@ impl std::fmt::Display for AnnotationOptions {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationOptions {
-    const LENGTH: usize = 9;
+    const LENGTH: usize = 10;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(color) = &self.color {
@@ -1697,6 +1611,11 @@ impl tabled::Tabled for AnnotationOptions {
             } else {
                 String::new().into()
             },
+            if let Some(name) = &self.name {
+                format!("{:?}", name).into()
+            } else {
+                String::new().into()
+            },
             if let Some(position) = &self.position {
                 format!("{:?}", position).into()
             } else {
@@ -1723,6 +1642,7 @@ impl tabled::Tabled for AnnotationOptions {
             "feature_tag".into(),
             "line_ends".into(),
             "line_width".into(),
+            "name".into(),
             "position".into(),
             "text".into(),
             "units".into(),
@@ -2525,42 +2445,6 @@ impl tabled::Tabled for ApiTokenWithFullToken {
     }
 }
 
-#[doc = "Information about a third party app client."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct AppClientInfo {
-    #[doc = "The URL for consent."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub url: Option<String>,
-}
-
-impl std::fmt::Display for AppClientInfo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for AppClientInfo {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![if let Some(url) = &self.url {
-            format!("{:?}", url).into()
-        } else {
-            String::new().into()
-        }]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["url".into()]
-    }
-}
-
 #[doc = "The output from the async API call."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3195,474 +3079,6 @@ impl tabled::Tabled for BeginExecution {
     }
 }
 
-#[doc = "How often a contract is expected to bill or renew operationally."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingCadence {
-    #[doc = "The contract is managed on an annual cycle."]
-    #[serde(rename = "annual")]
-    #[display("annual")]
-    Annual,
-    #[doc = "The contract is managed on a quarterly cycle."]
-    #[serde(rename = "quarterly")]
-    #[display("quarterly")]
-    Quarterly,
-    #[doc = "The contract is managed on a monthly cycle."]
-    #[serde(rename = "monthly")]
-    #[display("monthly")]
-    Monthly,
-    #[doc = "The contract does not follow a fixed automated cadence."]
-    #[serde(rename = "manual")]
-    #[display("manual")]
-    Manual,
-}
-
-#[doc = "How commitment funds are shared across contract items."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingCommitmentScope {
-    #[doc = "One shared commitment pool may fund multiple contract items."]
-    #[serde(rename = "pooled")]
-    #[display("pooled")]
-    Pooled,
-    #[doc = "Each contract item effectively manages its own commitment budget."]
-    #[serde(rename = "per_item")]
-    #[display("per_item")]
-    PerItem,
-}
-
-#[doc = "Serialized line-item payload for a contract definition."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingContractItemInput {
-    #[doc = "Whether the item should participate in billing decisions immediately."]
-    #[serde(default)]
-    pub active: bool,
-    #[doc = "Optional normalization rule used before rating usage."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub billing_unit_granularity: Option<BillingUnitGranularity>,
-    #[doc = "Canonical item code so later metering can find the right price row."]
-    pub code: BillingItemCode,
-    #[doc = "Human-readable name shown in finance tooling."]
-    pub display_name: String,
-    #[doc = "Fixed fee charged for the item when the kind is `fixed_fee`."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub fixed_fee_amount: Option<f64>,
-    #[doc = "Whether usage from this item may burn down contract commitment."]
-    #[serde(default)]
-    pub is_commitment_eligible: bool,
-    #[doc = "Pricing model for this item."]
-    pub kind: BillingItemKind,
-    #[doc = "Pricing tiers for usage-rated items."]
-    #[serde(default)]
-    pub rate_tiers: Vec<BillingRateTierInput>,
-    #[doc = "Base measurement unit for pricing and usage."]
-    pub unit: BillingUnit,
-}
-
-impl std::fmt::Display for BillingContractItemInput {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingContractItemInput {
-    const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.active).into(),
-            if let Some(billing_unit_granularity) = &self.billing_unit_granularity {
-                format!("{:?}", billing_unit_granularity).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.code).into(),
-            self.display_name.clone().into(),
-            if let Some(fixed_fee_amount) = &self.fixed_fee_amount {
-                format!("{:?}", fixed_fee_amount).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.is_commitment_eligible).into(),
-            format!("{:?}", self.kind).into(),
-            format!("{:?}", self.rate_tiers).into(),
-            format!("{:?}", self.unit).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "active".into(),
-            "billing_unit_granularity".into(),
-            "code".into(),
-            "display_name".into(),
-            "fixed_fee_amount".into(),
-            "is_commitment_eligible".into(),
-            "kind".into(),
-            "rate_tiers".into(),
-            "unit".into(),
-        ]
-    }
-}
-
-#[doc = "Serialized line item returned from a stored contract."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingContractItemView {
-    #[doc = "Whether the item is active."]
-    pub active: bool,
-    #[doc = "Optional normalization rule for usage."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub billing_unit_granularity: Option<BillingUnitGranularity>,
-    #[doc = "Canonical item code."]
-    pub code: BillingItemCode,
-    #[doc = "Human-readable item name."]
-    pub display_name: String,
-    #[doc = "Fixed fee charged for the item when applicable."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub fixed_fee_amount: Option<f64>,
-    #[doc = "Database identifier for the contract item row."]
-    pub id: uuid::Uuid,
-    #[doc = "Whether this item can consume commitment."]
-    pub is_commitment_eligible: bool,
-    #[doc = "Pricing model for the item."]
-    pub kind: BillingItemKind,
-    #[doc = "Usage tiers for the item."]
-    pub rate_tiers: Vec<BillingRateTierView>,
-    #[doc = "Measurement unit for the item."]
-    pub unit: BillingUnit,
-}
-
-impl std::fmt::Display for BillingContractItemView {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingContractItemView {
-    const LENGTH: usize = 10;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.active).into(),
-            if let Some(billing_unit_granularity) = &self.billing_unit_granularity {
-                format!("{:?}", billing_unit_granularity).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.code).into(),
-            self.display_name.clone().into(),
-            if let Some(fixed_fee_amount) = &self.fixed_fee_amount {
-                format!("{:?}", fixed_fee_amount).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.id).into(),
-            format!("{:?}", self.is_commitment_eligible).into(),
-            format!("{:?}", self.kind).into(),
-            format!("{:?}", self.rate_tiers).into(),
-            format!("{:?}", self.unit).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "active".into(),
-            "billing_unit_granularity".into(),
-            "code".into(),
-            "display_name".into(),
-            "fixed_fee_amount".into(),
-            "id".into(),
-            "is_commitment_eligible".into(),
-            "kind".into(),
-            "rate_tiers".into(),
-            "unit".into(),
-        ]
-    }
-}
-
-#[doc = "Lifecycle state for a billing contract."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingContractStatus {
-    #[doc = "Contract terms are still being assembled and should not drive billing yet."]
-    #[serde(rename = "draft")]
-    #[display("draft")]
-    Draft,
-    #[doc = "Contract is committed for a future start date and should not drive billing yet."]
-    #[serde(rename = "scheduled")]
-    #[display("scheduled")]
-    Scheduled,
-    #[doc = "Contract is in force and may be used for rating and funding decisions."]
-    #[serde(rename = "active")]
-    #[display("active")]
-    Active,
-    #[doc = "Contract finished its intended term and is no longer accruing new periods."]
-    #[serde(rename = "closed")]
-    #[display("closed")]
-    Closed,
-    #[doc = "Contract was intentionally terminated before completing its intended term."]
-    #[serde(rename = "canceled")]
-    #[display("canceled")]
-    Canceled,
-}
-
-#[doc = "Complete contract payload used to create or replace an org's contract."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingContractUpsert {
-    #[doc = "Operational cadence used for finance workflows."]
-    pub billing_cadence: BillingCadence,
-    #[doc = "Whether commitment is shared or item-scoped."]
-    pub commitment_scope: BillingCommitmentScope,
-    #[doc = "Contract currency shared by every money field in this definition."]
-    pub currency: String,
-    #[doc = "Free-form finance note for discounts or negotiated pricing."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub discount_description: Option<String>,
-    #[doc = "Timestamp when the contract starts to apply."]
-    pub effective_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Provider-owned customer reference, when one already exists."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub external_customer_id: Option<String>,
-    #[doc = "Billable items attached to the contract."]
-    pub items: Vec<BillingContractItemInput>,
-    #[doc = "Human-readable contract label."]
-    pub name: String,
-    #[doc = "Internal notes about the contract."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub notes: Option<String>,
-    #[doc = "Period schedule for the contract term."]
-    pub periods: Vec<BillingPeriodInput>,
-    #[doc = "Downstream provider responsible for collecting the invoice."]
-    pub provider: BillingProvider,
-    #[doc = "What should happen to unused commitment when a period ends."]
-    pub rollover_policy: BillingRolloverPolicy,
-    #[doc = "Lifecycle state for the new contract."]
-    pub status: BillingContractStatus,
-    #[doc = "Timestamp when the contract term ends."]
-    pub term_end_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl std::fmt::Display for BillingContractUpsert {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingContractUpsert {
-    const LENGTH: usize = 14;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.billing_cadence).into(),
-            format!("{:?}", self.commitment_scope).into(),
-            self.currency.clone().into(),
-            if let Some(discount_description) = &self.discount_description {
-                format!("{:?}", discount_description).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.effective_at).into(),
-            if let Some(external_customer_id) = &self.external_customer_id {
-                format!("{:?}", external_customer_id).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.items).into(),
-            self.name.clone().into(),
-            if let Some(notes) = &self.notes {
-                format!("{:?}", notes).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.periods).into(),
-            format!("{:?}", self.provider).into(),
-            format!("{:?}", self.rollover_policy).into(),
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.term_end_at).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "billing_cadence".into(),
-            "commitment_scope".into(),
-            "currency".into(),
-            "discount_description".into(),
-            "effective_at".into(),
-            "external_customer_id".into(),
-            "items".into(),
-            "name".into(),
-            "notes".into(),
-            "periods".into(),
-            "provider".into(),
-            "rollover_policy".into(),
-            "status".into(),
-            "term_end_at".into(),
-        ]
-    }
-}
-
-#[doc = "Serialized contract snapshot returned from the database."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingContractView {
-    #[doc = "Billing account identifier that owns the contract."]
-    pub account_id: uuid::Uuid,
-    #[doc = "Operational cadence for finance workflows."]
-    pub billing_cadence: BillingCadence,
-    #[doc = "Whether commitment is shared or item-scoped."]
-    pub commitment_scope: BillingCommitmentScope,
-    #[doc = "Billing contract identifier."]
-    pub contract_id: uuid::Uuid,
-    #[doc = "Currency shared by every money field in the contract."]
-    pub currency: String,
-    #[doc = "Discount note associated with the contract."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub discount_description: Option<String>,
-    #[doc = "Timestamp when the contract started applying."]
-    pub effective_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Provider-owned customer reference, when one exists."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub external_customer_id: Option<String>,
-    #[doc = "Billable items attached to the contract."]
-    pub items: Vec<BillingContractItemView>,
-    #[doc = "Human-readable contract label."]
-    pub name: String,
-    #[doc = "Internal notes for the contract."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub notes: Option<String>,
-    #[doc = "Period schedule for the contract."]
-    pub periods: Vec<BillingPeriodView>,
-    #[doc = "Downstream invoice provider."]
-    pub provider: BillingProvider,
-    #[doc = "What happens to unused commitment when a period ends."]
-    pub rollover_policy: BillingRolloverPolicy,
-    #[doc = "Lifecycle state for the contract."]
-    pub status: BillingContractStatus,
-    #[doc = "Timestamp when the contract term ends."]
-    pub term_end_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl std::fmt::Display for BillingContractView {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingContractView {
-    const LENGTH: usize = 16;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.account_id).into(),
-            format!("{:?}", self.billing_cadence).into(),
-            format!("{:?}", self.commitment_scope).into(),
-            format!("{:?}", self.contract_id).into(),
-            self.currency.clone().into(),
-            if let Some(discount_description) = &self.discount_description {
-                format!("{:?}", discount_description).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.effective_at).into(),
-            if let Some(external_customer_id) = &self.external_customer_id {
-                format!("{:?}", external_customer_id).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.items).into(),
-            self.name.clone().into(),
-            if let Some(notes) = &self.notes {
-                format!("{:?}", notes).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.periods).into(),
-            format!("{:?}", self.provider).into(),
-            format!("{:?}", self.rollover_policy).into(),
-            format!("{:?}", self.status).into(),
-            format!("{:?}", self.term_end_at).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "account_id".into(),
-            "billing_cadence".into(),
-            "commitment_scope".into(),
-            "contract_id".into(),
-            "currency".into(),
-            "discount_description".into(),
-            "effective_at".into(),
-            "external_customer_id".into(),
-            "items".into(),
-            "name".into(),
-            "notes".into(),
-            "periods".into(),
-            "provider".into(),
-            "rollover_policy".into(),
-            "status".into(),
-            "term_end_at".into(),
-        ]
-    }
-}
-
 #[doc = "The billing information for payments."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -3711,446 +3127,6 @@ impl tabled::Tabled for BillingInfo {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["address".into(), "name".into(), "phone".into()]
     }
-}
-
-#[doc = "Canonical product or service code for a contract item."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingItemCode {
-    #[doc = "Fixed or recurring enterprise support entitlement."]
-    #[serde(rename = "enterprise_support")]
-    #[display("enterprise_support")]
-    EnterpriseSupport,
-    #[doc = "Full deployment environment or similar managed environment charge."]
-    #[serde(rename = "fde")]
-    #[display("fde")]
-    Fde,
-    #[doc = "GovCloud-specific management or hosting charge."]
-    #[serde(rename = "govcloud_management")]
-    #[display("govcloud_management")]
-    GovcloudManagement,
-    #[doc = "Billing for the first successful conversion of a file version."]
-    #[serde(rename = "file_ingestion_conversion")]
-    #[display("file_ingestion_conversion")]
-    FileIngestionConversion,
-    #[doc = "Contract-rated API usage credits."]
-    #[serde(rename = "licensed_api_credits")]
-    #[display("licensed_api_credits")]
-    LicensedApiCredits,
-}
-
-#[doc = "Pricing model used by a contract item."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingItemKind {
-    #[doc = "A flat amount that does not vary with measured usage."]
-    #[serde(rename = "fixed_fee")]
-    #[display("fixed_fee")]
-    FixedFee,
-    #[doc = "Usage is rated by one or more explicit pricing tiers."]
-    #[serde(rename = "usage_tiered")]
-    #[display("usage_tiered")]
-    UsageTiered,
-    #[doc = "Usage burns down a commitment bucket before any overage path."]
-    #[serde(rename = "usage_commitment_bucket")]
-    #[display("usage_commitment_bucket")]
-    UsageCommitmentBucket,
-}
-
-#[doc = "Serialized billing period payload for a contract definition."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingPeriodInput {
-    #[doc = "New commitment funded for this period."]
-    pub commitment_amount: f64,
-    #[doc = "Exclusive period end timestamp."]
-    pub period_end_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Sequence index for the period inside the contract."]
-    pub period_index: i32,
-    #[doc = "Inclusive period start timestamp."]
-    pub period_start_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Commitment carried in from an earlier period."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rollover_in_amount: Option<f64>,
-    #[doc = "Commitment intentionally rolled out to a later period."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rollover_out_amount: Option<f64>,
-    #[doc = "Operational status for the period."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub status: Option<BillingPeriodStatus>,
-}
-
-impl std::fmt::Display for BillingPeriodInput {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingPeriodInput {
-    const LENGTH: usize = 7;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.commitment_amount).into(),
-            format!("{:?}", self.period_end_at).into(),
-            format!("{:?}", self.period_index).into(),
-            format!("{:?}", self.period_start_at).into(),
-            if let Some(rollover_in_amount) = &self.rollover_in_amount {
-                format!("{:?}", rollover_in_amount).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(rollover_out_amount) = &self.rollover_out_amount {
-                format!("{:?}", rollover_out_amount).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(status) = &self.status {
-                format!("{:?}", status).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "commitment_amount".into(),
-            "period_end_at".into(),
-            "period_index".into(),
-            "period_start_at".into(),
-            "rollover_in_amount".into(),
-            "rollover_out_amount".into(),
-            "status".into(),
-        ]
-    }
-}
-
-#[doc = "Operational status for a contract billing period."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingPeriodStatus {
-    #[doc = "Period is active and may still accrue usage or adjustments."]
-    #[serde(rename = "open")]
-    #[display("open")]
-    Open,
-    #[doc = "Period is finalized and should be treated as read-only for billing purposes."]
-    #[serde(rename = "closed")]
-    #[display("closed")]
-    Closed,
-}
-
-#[doc = "Serialized billing period returned from a stored contract."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingPeriodView {
-    #[doc = "New commitment funded for this period."]
-    pub commitment_amount: f64,
-    #[doc = "Database identifier for the period row."]
-    pub id: uuid::Uuid,
-    #[doc = "Exclusive period end timestamp."]
-    pub period_end_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Sequence index for the period inside the contract."]
-    pub period_index: i32,
-    #[doc = "Inclusive period start timestamp."]
-    pub period_start_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Commitment carried in from a previous period."]
-    pub rollover_in_amount: f64,
-    #[doc = "Commitment intentionally rolled out to a later period."]
-    pub rollover_out_amount: f64,
-    #[doc = "Operational status for the period."]
-    pub status: BillingPeriodStatus,
-}
-
-impl std::fmt::Display for BillingPeriodView {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingPeriodView {
-    const LENGTH: usize = 8;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.commitment_amount).into(),
-            format!("{:?}", self.id).into(),
-            format!("{:?}", self.period_end_at).into(),
-            format!("{:?}", self.period_index).into(),
-            format!("{:?}", self.period_start_at).into(),
-            format!("{:?}", self.rollover_in_amount).into(),
-            format!("{:?}", self.rollover_out_amount).into(),
-            format!("{:?}", self.status).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "commitment_amount".into(),
-            "id".into(),
-            "period_end_at".into(),
-            "period_index".into(),
-            "period_start_at".into(),
-            "rollover_in_amount".into(),
-            "rollover_out_amount".into(),
-            "status".into(),
-        ]
-    }
-}
-
-#[doc = "Billing provider that owns downstream invoice or statement delivery."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingProvider {
-    #[doc = "Charges are ultimately collected through Stripe."]
-    #[serde(rename = "stripe")]
-    #[display("stripe")]
-    Stripe,
-    #[doc = "Charges are collected outside Stripe, usually by finance or contract workflow."]
-    #[serde(rename = "manual_invoice")]
-    #[display("manual_invoice")]
-    ManualInvoice,
-}
-
-#[doc = "Serialized rate tier payload for a usage-rated contract item."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingRateTierInput {
-    #[doc = "Exclusive upper bound for the tier, or `None` when the tier is open-ended."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tier_end_exclusive: Option<i64>,
-    #[doc = "First billable quantity in this tier."]
-    pub tier_start_inclusive: i64,
-    #[doc = "Price to charge for each unit that lands in this tier."]
-    pub unit_price: f64,
-}
-
-impl std::fmt::Display for BillingRateTierInput {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingRateTierInput {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(tier_end_exclusive) = &self.tier_end_exclusive {
-                format!("{:?}", tier_end_exclusive).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.tier_start_inclusive).into(),
-            format!("{:?}", self.unit_price).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "tier_end_exclusive".into(),
-            "tier_start_inclusive".into(),
-            "unit_price".into(),
-        ]
-    }
-}
-
-#[doc = "Serialized rate tier returned from a stored contract."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct BillingRateTierView {
-    #[doc = "Database identifier for the tier row."]
-    pub id: uuid::Uuid,
-    #[doc = "Exclusive upper bound for the tier, or `None` when the tier is open-ended."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tier_end_exclusive: Option<i64>,
-    #[doc = "First billable quantity in this tier."]
-    pub tier_start_inclusive: i64,
-    #[doc = "Price charged for each unit in the tier."]
-    pub unit_price: f64,
-}
-
-impl std::fmt::Display for BillingRateTierView {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for BillingRateTierView {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.id).into(),
-            if let Some(tier_end_exclusive) = &self.tier_end_exclusive {
-                format!("{:?}", tier_end_exclusive).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.tier_start_inclusive).into(),
-            format!("{:?}", self.unit_price).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "id".into(),
-            "tier_end_exclusive".into(),
-            "tier_start_inclusive".into(),
-            "unit_price".into(),
-        ]
-    }
-}
-
-#[doc = "What happens to unused commitment when a contract period closes."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingRolloverPolicy {
-    #[doc = "Unused commitment expires at the end of the period."]
-    #[serde(rename = "none")]
-    #[display("none")]
-    None,
-    #[doc = "Unused year-one commitment may roll once into year two, but not beyond."]
-    #[serde(rename = "year1_to_year2_once")]
-    #[display("year1_to_year2_once")]
-    Year1ToYear2Once,
-}
-
-#[doc = "Base unit that measured usage or pricing is expressed in."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingUnit {
-    #[doc = "Quantity is counted in files."]
-    #[serde(rename = "file")]
-    #[display("file")]
-    File,
-    #[doc = "Quantity is counted in whole or rounded minutes."]
-    #[serde(rename = "minute")]
-    #[display("minute")]
-    Minute,
-    #[doc = "Quantity is counted in seconds."]
-    #[serde(rename = "second")]
-    #[display("second")]
-    Second,
-    #[doc = "Quantity is counted in years."]
-    #[serde(rename = "year")]
-    #[display("year")]
-    Year,
-    #[doc = "Quantity is counted once per billing period."]
-    #[serde(rename = "period")]
-    #[display("period")]
-    Period,
-}
-
-#[doc = "Optional finer-grained measurement rule for a billed unit."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum BillingUnitGranularity {
-    #[doc = "Usage should be normalized or rounded at the minute level."]
-    #[serde(rename = "minute")]
-    #[display("minute")]
-    Minute,
-    #[doc = "Usage should be normalized or rounded at the second level."]
-    #[serde(rename = "second")]
-    #[display("second")]
-    Second,
 }
 
 #[doc = "What kind of blend to do"]
@@ -5377,7 +4353,7 @@ pub struct ClientMetrics {
     #[doc = "Count the total number of Picture Loss Indication (PLI) packets.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-plicount"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rtc_pli_count: Option<u32>,
-    #[doc = "Total duration of pauses in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime"]
+    #[doc = "Estimated round trip time, measured in seconds.\n\nThis is the \"ping\" between the client and the STUN server. Not to be confused with the E2E RTT documented [here](https://www.w3.org/TR/webrtc-stats/#dom-rtcremoteinboundrtpstreamstats-roundtriptime)\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcicecandidatepairstats-currentroundtriptime"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub rtc_stun_rtt_sec: Option<f64>,
     #[doc = "Number of seconds of frozen video the user has been subjected to.\n\nhttps://www.w3.org/TR/webrtc-stats/#dom-rtcinboundrtpstreamstats-totalfreezesduration"]
@@ -7838,50 +6814,6 @@ impl tabled::Tabled for Discount {
     }
 }
 
-#[doc = "A discount code for a store."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct DiscountCode {
-    #[doc = "The code for the discount."]
-    pub code: String,
-    #[doc = "The date the discount code expires."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub expires_at: Option<chrono::DateTime<chrono::Utc>>,
-    #[doc = "The percent off for the discount."]
-    pub percent_off: u32,
-}
-
-impl std::fmt::Display for DiscountCode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for DiscountCode {
-    const LENGTH: usize = 3;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            self.code.clone().into(),
-            if let Some(expires_at) = &self.expires_at {
-                format!("{:?}", expires_at).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.percent_off).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["code".into(), "expires_at".into(), "percent_off".into()]
-    }
-}
-
 #[doc = "The type of distance Distances can vary depending on the objects used as input."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9323,8 +8255,8 @@ pub enum ErrorCode {
     #[serde(rename = "message_type_not_accepted")]
     #[display("message_type_not_accepted")]
     MessageTypeNotAccepted,
-    #[doc = "Client sent a Websocket message intended for WebRTC but it was configured as a \
-             WebRTC connection."]
+    #[doc = "Client sent a Websocket message intended for WebRTC, but did not configure the \
+             server to establish WebRTC."]
     #[serde(rename = "message_type_not_accepted_for_web_r_t_c")]
     #[display("message_type_not_accepted_for_web_r_t_c")]
     MessageTypeNotAcceptedForWebRTC,
@@ -10475,7 +9407,8 @@ pub enum Feature {
     #[serde(rename = "billing")]
     #[display("billing")]
     Billing,
-    #[doc = "Route non-WebRTC modeling sessions to the CPU-only engine pool."]
+    #[doc = "Allows explicitly selecting the CPU-only engine pool for non-WebRTC modeling \
+             sessions."]
     #[serde(rename = "cpu_engine_pool")]
     #[display("cpu_engine_pool")]
     CpuEnginePool,
@@ -10491,6 +9424,10 @@ pub enum Feature {
     #[serde(rename = "engine_manager_quarantine")]
     #[display("engine_manager_quarantine")]
     EngineManagerQuarantine,
+    #[doc = "Grants access to the internal execution jobs API."]
+    #[serde(rename = "execution_jobs")]
+    #[display("execution_jobs")]
+    ExecutionJobs,
     #[doc = "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio."]
     #[serde(rename = "enable_z0006_lint")]
     #[display("enable_z0006_lint")]
@@ -10587,6 +9524,10 @@ pub enum Feature {
     #[serde(rename = "zookeeper_ultra_mode")]
     #[display("zookeeper_ultra_mode")]
     ZookeeperUltraMode,
+    #[doc = "Enables experimental execution of client-advertised commands from Zookeeper."]
+    #[serde(rename = "zookeeper_client_commands")]
+    #[display("zookeeper_client_commands")]
+    ZookeeperClientCommands,
     #[doc = "Allow creating a session via an existing API key"]
     #[serde(rename = "unsafe_allow_api_key_auth")]
     #[display("unsafe_allow_api_key_auth")]
@@ -11861,8 +10802,7 @@ pub enum ImageFormat {
     Jpeg,
 }
 
-#[doc = "File to import into the current model. If you are sending binary data for a file, be sure \
-         to send the WebSocketRequest as binary/bson, not text/json."]
+#[doc = "File to import into the current scene."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -13216,6 +12156,35 @@ pub enum KclProjectShareLinkAccessMode {
     OrganizationOnly,
 }
 
+#[doc = "Which KCL versions does Zoo support?"]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclVersion {
+    #[doc = "Original KCL released in 2025"]
+    #[serde(rename = "1.0")]
+    #[display("1.0")]
+    One0,
+    #[doc = "KCL v2 is the same as KCL v1, except that it supports the `region` function."]
+    #[serde(rename = "2.0")]
+    #[display("2.0")]
+    Two0,
+    #[doc = "KCL v3 is currently in development."]
+    #[serde(rename = "3.0-preview")]
+    #[display("3.0-preview")]
+    Three0Preview,
+}
+
 #[doc = "The response from the `Loft` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13713,6 +12682,92 @@ pub enum MlCopilotAccessDeniedCode {
     Admin,
 }
 
+#[doc = "One client-owned command that Zookeeper may discover and request over the current copilot \
+         WebSocket connection.\n\nCommand definitions are connection-scoped capabilities, not \
+         durable user data. Clients replace the complete catalog whenever its revision changes."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct MlCopilotClientCommand {
+    #[doc = "Description used when Zookeeper searches the client catalog."]
+    pub description: String,
+    #[doc = "Stable identifier used to invoke the command, for example `modeling.export`."]
+    pub id: String,
+    #[doc = "JSON Schema describing the command arguments."]
+    pub input_schema: serde_json::Value,
+    #[doc = "Short human-readable command name."]
+    pub title: String,
+}
+
+impl std::fmt::Display for MlCopilotClientCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for MlCopilotClientCommand {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            self.id.clone().into(),
+            format!("{:?}", self.input_schema).into(),
+            self.title.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "id".into(),
+            "input_schema".into(),
+            "title".into(),
+        ]
+    }
+}
+
+#[doc = "Lifecycle state reported by a client for a requested command."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotClientCommandStatus {
+    #[doc = "The client accepted the request and execution is still in progress."]
+    #[serde(rename = "accepted")]
+    #[display("accepted")]
+    Accepted,
+    #[doc = "The command completed successfully."]
+    #[serde(rename = "succeeded")]
+    #[display("succeeded")]
+    Succeeded,
+    #[doc = "The client or user declined the request before execution completed."]
+    #[serde(rename = "rejected")]
+    #[display("rejected")]
+    Rejected,
+    #[doc = "The command failed during execution."]
+    #[serde(rename = "failed")]
+    #[display("failed")]
+    Failed,
+    #[doc = "Execution was cancelled after it started."]
+    #[serde(rename = "cancelled")]
+    #[display("cancelled")]
+    Cancelled,
+}
+
 #[doc = "The types of messages that can be sent by the client to the server."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13841,6 +12896,34 @@ pub enum MlCopilotClientMessage {
         #[doc = "Specific client message sequence, when requested."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         seq: Option<i32>,
+    },
+    #[doc = "Replace the commands advertised by this client connection.\n\nAPI and Zookeeper do \
+             not persist or replay this catalog. A client must advertise it again after every \
+             reconnect."]
+    #[serde(rename = "update_client_command_schema")]
+    UpdateClientCommandSchema {
+        #[doc = "Complete set of commands available at this revision."]
+        commands: Vec<MlCopilotClientCommand>,
+        #[doc = "Version of the client-command wire protocol understood by the client."]
+        protocol_version: u16,
+        #[doc = "Monotonically increasing catalog revision for this connection."]
+        revision: u64,
+    },
+    #[doc = "Report progress or a terminal result for a requested client command."]
+    #[serde(rename = "client_command_response")]
+    ClientCommandResponse {
+        #[doc = "Catalog revision against which the request was validated."]
+        catalog_revision: u64,
+        #[doc = "Optional error or rejection detail."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "Correlation identifier supplied in `ClientCommandRequest`."]
+        request_id: String,
+        #[doc = "Optional JSON-compatible result from a successful command."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        result: Option<serde_json::Value>,
+        #[doc = "Current execution state."]
+        status: MlCopilotClientCommandStatus,
     },
 }
 
@@ -14233,6 +13316,19 @@ pub enum MlCopilotServerMessage {
         snapshot_id: String,
         #[doc = "How the submitted snapshot affected canonical state."]
         status: MlCopilotProjectSnapshotStatus,
+    },
+    #[doc = "Ask the connected client to execute one of its advertised commands.\n\nThis request \
+             is transient and is never persisted or replayed by API."]
+    #[serde(rename = "client_command_request")]
+    ClientCommandRequest {
+        #[doc = "Arguments validated by the client against its advertised schema."]
+        arguments: serde_json::Value,
+        #[doc = "Catalog revision used when Zookeeper selected the command."]
+        catalog_revision: u64,
+        #[doc = "Identifier from the advertised client command catalog."]
+        command_id: String,
+        #[doc = "Unique request identifier used to correlate client responses."]
+        request_id: String,
     },
     #[doc = "Assistant reasoning / chain-of-thought (if you expose it)."]
     #[serde(rename = "reasoning")]
@@ -14989,7 +14085,9 @@ pub enum ModelingCmd {
                  precedence over `direction`."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         direction_reference: Option<EdgeSpecifier>,
-        #[doc = "How far off the plane to extrude"]
+        #[doc = "How far off the plane to extrude This distance is relative to the target's \
+                 plane, not an absolute coordinate. Symmetric extrusions will extrude outwards \
+                 from both sides of the sketch to the length specified."]
         distance: f64,
         #[doc = "What draft angle should be used in this extrusion? Negative values indicate an \
                  outward draft, while positive values indicate an inward draft"]
@@ -15338,9 +14436,8 @@ pub enum ModelingCmd {
     #[doc = "Adjust zoom of the default camera."]
     #[serde(rename = "default_camera_zoom")]
     DefaultCameraZoom {
-        #[doc = "Move the camera forward along the vector it's looking at, by this \
-                 magnitudedefaultCameraZoom. Basically, how much should the camera move forward \
-                 by."]
+        #[doc = "Move the camera forward along the vector it's looking at, by this magnitude. \
+                 Basically, how much should the camera move forward by."]
         magnitude: f64,
     },
     #[doc = "Export a sketch to a file."]
@@ -15351,7 +14448,8 @@ pub enum ModelingCmd {
         #[doc = "The file format to export to."]
         format: OutputFormat2D,
     },
-    #[doc = "Export the scene to a file."]
+    #[doc = "Export the scene to a file.\n\nThe response is a MsgPack-encoded message in a \
+             WebSocket binary frame."]
     #[serde(rename = "export3d")]
     Export3D {
         #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
@@ -15360,7 +14458,8 @@ pub enum ModelingCmd {
         #[doc = "The file format to export to."]
         format: OutputFormat3D,
     },
-    #[doc = "Export the scene to a file."]
+    #[doc = "Export the scene to a file.\n\nThe response is a MsgPack-encoded message in a \
+             WebSocket binary frame."]
     #[serde(rename = "export")]
     Export {
         #[doc = "IDs of the entities to be exported. If this is empty, then all entities are \
@@ -15786,7 +14885,7 @@ pub enum ModelingCmd {
     #[doc = "Gets the next adjacent edge for the given edge, along the given face."]
     #[serde(rename = "solid3d_get_next_adjacent_edge")]
     Solid3DGetNextAdjacentEdge {
-        #[doc = "Which edge you want the opposite of."]
+        #[doc = "Which edge you want the next edge of."]
         edge_id: uuid::Uuid,
         #[doc = "Which face is used to figure out the opposite edge?"]
         face_id: uuid::Uuid,
@@ -15796,7 +14895,7 @@ pub enum ModelingCmd {
     #[doc = "Gets the previous adjacent edge for the given edge, along the given face."]
     #[serde(rename = "solid3d_get_prev_adjacent_edge")]
     Solid3DGetPrevAdjacentEdge {
-        #[doc = "Which edge you want the opposite of."]
+        #[doc = "Which edge you want the previous edge of."]
         edge_id: uuid::Uuid,
         #[doc = "Which face is used to figure out the opposite edge?"]
         face_id: uuid::Uuid,
@@ -16075,6 +15174,9 @@ pub enum ModelingCmd {
         #[doc = "The default system color."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         color: Option<Color>,
+        #[doc = "The default color to use for the edges of 3D bodies."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_3d_color: Option<Color>,
         #[doc = "The default color to use for highlight"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         highlight_color: Option<Color>,
@@ -16230,7 +15332,10 @@ pub enum ModelingCmd {
         #[doc = "Width of the stream."]
         width: u32,
     },
-    #[doc = "Import files to the current model."]
+    #[doc = "Import CAD files to the current scene.\n\nSend a request containing binary file data \
+             as a MsgPack-encoded message in a WebSocket binary frame.\n\nNote: These imports are \
+             non-editable. In the future we may expose a proprietary-to-KCL function to resolve \
+             this. The main intention today is to use imports as design references."]
     #[serde(rename = "import_files")]
     ImportFiles {
         #[doc = "Files to import."]
@@ -16450,8 +15555,15 @@ pub enum ModelingCmd {
         #[doc = "List of transforms to be applied to the object."]
         transforms: Vec<ComponentTransform>,
     },
-    #[doc = "Create a new solid from combining other smaller solids. In other words, every part \
-             of the input solids will be included in the output solid."]
+    #[doc = "Given a set of overlapping solids, create a new single solid.\n\nMost successful \
+             unions come from solids who's faces do not overlap aka non-coplanar.\n\nFailure \
+             cases: * A common failure is unsupported coincident faces try to be \
+             unioned.\n\nWarning cases: * When an element of the set doesn't overlap.\n\nNotable \
+             behaviors: * What appear to be coincident points will succeed and not give a \"no \
+             overlap\" warning, even if they're not. * Elements' top or bottom faces may not \
+             combine into one new face, which can seem like the union failed. You can tell they \
+             succeeded from side faces not extending into the original solids. * When exporting \
+             to STEP, if the above behavior is observed, will merged the faces."]
     #[serde(rename = "boolean_union")]
     BooleanUnion {
         #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
@@ -16482,8 +15594,16 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         use_legacy: Option<bool>,
     },
-    #[doc = "Create a new solid from subtracting several other solids. The 'target' is what will \
-             be cut from. The 'tool' is what will be cut out from 'target'."]
+    #[doc = "Given a target solid, subtract a set of \"tool solids\" to create a new \
+             solid.\n\nMost successful subtracts come from solids who's faces do not overlap aka \
+             non-coplanar.\n\nPrefer one `tool` over multiple when calling this \
+             feature.\n\nFailure cases: * A common failure is unsupported coplanar faces try to \
+             be unioned.\n\nWarning cases:\n\nNotable behaviors: If two tools occupy the same \
+             vertical range and overlap, like two cubes of the same height, the subtract of the \
+             first will cause the second tool to fail because the first leaves behind coplanar \
+             faces, causing an aforementioned failure case.\n\nUnlike `boolean_union`, if one \
+             tool in the set overlaps, any OTHER tool in the set that doesn't WILL NOT signal a \
+             non-overlap warning."]
     #[serde(rename = "boolean_subtract")]
     BooleanSubtract {
         #[doc = "If true, non-contiguous bodies in the result will be returned as separate objects"]
@@ -18565,6 +17685,11 @@ pub enum OkWebSocketResponseData {
         #[doc = "Instance name. This may or may not mean something."]
         name: String,
     },
+    #[doc = "Request that the client end this connection and establish a new session using normal \
+             authentication and authorization. This does not guarantee that a new session will be \
+             accepted."]
+    #[serde(rename = "reconnect")]
+    Reconnect {},
 }
 
 #[doc = "An organization."]
@@ -21278,54 +20403,6 @@ pub enum PostEffectType {
     Noeffect,
 }
 
-#[doc = "Create or update a price row for a subscription plan."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct PriceUpsertRequest {
-    #[doc = "Whether the price should be active."]
-    #[serde(default)]
-    pub active: bool,
-    #[doc = "Billing model (flat or per-user)."]
-    pub billing_model: SubscriptionPlanBillingModel,
-    #[doc = "Cadence for billing (day, week, month, year)."]
-    pub cadence: PlanInterval,
-    #[doc = "Amount in USD."]
-    pub unit_amount: f64,
-}
-
-impl std::fmt::Display for PriceUpsertRequest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for PriceUpsertRequest {
-    const LENGTH: usize = 4;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.active).into(),
-            format!("{:?}", self.billing_model).into(),
-            format!("{:?}", self.cadence).into(),
-            format!("{:?}", self.unit_amount).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "active".into(),
-            "billing_model".into(),
-            "cadence".into(),
-            "unit_amount".into(),
-        ]
-    }
-}
-
 #[doc = "Optional fallback when primary UUIDs are missing from the client artifact graph (e.g. \
          stale or engine-only ids). Identifies the same topology via a **parent** entity UUID and \
          a **primitive index** on that parent.\n\nSemantics by selection kind (aligned with engine \
@@ -22280,8 +21357,8 @@ impl tabled::Tabled for QueryEntityTypeWithPoint {
     }
 }
 
-#[doc = "A raw file with unencoded contents to be passed over binary websockets. When raw files \
-         come back for exports it is sent as binary/bson, not text/json."]
+#[doc = "A raw file with unencoded contents.\n\nSee the command that emits this type for its \
+         response encoding."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -25257,37 +24334,6 @@ pub enum StorageProvider {
     ZooManaged,
 }
 
-#[doc = "The parameters for a new store coupon."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct StoreCouponParams {
-    #[doc = "The percentage off."]
-    pub percent_off: u32,
-}
-
-impl std::fmt::Display for StoreCouponParams {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for StoreCouponParams {
-    const LENGTH: usize = 1;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.percent_off).into()]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["percent_off".into()]
-    }
-}
-
 #[doc = "Indicates which kind of Stripe intent requires customer action during subscription \
          creation."]
 #[derive(
@@ -25337,108 +24383,6 @@ pub enum SubscriptionBillingMode {
     #[serde(rename = "contract")]
     #[display("contract")]
     Contract,
-}
-
-#[doc = "Billing model for a modeling-app plan price."]
-#[derive(
-    serde :: Serialize,
-    serde :: Deserialize,
-    PartialEq,
-    Hash,
-    Debug,
-    Clone,
-    schemars :: JsonSchema,
-    parse_display :: FromStr,
-    parse_display :: Display,
-)]
-#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
-#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-pub enum SubscriptionPlanBillingModel {
-    #[doc = "A flat amount charged every interval."]
-    #[serde(rename = "flat")]
-    #[display("flat")]
-    Flat,
-    #[doc = "A per-seat amount charged every interval."]
-    #[serde(rename = "per_user")]
-    #[display("per_user")]
-    PerUser,
-}
-
-#[doc = "Diesel model representing a row in `subscription_plan_prices`."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct SubscriptionPlanPriceRecord {
-    #[doc = "Whether this price is currently active."]
-    pub active: bool,
-    #[doc = "Billing model persisted in the database (`flat`, `per_user`, or `enterprise`)."]
-    pub billing_model: SubscriptionPlanBillingModel,
-    #[doc = "Billing cadence string (for example `month` or `year`)."]
-    pub cadence: PlanInterval,
-    #[doc = "Timestamp when the price row was created."]
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    #[doc = "Unique identifier for the plan price entry."]
-    pub id: uuid::Uuid,
-    #[doc = "Stripe price identifier, when synchronized."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stripe_price_id: Option<String>,
-    #[doc = "Foreign key referencing the parent plan."]
-    pub subscription_plan_id: uuid::Uuid,
-    #[doc = "Optional monetary amount associated with the price row."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub unit_amount: Option<String>,
-    #[doc = "Timestamp when the price row was last updated."]
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-impl std::fmt::Display for SubscriptionPlanPriceRecord {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for SubscriptionPlanPriceRecord {
-    const LENGTH: usize = 9;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.active).into(),
-            format!("{:?}", self.billing_model).into(),
-            format!("{:?}", self.cadence).into(),
-            format!("{:?}", self.created_at).into(),
-            format!("{:?}", self.id).into(),
-            if let Some(stripe_price_id) = &self.stripe_price_id {
-                format!("{:?}", stripe_price_id).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.subscription_plan_id).into(),
-            if let Some(unit_amount) = &self.unit_amount {
-                format!("{:?}", unit_amount).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.updated_at).into(),
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "active".into(),
-            "billing_model".into(),
-            "cadence".into(),
-            "created_at".into(),
-            "id".into(),
-            "stripe_price_id".into(),
-            "subscription_plan_id".into(),
-            "unit_amount".into(),
-            "updated_at".into(),
-        ]
-    }
 }
 
 #[doc = "A subscription tier feature."]
@@ -26673,7 +25617,7 @@ pub enum UnitArea {
     #[serde(rename = "mm2")]
     #[display("mm2")]
     Mm2,
-    #[doc = "Square yards <https://en.wikipedia.org/wiki/Square_mile>"]
+    #[doc = "Square yards <https://en.wikipedia.org/wiki/Square_yard>"]
     #[serde(rename = "yd2")]
     #[display("yd2")]
     Yd2,
@@ -28691,64 +27635,6 @@ impl tabled::Tabled for UpdateOrgDatasetSource {
     }
 }
 
-#[doc = "Payload for updating a user's balance."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct UpdatePaymentBalance {
-    #[doc = "The monetary value of the monthy API credits remaining in the balance. This gets \
-             re-upped every month,"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub monthly_api_credits_remaining_monetary_value: Option<f64>,
-    #[doc = "The monetary value of stable API credits remaining in the balance. These do not get \
-             reset or re-upped every month. This is separate from the monthly credits. Credits \
-             will first pull from the monthly credits, then the stable credits. Stable just means \
-             that they do not get reset every month. A user will have stable credits if a Zoo \
-             employee granted them credits."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stable_api_credits_remaining_monetary_value: Option<f64>,
-}
-
-impl std::fmt::Display for UpdatePaymentBalance {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for UpdatePaymentBalance {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(monthly_api_credits_remaining_monetary_value) =
-                &self.monthly_api_credits_remaining_monetary_value
-            {
-                format!("{:?}", monthly_api_credits_remaining_monetary_value).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(stable_api_credits_remaining_monetary_value) =
-                &self.stable_api_credits_remaining_monetary_value
-            {
-                format!("{:?}", stable_api_credits_remaining_monetary_value).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "monthly_api_credits_remaining_monetary_value".into(),
-            "stable_api_credits_remaining_monetary_value".into(),
-        ]
-    }
-}
-
 #[doc = "Request to update a shortlink."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -28942,274 +27828,6 @@ impl tabled::Tabled for UploadOrgDatasetFilesResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["queued_conversions".into(), "uploaded_files".into()]
-    }
-}
-
-#[doc = "Extra admin-only details for a user."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct UserAdminDetails {
-    #[doc = "Count of valid API tokens."]
-    pub active_api_tokens_count: i64,
-    #[doc = "Count of active (non-expired) device access tokens."]
-    pub active_device_tokens_count: i64,
-    #[doc = "Count of active (non-expired) sessions."]
-    pub active_sessions_count: i64,
-    #[doc = "Latest billing address stored for the user."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address: Option<Address>,
-    #[doc = "Readable billing address summary."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub address_summary: Option<String>,
-    #[doc = "Block reason when the user is blocked."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub block: Option<BlockReason>,
-    #[doc = "Human-friendly block reason message."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub block_message: Option<String>,
-    #[doc = "CAD user info collected from website onboarding/CRM form."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cad_user_info: Option<UserCadInfoAdminDetails>,
-    #[doc = "Whether this user is permanently exempt from blocking."]
-    pub never_block: bool,
-    #[doc = "Known payment methods on file."]
-    pub payment_methods: Vec<PaymentMethod>,
-    #[doc = "Summaries of the known payment methods."]
-    pub payment_methods_summary: Vec<String>,
-    #[doc = "Stripe customer identifier if one exists."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stripe_customer_id: Option<String>,
-    #[doc = "Direct link to the Stripe customer dashboard."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub stripe_dashboard_url: Option<String>,
-}
-
-impl std::fmt::Display for UserAdminDetails {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for UserAdminDetails {
-    const LENGTH: usize = 13;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.active_api_tokens_count).into(),
-            format!("{:?}", self.active_device_tokens_count).into(),
-            format!("{:?}", self.active_sessions_count).into(),
-            if let Some(address) = &self.address {
-                format!("{:?}", address).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(address_summary) = &self.address_summary {
-                format!("{:?}", address_summary).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(block) = &self.block {
-                format!("{:?}", block).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(block_message) = &self.block_message {
-                format!("{:?}", block_message).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cad_user_info) = &self.cad_user_info {
-                format!("{:?}", cad_user_info).into()
-            } else {
-                String::new().into()
-            },
-            format!("{:?}", self.never_block).into(),
-            format!("{:?}", self.payment_methods).into(),
-            format!("{:?}", self.payment_methods_summary).into(),
-            if let Some(stripe_customer_id) = &self.stripe_customer_id {
-                format!("{:?}", stripe_customer_id).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(stripe_dashboard_url) = &self.stripe_dashboard_url {
-                format!("{:?}", stripe_dashboard_url).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "active_api_tokens_count".into(),
-            "active_device_tokens_count".into(),
-            "active_sessions_count".into(),
-            "address".into(),
-            "address_summary".into(),
-            "block".into(),
-            "block_message".into(),
-            "cad_user_info".into(),
-            "never_block".into(),
-            "payment_methods".into(),
-            "payment_methods_summary".into(),
-            "stripe_customer_id".into(),
-            "stripe_dashboard_url".into(),
-        ]
-    }
-}
-
-#[doc = "CAD user info details for admin surfaces."]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct UserCadInfoAdminDetails {
-    #[doc = "CAD/API experience level."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cad_experience_level: Option<CadExperienceLevel>,
-    #[doc = "CAD industry selection."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cad_industry: Option<CadIndustry>,
-    #[doc = "CAD user persona/type."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cad_user_type: Option<CadUserType>,
-    #[doc = "Company size selection."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<CompanySize>,
-    #[doc = "Preferred design workflow."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub design_workflow: Option<CadDesignWorkflow>,
-    #[doc = "Whether the user has used Zoo Design Studio or the API before."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub has_used_zoo_design_studio_or_api_before: Option<bool>,
-    #[doc = "Acquisition source selection."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub how_did_you_find_us: Option<CadDiscoverySource>,
-    #[doc = "Free-text acquisition source when `other` was selected."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub how_did_you_find_us_other: Option<String>,
-    #[doc = "Free-text city for the user's location."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub location_city: Option<String>,
-    #[doc = "Free-text country for the user's location."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub location_country: Option<String>,
-    #[doc = "Free-text state or region for the user's location."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub location_state: Option<String>,
-    #[doc = "Number of CAD users."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub number_of_cad_users: Option<String>,
-    #[doc = "Free-text description of what the user wants to build."]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub what_are_you_building: Option<String>,
-}
-
-impl std::fmt::Display for UserCadInfoAdminDetails {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for UserCadInfoAdminDetails {
-    const LENGTH: usize = 13;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            if let Some(cad_experience_level) = &self.cad_experience_level {
-                format!("{:?}", cad_experience_level).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cad_industry) = &self.cad_industry {
-                format!("{:?}", cad_industry).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(cad_user_type) = &self.cad_user_type {
-                format!("{:?}", cad_user_type).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(company_size) = &self.company_size {
-                format!("{:?}", company_size).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(design_workflow) = &self.design_workflow {
-                format!("{:?}", design_workflow).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(has_used_zoo_design_studio_or_api_before) =
-                &self.has_used_zoo_design_studio_or_api_before
-            {
-                format!("{:?}", has_used_zoo_design_studio_or_api_before).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(how_did_you_find_us) = &self.how_did_you_find_us {
-                format!("{:?}", how_did_you_find_us).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(how_did_you_find_us_other) = &self.how_did_you_find_us_other {
-                format!("{:?}", how_did_you_find_us_other).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(location_city) = &self.location_city {
-                format!("{:?}", location_city).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(location_country) = &self.location_country {
-                format!("{:?}", location_country).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(location_state) = &self.location_state {
-                format!("{:?}", location_state).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(number_of_cad_users) = &self.number_of_cad_users {
-                format!("{:?}", number_of_cad_users).into()
-            } else {
-                String::new().into()
-            },
-            if let Some(what_are_you_building) = &self.what_are_you_building {
-                format!("{:?}", what_are_you_building).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            "cad_experience_level".into(),
-            "cad_industry".into(),
-            "cad_user_type".into(),
-            "company_size".into(),
-            "design_workflow".into(),
-            "has_used_zoo_design_studio_or_api_before".into(),
-            "how_did_you_find_us".into(),
-            "how_did_you_find_us_other".into(),
-            "location_city".into(),
-            "location_country".into(),
-            "location_state".into(),
-            "number_of_cad_users".into(),
-            "what_are_you_building".into(),
-        ]
     }
 }
 
