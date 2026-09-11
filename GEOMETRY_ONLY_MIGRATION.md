@@ -1,14 +1,30 @@
-# Geometry-only modeling sessions (proposed)
+# CPU modeling sessions
 
-`CommandsWsParams` gains `geometry_only: Option<bool>`. Pass `Some(true)`
-along with `webrtc: Some(false)` only for workloads that never need images
-or video. Omission and `Some(false)` preserve rendered-session intent.
+The public API selects CPU engines with `pool: Some("cpu".into())` and
+`webrtc: Some(false)`. The account must have the `cpu_engine_pool` feature enabled.
+Without effective CPU access, the API falls back to the default GPU pool.
+A successful WebSocket connection or pong does not establish CPU placement;
+verify the actual selected pool in server routing logs.
 
-Existing exhaustive struct initializers must add `geometry_only: None` or
-use `..Default::default()`. Review release compatibility before publication.
-The binding does not synthesize SSAO or video dimensions.
+```rust
+let params = kittycad::modeling::CommandsWsParams {
+    pool: Some("cpu".into()),
+    webrtc: Some(false),
+    ..Default::default()
+};
+```
 
-Deploy the explicit API contract before enabling callers. CPU routing also
-depends on the server rollout flag and pool availability; the option does
-not guarantee CPU placement. Require matched geometry/export parity and
-verified CPU routing before migrating CI beyond a bounded canary.
+The API derives geometry-only mode from the selected pool, including GPU fallback.
+The existing `geometry_only` field is retained for source compatibility, but is
+not a public CPU routing switch. Omit it when selecting CPU through the API.
+Explicit `pool: Some("default".into())`, or no pool, retains the default GPU route.
+
+Existing exhaustive struct initializers that predate the `geometry_only` field
+must include it or use `..Default::default()`; this guidance does not remove any
+fields or introduce a new signature change.
+
+CPU sessions currently have reduced rendering capabilities. Omit rendering
+options and validate the geometry commands and exports required by your workload.
+A paired protocol ping trial confirms connectivity, not geometry/rendering parity
+or a performance distribution. API #4622 defines this pool-based routing contract;
+API #4601 is not a prerequisite.
