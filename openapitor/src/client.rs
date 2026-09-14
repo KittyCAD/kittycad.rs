@@ -2,6 +2,14 @@
 
 /// Generate the base of the API client.
 pub fn generate_client(opts: &crate::Opts) -> String {
+    format!(
+        "{}\n{}",
+        RETRY_IF_CLONEABLE,
+        generate_client_functions(opts)
+    )
+}
+
+fn generate_client_functions(opts: &crate::Opts) -> String {
     if let Some(token_endpoint) = &opts.token_endpoint {
         // Ensure we also have a user consent endpoint.
         if opts.user_consent_endpoint.is_none() {
@@ -43,6 +51,31 @@ pub fn generate_client(opts: &crate::Opts) -> String {
         .replace("ENV_VARIABLE_CODE", &get_env_variable_code_token(opts))
         .replace("BASE_URL", opts.base_url.to_string().trim_end_matches('/'))
 }
+
+const RETRY_IF_CLONEABLE: &str = r#"
+/// Retry only requests whose bodies can be replayed.
+#[cfg(all(feature = "requests", feature = "retry"))]
+struct RetryIfCloneable<T>(T);
+
+#[cfg(all(feature = "requests", feature = "retry"))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait::async_trait)]
+#[cfg_attr(target_arch = "wasm32", async_trait::async_trait(?Send))]
+impl<T: reqwest_middleware::Middleware> reqwest_middleware::Middleware for RetryIfCloneable<T> {
+    async fn handle(
+        &self,
+        req: reqwest::Request,
+        extensions: &mut http::Extensions,
+        next: reqwest_middleware::Next<'_>,
+    ) -> reqwest_middleware::Result<reqwest::Response> {
+        if req.try_clone().is_some() {
+            self.0.handle(req, extensions, next).await
+        } else {
+            // Streaming bodies cannot be replayed, but must still be sent once.
+            next.run(req, extensions).await
+        }
+    }
+}
+"#;
 
 fn get_env_variable_code_basic_auth(opts: &crate::Opts) -> String {
     let start = if let Some(add_env_prefix) = &opts.add_env_prefix {
@@ -151,8 +184,8 @@ impl Client {
                         // Trace HTTP requests. See the tracing crate to make use of these traces.
                         .with(reqwest_tracing::TracingMiddleware::default())
                         // Retry failed requests.
-                        .with(reqwest_retry::RetryTransientMiddleware::new_with_policy(
-                            retry_policy,
+                        .with(RetryIfCloneable(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
                         ))
                         .build();
 
@@ -350,14 +383,14 @@ impl Client {
                         // Trace HTTP requests. See the tracing crate to make use of these traces.
                         .with(reqwest_tracing::TracingMiddleware::default())
                         // Retry failed requests.
-                        .with(reqwest_retry::RetryTransientMiddleware::new_with_policy(
-                            retry_policy,
+                        .with(RetryIfCloneable(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
                         ))
                         .build();
                     let client_http1_only = reqwest_middleware::ClientBuilder::new(c1)
                         .with(reqwest_tracing::TracingMiddleware::default())
-                        .with(reqwest_retry::RetryTransientMiddleware::new_with_policy(
-                            retry_policy,
+                        .with(RetryIfCloneable(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
                         ))
                         .build();
                     Client {
@@ -410,8 +443,8 @@ impl Client {
                         // Trace HTTP requests. See the tracing crate to make use of these traces.
                         .with(reqwest_tracing::TracingMiddleware::default())
                         // Retry failed requests.
-                        .with(reqwest_retry::RetryTransientMiddleware::new_with_policy(
-                            retry_policy,
+                        .with(RetryIfCloneable(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
                         ))
                         .build();
                     Client {
@@ -698,8 +731,8 @@ impl Client {
                         // Trace HTTP requests. See the tracing crate to make use of these traces.
                         .with(reqwest_tracing::TracingMiddleware::default())
                         // Retry failed requests.
-                        .with(reqwest_retry::RetryTransientMiddleware::new_with_policy(
-                            retry_policy,
+                        .with(RetryIfCloneable(
+                            reqwest_retry::RetryTransientMiddleware::new_with_policy(retry_policy),
                         ))
                         .build();
 

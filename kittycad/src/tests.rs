@@ -658,3 +658,60 @@ async fn test_modeling_websocket() {
         }
     }
 }
+
+#[cfg(all(feature = "retry", not(target_arch = "wasm32")))]
+#[tokio::test]
+async fn test_retry_skips_uncloneable_bodies() {
+    use std::sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    };
+
+    struct TransientResponse(Arc<AtomicUsize>);
+
+    #[async_trait::async_trait]
+    impl reqwest_middleware::Middleware for TransientResponse {
+        async fn handle(
+            &self,
+            _req: reqwest::Request,
+            _extensions: &mut http::Extensions,
+            _next: reqwest_middleware::Next<'_>,
+        ) -> reqwest_middleware::Result<reqwest::Response> {
+            let attempt = self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(http::Response::builder()
+                .status(if attempt == 0 { 503 } else { 200 })
+                .body("")
+                .unwrap()
+                .into())
+        }
+    }
+
+    for multipart in [true, false] {
+        let client = crate::Client::new("test-token");
+        for transport in [client.client, client.client_http1_only] {
+            let attempts = Arc::new(AtomicUsize::new(0));
+            let transport = reqwest_middleware::ClientBuilder::from_client(transport)
+                .with(TransientResponse(attempts.clone()))
+                .build();
+            let request = transport.post("http://localhost/upload");
+            let request = if multipart {
+                request.multipart(reqwest::multipart::Form::new().text("file", "contents"))
+            } else {
+                request.body("contents")
+            }
+            .build()
+            .unwrap();
+            assert_eq!(request.try_clone().is_none(), multipart);
+
+            let response = transport.execute(request).await.unwrap();
+            assert_eq!(
+                response.status().as_u16(),
+                if multipart { 503 } else { 200 }
+            );
+            assert_eq!(
+                attempts.load(Ordering::SeqCst),
+                if multipart { 1 } else { 2 }
+            );
+        }
+    }
+}
