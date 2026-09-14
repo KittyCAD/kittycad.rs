@@ -12,6 +12,132 @@ impl Payments {
         Self { client }
     }
 
+    #[doc = "Get the authenticated organization's aggregate-usage collection \
+             threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_get_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .get_org_usage_collection_threshold()\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_usage_collection_threshold<'a>(
+        &'a self,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Set the authenticated organization's aggregate-usage collection \
+             threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_set_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        \
+             .set_org_usage_collection_threshold(&\
+             kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as \
+             f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn set_org_usage_collection_threshold<'a>(
+        &'a self,
+        body: &crate::types::AggregateUsageCollectionThresholdSet,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::PUT,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Restore the default for the authenticated organization's aggregate-usage collection \
+             threshold.\n\n**Parameters:**\n\n- `expected_version: i64`: Version returned by the \
+             read that this mutation is based on. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_reset_org_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .reset_org_usage_collection_threshold(4 as i64)\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn reset_org_usage_collection_threshold<'a>(
+        &'a self,
+        expected_version: i64,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url, "org/billing/usage-collection-threshold"
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let query_params = vec![("expected_version", format!("{}", expected_version))];
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get payment info about your org.\n\nThis includes billing address, phone, and \
              name.\n\nThis endpoint requires authentication by an org admin. It gets the payment \
              information for the authenticated user's org.\n\n```rust,no_run\nasync fn \
@@ -589,38 +715,27 @@ impl Payments {
         }
     }
 
-    #[doc = "Get balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. \
-             It gets the balance information for the specified org.\n\n**Parameters:**\n\n- `id: \
-             uuid::Uuid`: The organization ID. (required)\n- `include_total_due: Option<bool>`: If \
-             you would like to return the total due for a user. This makes the API call take \
-             longer so it is off by default.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_payments_get_balance_for_any_org() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = \
-             client\n        .payments()\n        .get_balance_for_any_org(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
+    #[doc = "Get your personal aggregate-usage collection threshold.\n\nThe effective threshold is \
+             the amount of accrued, unfunded usage that causes an early invoice before the normal \
+             billing-period close.\n\n```rust,no_run\nasync fn \
+             example_payments_get_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .get_user_usage_collection_threshold()\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn get_balance_for_any_org<'a>(
+    pub async fn get_user_usage_collection_threshold<'a>(
         &'a self,
-        id: uuid::Uuid,
-        include_total_due: Option<bool>,
-    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
         let mut req = self.client.client.request(
             http::Method::GET,
             format!(
                 "{}/{}",
-                self.client.base_url,
-                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
+                self.client.base_url, "user/billing/usage-collection-threshold"
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -640,73 +755,26 @@ impl Payments {
         }
     }
 
-    #[doc = "Update balance for an org.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. (required)\n- `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_payments_update_balance_for_any_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_org(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn update_balance_for_any_org<'a>(
-        &'a self,
-        id: uuid::Uuid,
-        include_total_due: Option<bool>,
-        body: &crate::types::UpdatePaymentBalance,
-    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "orgs/{id}/payment/balance".replace("{id}", &format!("{}", id))
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Update the subscription for any org (admin override).\n\nThis endpoint requires \
-             authentication by a Zoo admin. It updates the subscription for the specified \
-             org.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The organization ID. \
-             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_payments_update_org_subscription_for_any_org() -> anyhow::Result<()> {\n    \
+    #[doc = "Set your personal aggregate-usage collection threshold.\n\n```rust,no_run\nasync fn \
+             example_payments_set_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
              let client = kittycad::Client::new_from_env();\n    let result: \
-             kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        \
-             .update_org_subscription_for_any_org(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             &kittycad::types::ZooProductSubscriptionsOrgRequest {\n                modeling_app: \
-             \"some-string\".to_string(),\n                pay_annually: Some(true),\n            \
-             },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        \
+             .set_user_usage_collection_threshold(&\
+             kittycad::types::AggregateUsageCollectionThresholdSet {\n            amount: 3.14 as \
+             f64,\n            expected_version: 4 as i64,\n        })\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn update_org_subscription_for_any_org<'a>(
+    pub async fn set_user_usage_collection_threshold<'a>(
         &'a self,
-        id: uuid::Uuid,
-        body: &crate::types::ZooProductSubscriptionsOrgRequest,
-    ) -> Result<crate::types::ZooProductSubscriptions, crate::types::error::Error> {
+        body: &crate::types::AggregateUsageCollectionThresholdSet,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
         let mut req = self.client.client.request(
             http::Method::PUT,
             format!(
                 "{}/{}",
-                self.client.base_url,
-                "orgs/{id}/payment/subscriptions".replace("{id}", &format!("{}", id))
+                self.client.base_url, "user/billing/usage-collection-threshold"
             ),
         );
         req = req.bearer_auth(&self.client.token);
@@ -730,23 +798,30 @@ impl Payments {
         }
     }
 
-    #[doc = "Create or update a price for a subscription plan.\n\nYou must be a Zoo admin to perform this request.\n\n**Parameters:**\n\n- `slug: &'astr` (required)\n\n```rust,no_run\nasync fn example_payments_upsert_subscription_plan_price() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::SubscriptionPlanPriceRecord = client\n        .payments()\n        .upsert_subscription_plan_price(\n            \"some-string\",\n            &kittycad::types::PriceUpsertRequest {\n                active: true,\n                billing_model: kittycad::types::SubscriptionPlanBillingModel::PerUser,\n                cadence: kittycad::types::PlanInterval::Year,\n                unit_amount: 3.14 as f64,\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Restore the default for your personal aggregate-usage collection \
+             threshold.\n\n**Parameters:**\n\n- `expected_version: i64`: Version returned by the \
+             read that this mutation is based on. (required)\n\n```rust,no_run\nasync fn \
+             example_payments_reset_user_usage_collection_threshold() -> anyhow::Result<()> {\n    \
+             let client = kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::AggregateUsageCollectionThresholdView = client\n        \
+             .payments()\n        .reset_user_usage_collection_threshold(4 as i64)\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn upsert_subscription_plan_price<'a>(
+    pub async fn reset_user_usage_collection_threshold<'a>(
         &'a self,
-        slug: &'a str,
-        body: &crate::types::PriceUpsertRequest,
-    ) -> Result<crate::types::SubscriptionPlanPriceRecord, crate::types::error::Error> {
+        expected_version: i64,
+    ) -> Result<crate::types::AggregateUsageCollectionThresholdView, crate::types::error::Error>
+    {
         let mut req = self.client.client.request(
-            http::Method::POST,
+            http::Method::DELETE,
             format!(
                 "{}/{}",
-                self.client.base_url,
-                "subscription-plans/{slug}/prices".replace("{slug}", slug)
+                self.client.base_url, "user/billing/usage-collection-threshold"
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        req = req.json(body);
+        let query_params = vec![("expected_version", format!("{}", expected_version))];
+        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -1310,7 +1385,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Update the user's subscription.\n\nThis endpoint requires authentication by any Zoo user. It updates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_update_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .update_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            downgrade_reason: Some(\n                kittycad::types::ZooProductSubscriptionDowngradeReason::ZookeeperResultsLowQuality,\n            ),\n            downgrade_reason_text: Some(\"some-string\".to_string()),\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn update_user_subscription<'a>(
         &'a self,
@@ -1341,7 +1416,7 @@ impl Payments {
         }
     }
 
-    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[doc = "Create the subscription for a user.\n\nThis endpoint requires authentication by any Zoo user. It creates the subscription for the user.\n\n```rust,no_run\nasync fn example_payments_create_user_subscription() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ZooProductSubscriptions = client\n        .payments()\n        .create_user_subscription(&kittycad::types::ZooProductSubscriptionsUserRequest {\n            downgrade_reason: Some(\n                kittycad::types::ZooProductSubscriptionDowngradeReason::ZookeeperResultsLowQuality,\n            ),\n            downgrade_reason_text: Some(\"some-string\".to_string()),\n            modeling_app: \"some-string\".to_string(),\n            pay_annually: Some(true),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_user_subscription<'a>(
         &'a self,
@@ -1393,98 +1468,6 @@ impl Payments {
         let status = resp.status();
         if status.is_success() {
             Ok(())
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Get balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. \
-             It gets the balance information for the specified user.\n\n**Parameters:**\n\n- `id: \
-             &'astr`: The user's identifier (uuid or email). (required)\n- `include_total_due: \
-             Option<bool>`: If you would like to return the total due for a user. This makes the \
-             API call take longer so it is off by default.\n\n```rust,no_run\nasync fn \
-             example_payments_get_balance_for_any_user() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = \
-             client\n        .payments()\n        .get_balance_for_any_user(\"some-string\", \
-             Some(true))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn get_balance_for_any_user<'a>(
-        &'a self,
-        id: &'a str,
-        include_total_due: Option<bool>,
-    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::GET,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "users/{id}/payment/balance".replace("{id}", id)
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
-        } else {
-            let text = resp.text().await.unwrap_or_default();
-            Err(crate::types::error::Error::Server {
-                body: text.to_string(),
-                status,
-            })
-        }
-    }
-
-    #[doc = "Update balance for an user.\n\nThis endpoint requires authentication by a Zoo employee. It updates the balance information for the specified user.\n\n**Parameters:**\n\n- `id: &'astr`: The user's identifier (uuid or email). (required)\n- `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\n\n```rust,no_run\nasync fn example_payments_update_balance_for_any_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance = client\n        .payments()\n        .update_balance_for_any_user(\n            \"some-string\",\n            Some(true),\n            &kittycad::types::UpdatePaymentBalance {\n                monthly_api_credits_remaining_monetary_value: Some(3.14 as f64),\n                stable_api_credits_remaining_monetary_value: Some(3.14 as f64),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
-    #[tracing::instrument]
-    pub async fn update_balance_for_any_user<'a>(
-        &'a self,
-        id: &'a str,
-        include_total_due: Option<bool>,
-        body: &crate::types::UpdatePaymentBalance,
-    ) -> Result<crate::types::CustomerBalance, crate::types::error::Error> {
-        let mut req = self.client.client.request(
-            http::Method::PUT,
-            format!(
-                "{}/{}",
-                self.client.base_url,
-                "users/{id}/payment/balance".replace("{id}", id)
-            ),
-        );
-        req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = include_total_due {
-            query_params.push(("include_total_due", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
-        req = req.json(body);
-        let resp = req.send().await?;
-        let status = resp.status();
-        if status.is_success() {
-            let text = resp.text().await.unwrap_or_default();
-            serde_json::from_str(&text).map_err(|err| {
-                crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
-                    status,
-                )
-            })
         } else {
             let text = resp.text().await.unwrap_or_default();
             Err(crate::types::error::Error::Server {

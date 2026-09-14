@@ -29,7 +29,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! kittycad = "0.4.13"
+//! kittycad = "0.5.1"
 //! ```
 //!
 //! ## Basic example
@@ -74,16 +74,16 @@ pub mod api_calls;
 /// FROM: <https://zoo.dev/docs/api/api-tokens>
 #[cfg(feature = "requests")]
 pub mod api_tokens;
-/// Endpoints for third party app grant flows.
-///
-/// FROM: <https://zoo.dev/docs/api/apps>
-#[cfg(feature = "requests")]
-pub mod apps;
 /// Endpoints that allow for code execution or creation of code execution environments.
 ///
 /// FROM: <https://zoo.dev/docs/api/executor>
 #[cfg(feature = "requests")]
 pub mod executor;
+/// Operations for submitting and managing Factory manufacturing jobs.
+///
+/// FROM: <https://zoo.dev/docs/api/factory>
+#[cfg(feature = "requests")]
+pub mod factory;
 /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
 ///
 /// FROM: <https://zoo.dev/docs/api/file>
@@ -135,11 +135,6 @@ pub mod projects;
 /// FROM: <https://zoo.dev/docs/api/service-accounts>
 #[cfg(feature = "requests")]
 pub mod service_accounts;
-/// Operations involving our swag store.
-///
-/// FROM: <https://zoo.dev/docs/api/store>
-#[cfg(feature = "requests")]
-pub mod store;
 #[cfg(test)]
 mod tests;
 pub mod types;
@@ -414,18 +409,18 @@ impl Client {
         api_tokens::ApiTokens::new(self.clone())
     }
 
-    /// Endpoints for third party app grant flows.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/apps>
-    pub fn apps(&self) -> apps::Apps {
-        apps::Apps::new(self.clone())
-    }
-
     /// Endpoints that allow for code execution or creation of code execution environments.
     ///
     /// FROM: <https://zoo.dev/docs/api/executor>
     pub fn executor(&self) -> executor::Executor {
         executor::Executor::new(self.clone())
+    }
+
+    /// Operations for submitting and managing Factory manufacturing jobs.
+    ///
+    /// FROM: <https://zoo.dev/docs/api/factory>
+    pub fn factory(&self) -> factory::Factory {
+        factory::Factory::new(self.clone())
     }
 
     /// CAD file operations. Create, get, and list CAD file conversions. More endpoints will be added here in the future as we build out transforms, etc on CAD models.
@@ -496,13 +491,6 @@ impl Client {
     /// FROM: <https://zoo.dev/docs/api/service-accounts>
     pub fn service_accounts(&self) -> service_accounts::ServiceAccounts {
         service_accounts::ServiceAccounts::new(self.clone())
-    }
-
-    /// Operations involving our swag store.
-    ///
-    /// FROM: <https://zoo.dev/docs/api/store>
-    pub fn store(&self) -> store::Store {
-        store::Store::new(self.clone())
     }
 
     /// Unit conversion operations.
