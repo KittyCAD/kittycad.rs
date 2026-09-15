@@ -628,7 +628,8 @@ impl Oauth2 {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_org_oauth_2_apps(limit, None, sort_by)
+        let stream = self
+            .list_org_oauth_2_apps(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -693,8 +694,16 @@ impl Oauth2 {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Create an org OAuth app.\n\nThis endpoint requires authentication by an org admin. It creates an active public OAuth app owned by the authenticated organization.\n\n```rust,no_run\nasync fn example_oauth2_create_org_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_org_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            mode: Some(kittycad::types::Oauth2AppMode::Production),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
@@ -904,7 +913,8 @@ impl Oauth2 {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_user_oauth_2_apps(limit, None, sort_by)
+        let stream = self
+            .list_user_oauth_2_apps(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -969,8 +979,16 @@ impl Oauth2 {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Create a personal OAuth app.\n\nThis endpoint requires authentication by any Zoo user. It creates an active public OAuth app owned by the authenticated user.\n\n```rust,no_run\nasync fn example_oauth2_create_user_oauth_2_app() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Oauth2AppResponse = client\n        .oauth2()\n        .create_user_oauth_2_app(&kittycad::types::CreateOAuth2AppRequest {\n            grant_types: Some(vec![kittycad::types::Oauth2AppGrantType::RefreshToken]),\n            mode: Some(kittycad::types::Oauth2AppMode::Production),\n            name: \"some-string\".to_string(),\n            redirect_uris: Some(vec![\"https://example.com/foo/bar\".to_string()]),\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]

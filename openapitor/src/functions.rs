@@ -364,8 +364,7 @@ pub(crate) fn generate_files(
                                 #params_unpack
                                 #pagination_setup
 
-                                // Get the result from our main function.
-                                self.#fn_name_ident(params_for_call #body_arg)
+                                let stream = self.#fn_name_ident(params_for_call #body_arg)
                                     .map_ok(move |result| {
                                         let items = futures::stream::iter(result.items().into_iter().map(Ok));
 
@@ -401,8 +400,17 @@ pub(crate) fn generate_files(
 
                                         items.chain(next_pages)
                                     })
-                                    .try_flatten_stream()
-                                    .boxed()
+                                    .try_flatten_stream();
+
+                                #[cfg(target_arch = "wasm32")]
+                                {
+                                    stream.boxed_local()
+                                }
+
+                                #[cfg(not(target_arch = "wasm32"))]
+                                {
+                                    stream.boxed()
+                                }
                                 }
                         }
                     } else {
@@ -449,8 +457,7 @@ pub(crate) fn generate_files(
 
                                 #pagination_setup
 
-                                // Get the result from our main function.
-                                self.#fn_name_ident(#inner_args #body_arg)
+                                let stream = self.#fn_name_ident(#inner_args #body_arg)
                                     .map_ok(move |result| {
                                         let items = futures::stream::iter(result.items().into_iter().map(Ok));
 
@@ -486,8 +493,17 @@ pub(crate) fn generate_files(
 
                                         items.chain(next_pages)
                                     })
-                                    .try_flatten_stream()
-                                    .boxed()
+                                    .try_flatten_stream();
+
+                                #[cfg(target_arch = "wasm32")]
+                                {
+                                    stream.boxed_local()
+                                }
+
+                                #[cfg(not(target_arch = "wasm32"))]
+                                {
+                                    stream.boxed()
+                                }
                                 }
                         }
                     };

@@ -81,7 +81,8 @@ impl ServiceAccounts {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_for_org(limit, None, sort_by)
+        let stream = self
+            .list_for_org(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -146,8 +147,16 @@ impl ServiceAccounts {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Create a new service account for your org.\n\nThis endpoint requires authentication \

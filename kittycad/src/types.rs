@@ -3152,7 +3152,6 @@ pub enum BlendType {
     Tangent,
 }
 
-
 #[doc = "The reason for blocking a user."]
 #[derive(
     serde :: Serialize,
@@ -16356,7 +16355,6 @@ pub enum Oauth2AuthorizationResponseType {
     Code,
 }
 
-
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -16473,7 +16471,6 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
-
 
 #[doc = "Supported OAuth 2.0 scopes."]
 #[derive(
@@ -19279,7 +19276,6 @@ pub enum Type {
     Dxf,
 }
 
-
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -20015,7 +20011,6 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
-
 
 #[doc = "Defines a perspective view."]
 #[derive(
