@@ -83,7 +83,8 @@ impl Factory {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_org_jobs(limit, None, sort_by)
+        let stream = self
+            .list_org_jobs(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -152,8 +153,16 @@ impl Factory {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "List finishes currently available for customer Factory submissions.\n\nInternal-only \
@@ -263,7 +272,8 @@ impl Factory {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        self.list_user_jobs(limit, None, sort_by)
+        let stream = self
+            .list_user_jobs(limit, None, sort_by)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -332,8 +342,16 @@ impl Factory {
                 .try_flatten();
                 items.chain(next_pages)
             })
-            .try_flatten_stream()
-            .boxed()
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
     }
 
     #[doc = "Submit a part for manufacturing. Requires a signed-in Zoo account.\n\nThe request is `multipart/form-data`: - one JSON part named `body` (`FactoryIntakeForm`) whose `fields` object holds   intake data (material, finish, quantity, notes, …). Material and finish   are required customer-visible catalog names; all other fields are stored   verbatim so they can be added or renamed without an API change. - one or more file parts (any part name). At least one file is required.\n\nThe submitter's identity (email, name, user id) comes from the authenticated account, not the form.\n\nFetch `GET /user/factory/materials` and `GET /user/factory/finishes`, then send the returned exact `material` and `finish` names. The server rejects missing, non-string, unknown, deleted, and internal-only choices with these stable field-specific `error_code` values: - `factory_material_input_missing` - `factory_material_input_invalid_type` - `factory_material_not_found` - `factory_material_not_customer_visible` - `factory_finish_input_missing` - `factory_finish_input_invalid_type` - `factory_finish_not_found` - `factory_finish_not_customer_visible` - `quantity`: a positive integer.\n\nExample `body` part: ```ignorejson { \"fields\": { \"material\": \"6061 Aluminum\", \"finish\": \"Anodized\", \"quantity\": 10, \"notes\": \"deburr all edges\" } } ```ignore\n\nExample request (curl): ```ignore curl -X POST https://api.zoo.dev/user/factory/jobs \\   -H \"Authorization: Bearer $ZOO_API_TOKEN\" \\   -F 'body={\"fields\":{\"material\":\"6061 Aluminum\",\"finish\":\"Anodized\",\"quantity\":10}};type=application/json' \\   -F 'file=@bracket.step' ```ignore\n\nReturns `201` with the created job (`FactoryJobResponse`).\n\n```rust,no_run\nasync fn example_factory_create_user_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryJobResponse = client\n        .factory()\n        .create_user_job(vec![kittycad::types::multipart::Attachment {\n            name: \"thing\".to_string(),\n            filepath: Some(\"myfile.json\".into()),\n            content_type: Some(\"application/json\".to_string()),\n            data: std::fs::read(\"myfile.json\").unwrap(),\n        }])\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
