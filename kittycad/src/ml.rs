@@ -790,7 +790,7 @@ impl Ml {
                 url,
                 status,
                 body,
-                headers,
+                headers: Box::new(headers),
             });
         }
 
@@ -842,7 +842,7 @@ impl Ml {
                 url,
                 status,
                 body,
-                headers,
+                headers: Box::new(headers),
             });
         }
 

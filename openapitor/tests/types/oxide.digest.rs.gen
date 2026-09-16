@@ -1,4 +1,5 @@
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -14,13 +15,8 @@
 pub enum Type {
     #[serde(rename = "sha256")]
     #[display("sha256")]
+    #[default]
     Sha256,
-}
-
-impl std::default::Default for Type {
-    fn default() -> Self {
-        Type::Sha256
-    }
 }
 
 #[derive(

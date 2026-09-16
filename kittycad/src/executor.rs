@@ -101,7 +101,7 @@ impl Executor {
                 url,
                 status,
                 body,
-                headers,
+                headers: Box::new(headers),
             });
         }
 

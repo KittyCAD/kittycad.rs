@@ -109,7 +109,7 @@ fn generate_websocket_fn(
             let status = resp.status();
             let url = resp.url().to_string();
             let body = resp.text().await.unwrap_or_else(|_| "<error reading body>".to_owned());
-            return Err(crate::types::error::Error::UnexpectedResponse{url, status, body, headers});
+            return Err(crate::types::error::Error::UnexpectedResponse{url, status, body, headers: Box::new(headers)});
         }
 
         // TODO: This isn't really a request error, but the response was already consumed.
@@ -434,7 +434,7 @@ pub(crate) fn generate_files(
                             quote!()
                         } else {
                             let mut a = Vec::new();
-                            for (k, _v) in raw_args.iter() {
+                            for k in raw_args.keys() {
                                 // Skip the next page arg.
                                 if k != &page_param_str {
                                     let n = format_ident!("{}", k);
@@ -1256,6 +1256,10 @@ fn gen_query_params_code(query_params: &BTreeMap<String, TokenStream>) -> Result
                 required_params.push(quote! {
                    (#name, #name_ident)
                 })
+            } else if t.is_string()? {
+                required_params.push(quote! {
+                   (#name, #name_ident.to_string())
+                })
             } else {
                 required_params.push(quote! {
                    (#name, format!("{}", #name_ident))
@@ -1322,6 +1326,10 @@ fn gen_pagination_query_params_setup_code(
             if type_text == "String" {
                 push_params.push(quote! {
                     pagination_query_params.push((#name, #name_ident.clone()));
+                })
+            } else if t.is_string()? {
+                push_params.push(quote! {
+                    pagination_query_params.push((#name, #name_ident.to_string()));
                 })
             } else {
                 push_params.push(quote! {

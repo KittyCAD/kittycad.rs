@@ -28,8 +28,8 @@ pub enum Error {
         #[cfg(not(feature = "retry"))]
         /// The error.
         error: reqwest::Error,
-        /// The full response.
-        response: reqwest::Response,
+        /// The full response, boxed to keep the error compact.
+        response: Box<reqwest::Response>,
     },
 
     /// An error from the server.
@@ -49,8 +49,8 @@ pub enum Error {
         url: String,
         /// HTTP response body from the server, rendered as text.
         body: String,
-        /// HTTP headers
-        headers: reqwest::header::HeaderMap,
+        /// HTTP headers, boxed to keep the error compact.
+        headers: Box<reqwest::header::HeaderMap>,
     },
 }
 

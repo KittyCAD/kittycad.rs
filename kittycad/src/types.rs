@@ -182,7 +182,6 @@ pub mod multipart {
 #[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
-    #![allow(clippy::result_large_err)]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
     pub trait Pagination {
@@ -384,8 +383,8 @@ pub mod error {
             #[cfg(not(feature = "retry"))]
             #[doc = " The error."]
             error: reqwest::Error,
-            #[doc = " The full response."]
-            response: reqwest::Response,
+            #[doc = " The full response, boxed to keep the error compact."]
+            response: Box<reqwest::Response>,
         },
         #[doc = " An error from the server."]
         Server {
@@ -403,8 +402,8 @@ pub mod error {
             url: String,
             #[doc = " HTTP response body from the server, rendered as text."]
             body: String,
-            #[doc = " HTTP headers"]
-            headers: reqwest::header::HeaderMap,
+            #[doc = " HTTP headers, boxed to keep the error compact."]
+            headers: Box<reqwest::header::HeaderMap>,
         },
     }
 
@@ -3131,6 +3130,7 @@ impl tabled::Tabled for BillingInfo {
 
 #[doc = "What kind of blend to do"]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -3143,7 +3143,6 @@ impl tabled::Tabled for BillingInfo {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum BlendType {
     #[doc = "Use the tangent of the surfaces to calculate the blend."]
     #[serde(rename = "tangent")]
@@ -3151,7 +3150,6 @@ pub enum BlendType {
     #[default]
     Tangent,
 }
-
 
 #[doc = "The reason for blocking a user."]
 #[derive(
@@ -16335,6 +16333,7 @@ impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
 
 #[doc = "The OAuth 2.0 authorization response type."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -16347,7 +16346,6 @@ impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum Oauth2AuthorizationResponseType {
     #[doc = "The authorization code response type."]
     #[serde(rename = "code")]
@@ -16355,7 +16353,6 @@ pub enum Oauth2AuthorizationResponseType {
     #[default]
     Code,
 }
-
 
 #[doc = "Information about an OAuth 2.0 client."]
 #[derive(
@@ -16453,6 +16450,7 @@ pub enum Oauth2CodeChallengeMethod {
 
 #[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -16465,7 +16463,6 @@ pub enum Oauth2CodeChallengeMethod {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
@@ -16473,7 +16470,6 @@ pub enum Oauth2GrantType {
     #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
 }
-
 
 #[doc = "Supported OAuth 2.0 scopes."]
 #[derive(
@@ -19259,6 +19255,7 @@ impl tabled::Tabled for OutputFile {
 }
 
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -19271,14 +19268,12 @@ impl tabled::Tabled for OutputFile {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum Type {
     #[serde(rename = "dxf")]
     #[display("dxf")]
     #[default]
     Dxf,
 }
-
 
 #[doc = "AutoCAD drawing interchange format."]
 #[derive(
@@ -19995,6 +19990,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 
 #[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -20007,7 +20003,6 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 )]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
-#[derive(Default)]
 pub enum PaymentMethodType {
     #[doc = "A card payment method."]
     #[serde(rename = "card")]
@@ -20015,7 +20010,6 @@ pub enum PaymentMethodType {
     #[default]
     Card,
 }
-
 
 #[doc = "Defines a perspective view."]
 #[derive(

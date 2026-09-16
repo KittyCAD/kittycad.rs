@@ -180,7 +180,6 @@ pub mod multipart {
 #[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
-    #![allow(clippy::result_large_err)]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
     pub trait Pagination {
@@ -379,8 +378,8 @@ pub mod error {
             #[cfg(not(feature = "retry"))]
             #[doc = " The error."]
             error: reqwest::Error,
-            #[doc = " The full response."]
-            response: reqwest::Response,
+            #[doc = " The full response, boxed to keep the error compact."]
+            response: Box<reqwest::Response>,
         },
         #[doc = " An error from the server."]
         Server {
@@ -398,8 +397,8 @@ pub mod error {
             url: String,
             #[doc = " HTTP response body from the server, rendered as text."]
             body: String,
-            #[doc = " HTTP headers"]
-            headers: reqwest::header::HeaderMap,
+            #[doc = " HTTP headers, boxed to keep the error compact."]
+            headers: Box<reqwest::header::HeaderMap>,
         },
     }
 
@@ -685,6 +684,7 @@ impl tabled::Tabled for DeviceAuthVerify {
 }
 
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -700,13 +700,8 @@ impl tabled::Tabled for DeviceAuthVerify {
 pub enum Type {
     #[serde(rename = "sha256")]
     #[display("sha256")]
+    #[default]
     Sha256,
-}
-
-impl std::default::Default for Type {
-    fn default() -> Self {
-        Type::Sha256
-    }
 }
 
 #[derive(
@@ -1657,6 +1652,7 @@ impl tabled::Tabled for IdentityProviderResultsPage {
 }
 
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -1672,17 +1668,13 @@ impl tabled::Tabled for IdentityProviderResultsPage {
 pub enum IdentityProviderType {
     #[serde(rename = "saml")]
     #[display("saml")]
+    #[default]
     Saml,
-}
-
-impl std::default::Default for IdentityProviderType {
-    fn default() -> Self {
-        IdentityProviderType::Saml
-    }
 }
 
 #[doc = "Describes what kind of identity is described by an id"]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -1698,13 +1690,8 @@ impl std::default::Default for IdentityProviderType {
 pub enum IdentityType {
     #[serde(rename = "silo_user")]
     #[display("silo_user")]
+    #[default]
     SiloUser,
-}
-
-impl std::default::Default for IdentityType {
-    fn default() -> Self {
-        IdentityType::SiloUser
-    }
 }
 
 #[derive(
@@ -6807,6 +6794,7 @@ impl tabled::Tabled for VpcUpdate {
 
 #[doc = "Supported set of sort modes for scanning by id only.\n\nCurrently, we only support scanning in ascending order."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -6822,17 +6810,13 @@ impl tabled::Tabled for VpcUpdate {
 pub enum IdSortMode {
     #[serde(rename = "id_ascending")]
     #[display("id_ascending")]
+    #[default]
     IdAscending,
-}
-
-impl std::default::Default for IdSortMode {
-    fn default() -> Self {
-        IdSortMode::IdAscending
-    }
 }
 
 #[doc = "Supported set of sort modes for scanning by name only\n\nCurrently, we only support scanning in ascending order."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -6848,13 +6832,8 @@ impl std::default::Default for IdSortMode {
 pub enum NameSortMode {
     #[serde(rename = "name_ascending")]
     #[display("name_ascending")]
+    #[default]
     NameAscending,
-}
-
-impl std::default::Default for NameSortMode {
-    fn default() -> Self {
-        NameSortMode::NameAscending
-    }
 }
 
 #[doc = "Supported set of sort modes for scanning by name or id"]

@@ -180,7 +180,6 @@ pub mod multipart {
 #[cfg(feature = "requests")]
 pub mod paginate {
     #![doc = " Utility functions used for pagination."]
-    #![allow(clippy::result_large_err)]
     use anyhow::Result;
     #[doc = " A trait for types that allow pagination."]
     pub trait Pagination {
@@ -379,8 +378,8 @@ pub mod error {
             #[cfg(not(feature = "retry"))]
             #[doc = " The error."]
             error: reqwest::Error,
-            #[doc = " The full response."]
-            response: reqwest::Response,
+            #[doc = " The full response, boxed to keep the error compact."]
+            response: Box<reqwest::Response>,
         },
         #[doc = " An error from the server."]
         Server {
@@ -398,8 +397,8 @@ pub mod error {
             url: String,
             #[doc = " HTTP response body from the server, rendered as text."]
             body: String,
-            #[doc = " HTTP headers"]
-            headers: reqwest::header::HeaderMap,
+            #[doc = " HTTP headers, boxed to keep the error compact."]
+            headers: Box<reqwest::header::HeaderMap>,
         },
     }
 
@@ -3088,6 +3087,7 @@ impl tabled::Tabled for BillingInfo {
 
 #[doc = "What kind of blend to do"]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -3104,13 +3104,8 @@ pub enum BlendType {
     #[doc = "Use the tangent of the surfaces to calculate the blend."]
     #[serde(rename = "tangent")]
     #[display("tangent")]
+    #[default]
     Tangent,
-}
-
-impl std::default::Default for BlendType {
-    fn default() -> Self {
-        BlendType::Tangent
-    }
 }
 
 #[doc = "The reason for blocking a user."]
@@ -15787,6 +15782,7 @@ impl tabled::Tabled for Oauth2AuthorizationRequestResponse {
 
 #[doc = "The OAuth 2.0 authorization response type."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -15803,13 +15799,8 @@ pub enum Oauth2AuthorizationResponseType {
     #[doc = "The authorization code response type."]
     #[serde(rename = "code")]
     #[display("code")]
+    #[default]
     Code,
-}
-
-impl std::default::Default for Oauth2AuthorizationResponseType {
-    fn default() -> Self {
-        Oauth2AuthorizationResponseType::Code
-    }
 }
 
 #[doc = "Information about an OAuth 2.0 client."]
@@ -15904,6 +15895,7 @@ pub enum Oauth2CodeChallengeMethod {
 
 #[doc = "An OAuth 2.0 Grant Type. These are documented here: <https://oauth.net/2/grant-types/>."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -15920,13 +15912,8 @@ pub enum Oauth2GrantType {
     #[doc = "An OAuth 2.0 Device Authorization Grant."]
     #[serde(rename = "urn:ietf:params:oauth:grant-type:device_code")]
     #[display("urn:ietf:params:oauth:grant-type:device_code")]
+    #[default]
     UrnIetfParamsOauthGrantTypeDeviceCode,
-}
-
-impl std::default::Default for Oauth2GrantType {
-    fn default() -> Self {
-        Oauth2GrantType::UrnIetfParamsOauthGrantTypeDeviceCode
-    }
 }
 
 #[doc = "Supported OAuth 2.0 scopes."]
@@ -18670,6 +18657,7 @@ impl tabled::Tabled for OutputFile {
 }
 
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -18685,13 +18673,8 @@ impl tabled::Tabled for OutputFile {
 pub enum Type {
     #[serde(rename = "dxf")]
     #[display("dxf")]
+    #[default]
     Dxf,
-}
-
-impl std::default::Default for Type {
-    fn default() -> Self {
-        Type::Dxf
-    }
 }
 
 #[doc = "AutoCAD drawing interchange format."]
@@ -19384,6 +19367,7 @@ impl tabled::Tabled for PaymentMethodCardChecks {
 
 #[doc = "An enum representing the possible values of an `PaymentMethod`'s `type` field."]
 #[derive(
+    Default,
     serde :: Serialize,
     serde :: Deserialize,
     PartialEq,
@@ -19400,13 +19384,8 @@ pub enum PaymentMethodType {
     #[doc = "A card payment method."]
     #[serde(rename = "card")]
     #[display("card")]
+    #[default]
     Card,
-}
-
-impl std::default::Default for PaymentMethodType {
-    fn default() -> Self {
-        PaymentMethodType::Card
-    }
 }
 
 #[doc = "Defines a perspective view."]

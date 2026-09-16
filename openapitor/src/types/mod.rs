@@ -1142,9 +1142,17 @@ impl TypeSpace {
             quote!()
         };
 
+        let default_variant = if let Some(default) = &data.default {
+            Some(proper_name(&default.to_string()))
+        } else if let [Some(default)] = s.enumeration.as_slice() {
+            Some(proper_name(default))
+        } else {
+            None
+        };
+
         let mut values = quote!();
         for (index, e) in s.enumeration.iter().enumerate() {
-            if e.is_none() {
+            let Some(e) = e else {
                 // GitHub will sometimes put in a null value.
                 // But it's fine because they also mark it as null.
                 // Just in case tho let's ensure it's marked as nullable.
@@ -1154,15 +1162,20 @@ impl TypeSpace {
 
                 // We can continue early.
                 continue;
-            }
+            };
 
-            let e = e.as_ref().unwrap().to_string();
-
-            let e_name = format_ident!("{}", proper_name(&e));
+            let variant_name = proper_name(e);
+            let e_name = format_ident!("{}", variant_name);
             let mut e_value = quote!(
                 #e_name,
             );
-            if proper_name(&e) != e {
+            if default_variant.as_ref() == Some(&variant_name) {
+                e_value = quote!(
+                    #[default]
+                    #e_value
+                );
+            }
+            if variant_name != *e {
                 e_value = quote!(
                     #[serde(rename = #e)]
                     #[display(#e)]
@@ -1173,7 +1186,7 @@ impl TypeSpace {
             // Check if we have a description for the enum.
             if let Some(description) = additional_docs.get(index) {
                 if !description.is_empty() {
-                    let description_sanitized = sanitize_indents(description, proper_name(&e));
+                    let description_sanitized = sanitize_indents(description, variant_name);
                     e_value = quote!(
                         #[doc = #description_sanitized]
                         #e_value
@@ -1187,41 +1200,21 @@ impl TypeSpace {
             );
         }
 
-        // If the data for the enum has a default value, implement default for the enum.
-        let default = if let Some(default) = &data.default {
-            let default = default.to_string();
-            let default = format_ident!("{}", proper_name(&default));
-            quote!(
-                impl std::default::Default for #enum_name {
-                    fn default() -> Self {
-                        #enum_name::#default
-                    }
-                }
-            )
-        } else if s.enumeration.len() == 1 {
-            let default = s.enumeration[0].as_ref().unwrap().to_string();
-            let default = format_ident!("{}", proper_name(&default));
-            quote!(
-                impl std::default::Default for #enum_name {
-                    fn default() -> Self {
-                        #enum_name::#default
-                    }
-                }
-            )
+        let default = if default_variant.is_some() {
+            quote!(#[derive(Default)])
         } else {
             quote!()
         };
 
         let rendered = quote! {
             #description
+            #default
             #[derive(serde::Serialize, serde::Deserialize, PartialEq, Hash, Debug, Clone, schemars::JsonSchema, parse_display::FromStr, parse_display::Display)]
             #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
             #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
             pub enum #enum_name {
                 #values
             }
-
-            #default
         };
 
         // Add the type to the list of types, if it doesn't already exist.
@@ -1773,40 +1766,17 @@ fn get_type_name_for_integer(i: &openapiv3::IntegerType) -> Result<proc_macro2::
         }
         openapiv3::VariantOrUnknownOrEmpty::Empty => quote!(i64),
         openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
-            let uint;
-            let width;
-            match f.as_str() {
-                "uint" | "uint32" => {
-                    uint = true;
-                    width = 32;
-                }
-                "uint8" => {
-                    uint = true;
-                    width = 8;
-                }
-                "uint16" => {
-                    uint = true;
-                    width = 16;
-                }
-                "uint64" => {
-                    uint = true;
-                    width = 64;
-                }
-                "int8" => {
-                    uint = false;
-                    width = 8;
-                }
-                "int16" => {
-                    uint = false;
-                    width = 16;
-                }
-                "duration" => {
-                    uint = false;
-                    width = 64;
-                }
-                /* int32 and int64 are build it and parse as the integer type */
+            let (uint, width) = match f.as_str() {
+                "uint" | "uint32" => (true, 32),
+                "uint8" => (true, 8),
+                "uint16" => (true, 16),
+                "uint64" => (true, 64),
+                "int8" => (false, 8),
+                "int16" => (false, 16),
+                "duration" => (false, 64),
+                /* int32 and int64 are built in and parse as the integer type */
                 f => anyhow::bail!("unknown integer format {}", f),
-            }
+            };
 
             if uint {
                 match width {
