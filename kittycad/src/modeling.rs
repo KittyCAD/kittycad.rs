@@ -140,7 +140,7 @@ impl Modeling {
                 url,
                 status,
                 body,
-                headers,
+                headers: Box::new(headers),
             });
         }
 

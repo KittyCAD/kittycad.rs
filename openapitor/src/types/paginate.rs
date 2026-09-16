@@ -1,5 +1,4 @@
 //! Utility functions used for pagination.
-#![allow(clippy::result_large_err)]
 
 use anyhow::Result;
 

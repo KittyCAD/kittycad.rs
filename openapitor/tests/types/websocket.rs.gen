@@ -39,7 +39,7 @@ pub async fn example_api_websocket_counter<'a>(
             url,
             status,
             body,
-            headers,
+            headers: Box::new(headers),
         });
     }
     let upgraded = resp

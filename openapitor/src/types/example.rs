@@ -175,40 +175,17 @@ pub fn generate_example_json_from_schema(
                 }
                 openapiv3::VariantOrUnknownOrEmpty::Empty => serde_json::from_str("0")?,
                 openapiv3::VariantOrUnknownOrEmpty::Unknown(f) => {
-                    let uint;
-                    let width;
-                    match f.as_str() {
-                        "uint" | "uint32" => {
-                            uint = true;
-                            width = 32;
-                        }
-                        "uint8" => {
-                            uint = true;
-                            width = 8;
-                        }
-                        "uint16" => {
-                            uint = true;
-                            width = 16;
-                        }
-                        "uint64" => {
-                            uint = true;
-                            width = 64;
-                        }
-                        "int8" => {
-                            uint = false;
-                            width = 8;
-                        }
-                        "int16" => {
-                            uint = false;
-                            width = 16;
-                        }
-                        "duration" => {
-                            uint = false;
-                            width = 64;
-                        }
-                        /* int32 and int64 are build it and parse as the integer type */
+                    let (uint, width) = match f.as_str() {
+                        "uint" | "uint32" => (true, 32),
+                        "uint8" => (true, 8),
+                        "uint16" => (true, 16),
+                        "uint64" => (true, 64),
+                        "int8" => (false, 8),
+                        "int16" => (false, 16),
+                        "duration" => (false, 64),
+                        /* int32 and int64 are built in and parse as the integer type */
                         f => anyhow::bail!("unknown integer format {}", f),
-                    }
+                    };
 
                     if uint {
                         match width {

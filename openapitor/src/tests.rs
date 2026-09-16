@@ -294,6 +294,73 @@ fn test_commonroom_generation(ctx: &mut TestContext) {
     run_cargo_test(&opts).unwrap();
 }
 
+#[test]
+fn test_client_error_size() {
+    // This template is embedded in every generated client. Keep returned errors
+    // within Clippy's default large-error-threshold, including enum overhead.
+    let size = std::mem::size_of::<crate::types::error::Error>();
+    assert!(size < 128, "generated client error is {} bytes", size);
+}
+
+#[test]
+fn test_invalid_response_payload_preserves_response_and_source() {
+    use std::error::Error as _;
+
+    let response = reqwest::Response::from(
+        http::Response::builder()
+            .status(reqwest::StatusCode::BAD_GATEWAY)
+            .header("x-request-id", "request-123")
+            .body("invalid payload")
+            .unwrap(),
+    );
+    let source = response.error_for_status_ref().unwrap_err();
+    let source_message = source.to_string();
+    #[cfg(feature = "retry")]
+    let source = reqwest_middleware::Error::from(source);
+    let error = crate::types::error::Error::InvalidResponsePayload {
+        error: source,
+        response: Box::new(response),
+    };
+
+    assert_eq!(error.status(), Some(reqwest::StatusCode::BAD_GATEWAY));
+    assert_eq!(error.source().unwrap().to_string(), source_message);
+    assert_eq!(
+        error.to_string(),
+        format!("Invalid Response Payload: {source_message}")
+    );
+    let crate::types::error::Error::InvalidResponsePayload { response, .. } = error else {
+        panic!("expected an invalid response payload");
+    };
+    assert_eq!(response.headers()["x-request-id"], "request-123");
+    assert_eq!(response.content_length(), Some(15));
+}
+
+#[test]
+fn test_unexpected_response_preserves_diagnostics() {
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert("x-request-id", "request-123".parse().unwrap());
+    let error = crate::types::error::Error::UnexpectedResponse {
+        status: reqwest::StatusCode::BAD_GATEWAY,
+        url: "https://example.com/websocket".to_string(),
+        body: "upstream unavailable".to_string(),
+        headers: Box::new(headers.clone()),
+    };
+
+    assert_eq!(error.status(), Some(reqwest::StatusCode::BAD_GATEWAY));
+    assert_eq!(
+        error.to_string(),
+        format!(
+            "Unexpected Response for https://example.com/websocket (HTTP {}). Headers: \
+             {headers:?}, body: upstream unavailable",
+            reqwest::StatusCode::BAD_GATEWAY
+        )
+    );
+    let crate::types::error::Error::UnexpectedResponse { headers, .. } = error else {
+        panic!("expected an unexpected response");
+    };
+    assert_eq!(headers["x-request-id"], "request-123");
+}
+
 fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     log::info!("Running `cargo test`...");
 
