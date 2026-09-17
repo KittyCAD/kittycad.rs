@@ -359,7 +359,7 @@ pub(crate) fn generate_files(
                                 use crate::types::paginate::Pagination;
 
                                 let mut params = params;
-                                params.#page_param_ident = Default::default();
+                                params.#page_param_ident = std::default::Default::default();
                                 let params_for_call = params.clone();
                                 #params_unpack
                                 #pagination_setup
@@ -1745,7 +1745,7 @@ fn build_params_struct(
             {
                 quote!(#field_ident)
             } else {
-                quote!(#field_ident: Default::default())
+                quote!(#field_ident: std::default::Default::default())
             }
         });
         quote! {
@@ -2040,6 +2040,61 @@ mod tests {
     use pretty_assertions::assert_eq;
 
     use crate::types::exts::OperationExt;
+
+    #[test]
+    fn test_params_constructor_with_default_resource() {
+        let args = std::collections::BTreeMap::from([
+            ("account_id".to_string(), quote::quote!(&'a str)),
+            ("limit".to_string(), quote::quote!(Option<i64>)),
+        ]);
+        let definition = super::build_params_struct("list_items", &args)
+            .unwrap()
+            .definition;
+        let source = quote::quote! {
+            #definition
+
+            // Untagged APIs generate a resource with this name in the same module.
+            pub struct Default;
+
+            #[test]
+            fn constructor_preserves_required_fields_and_defaults_optional_fields() {
+                let params = ListItemsParams::new("account-123");
+                assert_eq!(params.account_id, "account-123");
+                assert_eq!(params.limit, None);
+            }
+        };
+        let directory = std::env::temp_dir().join(format!("openapitor-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let source_path = directory.join("params.rs");
+        let binary_path = directory.join(format!("params-test{}", std::env::consts::EXE_SUFFIX));
+        std::fs::write(&source_path, source.to_string()).unwrap();
+
+        let compiled = std::process::Command::new("rustc")
+            .args(["--edition=2021", "--test"])
+            .arg(&source_path)
+            .arg("-o")
+            .arg(&binary_path)
+            .output()
+            .unwrap();
+        let executed = compiled
+            .status
+            .success()
+            .then(|| std::process::Command::new(&binary_path).output().unwrap());
+        std::fs::remove_dir_all(&directory).unwrap();
+
+        assert!(
+            compiled.status.success(),
+            "generated parameter constructor did not compile: {}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
+        let executed = executed.unwrap();
+        assert!(
+            executed.status.success(),
+            "generated parameter constructor failed: {}\n{}",
+            String::from_utf8_lossy(&executed.stdout),
+            String::from_utf8_lossy(&executed.stderr)
+        );
+    }
 
     #[test]
     fn test_fn_name() {
