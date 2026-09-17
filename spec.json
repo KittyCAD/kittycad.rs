@@ -44844,6 +44844,10 @@
                   }
                 ]
               },
+              "tangent_chain": {
+                "description": "If true, also cut edges that are tangent to the selected edges.",
+                "type": "boolean"
+              },
               "tolerance": {
                 "description": "The maximum acceptable surface gap computed between the cut surfaces. Must be positive (i.e. greater than zero).",
                 "allOf": [
@@ -44921,6 +44925,10 @@
                     "$ref": "#/components/schemas/CutStrategy"
                   }
                 ]
+              },
+              "tangent_chain": {
+                "description": "If true, also cut edges that are tangent to the selected edges.",
+                "type": "boolean"
               },
               "tolerance": {
                 "description": "The maximum acceptable surface gap computed between the cut surfaces. Must be positive (i.e. greater than zero).",
@@ -47395,6 +47403,30 @@
             },
             "required": [
               "path_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Sets the KCL Version used by the engine.",
+            "type": "object",
+            "properties": {
+              "kcl_version": {
+                "description": "Which KCL version the following commands should be executed with.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/KclVersion"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_kcl_version"
+                ]
+              }
+            },
+            "required": [
+              "kcl_version",
               "type"
             ]
           }
@@ -51002,6 +51034,24 @@
                 "type": "string",
                 "enum": [
                   "sketch_get_info"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/SetKclVersion"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "set_kcl_version"
                 ]
               }
             },
@@ -55548,6 +55598,10 @@
       },
       "SetGridScale": {
         "description": "The response from the 'SetGridScale'.",
+        "type": "object"
+      },
+      "SetKclVersion": {
+        "description": "The response from the 'SetKclVersion'.",
         "type": "object"
       },
       "SetObjectTransform": {

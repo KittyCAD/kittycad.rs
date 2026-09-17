@@ -27,7 +27,7 @@ impl<'a> Oauth2AuthorizeParams<'a> {
             code_challenge_method,
             redirect_uri,
             response_type,
-            scope: Default::default(),
+            scope: std::default::Default::default(),
             state,
         }
     }

@@ -14967,6 +14967,9 @@ pub enum ModelingCmd {
         #[doc = "Which cutting algorithm to use."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         strategy: Option<CutStrategy>,
+        #[doc = "If true, also cut edges that are tangent to the selected edges."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tangent_chain: Option<bool>,
         #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
@@ -14996,6 +14999,9 @@ pub enum ModelingCmd {
         #[doc = "Which cutting algorithm to use."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         strategy: Option<CutStrategy>,
+        #[doc = "If true, also cut edges that are tangent to the selected edges."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tangent_chain: Option<bool>,
         #[doc = "The maximum acceptable surface gap computed between the cut surfaces. Must be \
                  positive (i.e. greater than zero)."]
         tolerance: f64,
@@ -15814,6 +15820,12 @@ pub enum ModelingCmd {
     SketchGetInfo {
         #[doc = "Which path to query"]
         path_id: uuid::Uuid,
+    },
+    #[doc = "Sets the KCL Version used by the engine."]
+    #[serde(rename = "set_kcl_version")]
+    SetKclVersion {
+        #[doc = "Which KCL version the following commands should be executed with."]
+        kcl_version: KclVersion,
     },
 }
 
@@ -17617,6 +17629,11 @@ pub enum OkModelingCmdResponse {
     SketchGetInfo {
         #[doc = "The response from the 'SketchGetInfo'."]
         data: SketchGetInfo,
+    },
+    #[serde(rename = "set_kcl_version")]
+    SetKclVersion {
+        #[doc = "The response from the 'SetKclVersion'."]
+        data: SetKclVersion,
     },
 }
 
@@ -23026,6 +23043,34 @@ impl std::fmt::Display for SetGridScale {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for SetGridScale {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+}
+
+#[doc = "The response from the 'SetKclVersion'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct SetKclVersion {}
+
+impl std::fmt::Display for SetKclVersion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for SetKclVersion {
     const LENGTH: usize = 0;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
