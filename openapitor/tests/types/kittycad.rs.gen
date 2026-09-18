@@ -10867,6 +10867,9 @@ pub struct Invoice {
     #[doc = "Why this invoice was created (e.g. `subscription_cycle`)."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub billing_reason: Option<String>,
+    #[doc = "Whether the provider confirmed a currently failed payment can be retried. Revalidated by the provider before each retry; open invoices alone do not qualify."]
+    #[serde(default)]
+    pub can_retry_payment: bool,
     #[doc = "Invoice collection method as returned by Stripe."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub collection_method: Option<String>,
@@ -10949,7 +10952,7 @@ impl std::fmt::Display for Invoice {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for Invoice {
-    const LENGTH: usize = 30;
+    const LENGTH: usize = 31;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(amount_due) = &self.amount_due {
@@ -10983,6 +10986,7 @@ impl tabled::Tabled for Invoice {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.can_retry_payment).into(),
             if let Some(collection_method) = &self.collection_method {
                 format!("{:?}", collection_method).into()
             } else {
@@ -11102,6 +11106,7 @@ impl tabled::Tabled for Invoice {
             "attempt_count".into(),
             "attempted".into(),
             "billing_reason".into(),
+            "can_retry_payment".into(),
             "collection_method".into(),
             "created_at".into(),
             "currency".into(),
