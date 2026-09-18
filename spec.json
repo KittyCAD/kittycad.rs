@@ -38948,6 +38948,11 @@
             "description": "Why this invoice was created (e.g. `subscription_cycle`).",
             "type": "string"
           },
+          "can_retry_payment": {
+            "description": "Whether the provider confirmed a currently failed payment can be retried. Revalidated by the provider before each retry; open invoices alone do not qualify.",
+            "default": false,
+            "type": "boolean"
+          },
           "collection_method": {
             "nullable": true,
             "description": "Invoice collection method as returned by Stripe.",
