@@ -40310,6 +40310,11 @@
                 "type": "integer",
                 "format": "int32"
               },
+              "supports_attachments_error": {
+                "description": "Whether the client can handle an `AttachmentsError` response. Defaults to false so older desktop clients keep receiving the generic `Error` response until they update and explicitly opt in.",
+                "default": false,
+                "type": "boolean"
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -41430,6 +41435,53 @@
             },
             "required": [
               "attachments"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Failure to fetch a batch of persisted attachments over the websocket. This response is not persisted and does not indicate a generation failure.",
+            "type": "object",
+            "properties": {
+              "attachments_error": {
+                "type": "object",
+                "properties": {
+                  "detail": {
+                    "description": "Client readable error detail.",
+                    "type": "string"
+                  },
+                  "indices": {
+                    "description": "Attachment indices from the failed request.",
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "uint32",
+                      "minimum": 0
+                    }
+                  },
+                  "prompt_id": {
+                    "description": "Prompt containing the persisted message row.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Uuid"
+                      }
+                    ]
+                  },
+                  "seq": {
+                    "description": "Sequence number of the persisted message row.",
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                },
+                "required": [
+                  "detail",
+                  "indices",
+                  "prompt_id",
+                  "seq"
+                ]
+              }
+            },
+            "required": [
+              "attachments_error"
             ],
             "additionalProperties": false
           }

@@ -12629,6 +12629,9 @@ pub enum MlCopilotClientMessage {
         prompt_id: uuid::Uuid,
         #[doc = "Sequence number of the persisted message row."]
         seq: i32,
+        #[doc = "Whether the client can handle an `AttachmentsError` response. Defaults to false so older desktop clients keep receiving the generic `Error` response until they update and explicitly opt in."]
+        #[serde(default)]
+        supports_attachments_error: bool,
     },
     #[doc = "The system message, which can be used to set the context or instructions for the AI."]
     #[serde(rename = "system")]
@@ -13251,6 +13254,18 @@ pub enum MlCopilotServerMessage {
         prompt_id: uuid::Uuid,
         #[doc = "Authoritative role that owns the file attachment, read from the stored row."]
         role: MlMessageRole,
+        #[doc = "Sequence number of the persisted message row."]
+        seq: i32,
+    },
+    #[doc = "Failure to fetch a batch of persisted attachments over the websocket. This response is not persisted and does not indicate a generation failure."]
+    #[serde(rename = "attachments_error")]
+    AttachmentsError {
+        #[doc = "Client readable error detail."]
+        detail: String,
+        #[doc = "Attachment indices from the failed request."]
+        indices: Vec<u32>,
+        #[doc = "Prompt containing the persisted message row."]
+        prompt_id: uuid::Uuid,
         #[doc = "Sequence number of the persisted message row."]
         seq: i32,
     },
