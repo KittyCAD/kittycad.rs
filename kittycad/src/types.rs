@@ -6037,9 +6037,11 @@ pub struct CustomerBalance {
     #[doc = "The subscription ID for the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<String>,
-    #[doc = "This includes any outstanding, draft, or open invoices and any pending invoice \
-             items. This does not include any credits the customer has on their account. This \
-             amount is only returned if requested from the api."]
+    #[doc = "Net cash owed for completed API usage awaiting invoicing, outstanding invoices, and \
+             pending invoice items. Usage credits and writeoffs have already been applied; do not \
+             subtract the remaining credit balance from this amount. Ongoing sessions and usage \
+             still being priced are not included. This amount is only returned if requested from \
+             the api."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_due: Option<f64>,
     #[doc = "The date and time the balance was last updated."]
