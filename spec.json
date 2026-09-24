@@ -37218,6 +37218,13 @@
             ]
           },
           {
+            "description": "Enables DFM Review mode in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "dfm_review"
+            ]
+          },
+          {
             "description": "Enables drawing features across Zoo applications.",
             "type": "string",
             "enum": [
