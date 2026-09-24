@@ -9478,6 +9478,10 @@ pub enum Feature {
     #[serde(rename = "validate_tax_info")]
     #[display("validate_tax_info")]
     ValidateTaxInfo,
+    #[doc = "Enables DFM Review mode in Zoo Design Studio."]
+    #[serde(rename = "dfm_review")]
+    #[display("dfm_review")]
+    DfmReview,
     #[doc = "Enables drawing features across Zoo applications."]
     #[serde(rename = "drawings")]
     #[display("drawings")]
