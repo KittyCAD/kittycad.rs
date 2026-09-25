@@ -165,6 +165,48 @@ impl Factory {
         }
     }
 
+    #[doc = "Get an organization-owned Factory job for any current member.\n\n**Parameters:**\n\n- \
+             `job_id: uuid::Uuid`: The requested job's identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_get_org_job() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryCustomerJobDetail = client\n        .factory()\n        \
+             .get_org_job(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_job<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+    ) -> Result<crate::types::FactoryCustomerJobDetail, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/factory/jobs/{job_id}".replace("{job_id}", &format!("{}", job_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "List finishes currently available for customer Factory submissions.\n\nInternal-only \
              entries are omitted. Clients should refetch this endpoint after a catalog validation \
              error before asking the customer to choose again.\n\n```rust,no_run\nasync fn \
@@ -372,6 +414,48 @@ impl Factory {
         }
 
         req = req.multipart(form);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Get a personal Factory job and its current customer-visible \
+             specifications.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The requested job's \
+             identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_get_user_job() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryCustomerJobDetail = client\n        .factory()\n        \
+             .get_user_job(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_job<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+    ) -> Result<crate::types::FactoryCustomerJobDetail, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/factory/jobs/{job_id}".replace("{job_id}", &format!("{}", job_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

@@ -5900,6 +5900,9 @@ impl tabled::Tabled for Customer {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct CustomerBalance {
+    #[doc = "Estimated cash charges after applying currently available monthly and stable API credits to eligible usage, including usage from earlier billing periods. Credits cannot reduce subscription charges or invoices whose provider export has already started. Credits are counted once and never beyond eligible usage.\n\nThis read does not reserve or spend credits. The amount can change as credits are granted, spent, or refreshed, or as new charges arrive. Use this field directly instead of subtracting the credit balance from `total_due`. Like `total_due`, this is only returned when the amount due is requested and the payment provider is available; otherwise it is `null`."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub amount_due_after_credits: Option<f64>,
     #[doc = "The date and time the balance was created."]
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "The date and time the monthly API credits are next scheduled to refresh.\n\nWhen a refresh is due but has not been applied yet, this is the due timestamp in the past. Clients can use that to show the refresh as pending rather than incorrectly advancing by a month.\n\nThis is `null` when the customer does not have an active standard billing schedule, such as before their billing account is established or while a contract owns billing."]
@@ -5919,7 +5922,7 @@ pub struct CustomerBalance {
     #[doc = "The subscription ID for the user."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub subscription_id: Option<String>,
-    #[doc = "Net cash owed for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Usage credits and writeoffs have already been applied; do not subtract the remaining credit balance from this amount. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the api."]
+    #[doc = "Recorded cash charges for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Credits and writeoffs already assigned to usage are reflected in this amount.\n\nAvailable credits can still reduce eligible usage charges, including usage from earlier billing periods. They are applied when an aggregate usage invoice is generated and again immediately before its first provider export, using monthly credits before stable credits.\n\nThis amount is not a forecast of the next payment. Do not subtract the full remaining credit balance: the total can also include subscription charges and invoices whose provider export has already started, which usage credits cannot reduce. Use `amount_due_after_credits` for the estimate after applicable remaining credits. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the API."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_due: Option<f64>,
     #[doc = "The date and time the balance was last updated."]
@@ -5938,9 +5941,14 @@ impl std::fmt::Display for CustomerBalance {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CustomerBalance {
-    const LENGTH: usize = 10;
+    const LENGTH: usize = 11;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            if let Some(amount_due_after_credits) = &self.amount_due_after_credits {
+                format!("{:?}", amount_due_after_credits).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.created_at).into(),
             if let Some(monthly_api_credits_refresh_at) = &self.monthly_api_credits_refresh_at {
                 format!("{:?}", monthly_api_credits_refresh_at).into()
@@ -5972,6 +5980,7 @@ impl tabled::Tabled for CustomerBalance {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
+            "amount_due_after_credits".into(),
             "created_at".into(),
             "monthly_api_credits_refresh_at".into(),
             "monthly_api_credits_remaining".into(),
@@ -8968,6 +8977,47 @@ impl tabled::Tabled for FactoryCustomerCatalogOption {
     }
 }
 
+#[doc = "Customer-visible detail for a single Factory job."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobDetail {
+    #[doc = "The current version, if the job has one."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_version: Option<FactoryCustomerJobVersion>,
+    #[doc = "The same summary returned by the customer job list."]
+    pub job: FactoryCustomerJobSummary,
+}
+
+impl std::fmt::Display for FactoryCustomerJobDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobDetail {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(current_version) = &self.current_version {
+                format!("{:?}", current_version).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.job).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["current_version".into(), "job".into()]
+    }
+}
+
 #[doc = "Customer-visible summary of a manufacturing job."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9102,6 +9152,53 @@ impl tabled::Tabled for FactoryCustomerJobSummaryResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Customer-visible snapshot of the current job version. File names are display metadata; no private storage URI or download capability is exposed."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobVersion {
+    #[doc = "When this version was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Names of files attached to this version, without storage locations."]
+    pub file_names: Vec<String>,
+    #[doc = "Identifier of the current version."]
+    pub id: uuid::Uuid,
+    #[doc = "Customer-visible fields from the version's intake payload."]
+    pub specs: serde_json::Value,
+}
+
+impl std::fmt::Display for FactoryCustomerJobVersion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobVersion {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.file_names).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.specs).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "created_at".into(),
+            "file_names".into(),
+            "id".into(),
+            "specs".into(),
+        ]
     }
 }
 
