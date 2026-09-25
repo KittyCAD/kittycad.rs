@@ -142,7 +142,7 @@ static APP_USER_AGENT: &str = concat!(
 );
 
 /// Entrypoint for interacting with the API client.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[cfg(feature = "requests")]
 pub struct Client {
     username: String,
@@ -153,6 +153,18 @@ pub struct Client {
     client: reqwest_middleware::ClientWithMiddleware,
     #[cfg(not(feature = "retry"))]
     client: reqwest::Client,
+}
+
+// Not derived so credentials never end up in logs, e.g. via `#[tracing::instrument]`.
+#[cfg(feature = "requests")]
+impl std::fmt::Debug for Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Client")
+            .field("username", &"[REDACTED]")
+            .field("password", &"[REDACTED]")
+            .field("base_url", &self.base_url)
+            .finish_non_exhaustive()
+    }
 }
 
 #[cfg(feature = "requests")]
@@ -327,7 +339,7 @@ static APP_USER_AGENT: &str = concat!(
 );
 
 /// Entrypoint for interacting with the API client.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[cfg(feature = "requests")]
 pub struct Client {
     token: String,
@@ -346,6 +358,17 @@ pub struct Client {
     #[cfg(not(target_arch = "wasm32"))]
     #[allow(dead_code)]
     client_http1_only: reqwest::Client,
+}
+
+// Not derived so credentials never end up in logs, e.g. via `#[tracing::instrument]`.
+#[cfg(feature = "requests")]
+impl std::fmt::Debug for Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Client")
+            .field("token", &"[REDACTED]")
+            .field("base_url", &self.base_url)
+            .finish_non_exhaustive()
+    }
 }
 
 /// A request builder.
@@ -632,7 +655,7 @@ static APP_USER_AGENT: &str = concat!(
 );
 
 /// Entrypoint for interacting with the API client.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[cfg(feature = "requests")]
 pub struct Client {
     base_url: String,
@@ -647,6 +670,21 @@ pub struct Client {
     client: reqwest_middleware::ClientWithMiddleware,
     #[cfg(not(feature = "retry"))]
     client: reqwest::Client,
+}
+
+// Not derived so credentials never end up in logs, e.g. via `#[tracing::instrument]`.
+#[cfg(feature = "requests")]
+impl std::fmt::Debug for Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Client")
+            .field("base_url", &self.base_url)
+            .field("token", &"[REDACTED]")
+            .field("client_id", &self.client_id)
+            .field("client_secret", &"[REDACTED]")
+            .field("redirect_uri", &self.redirect_uri)
+            .field("auto_refresh", &self.auto_refresh)
+            .finish_non_exhaustive()
+    }
 }
 
 /// An access token.
