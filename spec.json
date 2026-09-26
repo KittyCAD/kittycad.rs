@@ -4453,115 +4453,6 @@
         "x-billable": false
       }
     },
-    "/ml/custom/models/{id}/datasets": {
-      "get": {
-        "tags": [
-          "ml"
-        ],
-        "summary": "List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.",
-        "operationId": "list_org_datasets_for_model",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The identifier.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Array_of_OrgDataset",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgDataset"
-                  }
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-billable": false
-      }
-    },
     "/ml/kcl/completions": {
       "post": {
         "tags": [
@@ -10702,6 +10593,208 @@
         "x-billable": false
       }
     },
+    "/org/factory/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Get an organization-owned Factory job for any current member.",
+        "operationId": "get_org_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobDetail"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_org_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/org/members": {
       "get": {
         "tags": [
@@ -12660,7 +12753,7 @@
           {
             "in": "query",
             "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "description": "Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.",
             "schema": {
               "type": "boolean"
             }
@@ -21779,6 +21872,208 @@
         "x-billable": false
       }
     },
+    "/user/factory/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Get a personal Factory job and its current customer-visible specifications.",
+        "operationId": "get_user_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobDetail"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_user_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/user/factory/materials": {
       "get": {
         "tags": [
@@ -23474,7 +23769,7 @@
           {
             "in": "query",
             "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "description": "Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.",
             "schema": {
               "type": "boolean"
             }
@@ -34797,6 +35092,13 @@
         "description": "A balance for a customer.\n\nThis holds information about the financial balance for the customer.",
         "type": "object",
         "properties": {
+          "amount_due_after_credits": {
+            "nullable": true,
+            "title": "double",
+            "description": "Estimated cash charges after applying currently available monthly and stable API credits to eligible usage, including usage from earlier billing periods. Credits cannot reduce subscription charges or invoices whose provider export has already started. Credits are counted once and never beyond eligible usage.\n\nThis read does not reserve or spend credits. The amount can change as credits are granted, spent, or refreshed, or as new charges arrive. Use this field directly instead of subtracting the credit balance from `total_due`. Like `total_due`, this is only returned when the amount due is requested and the payment provider is available; otherwise it is `null`.",
+            "type": "number",
+            "format": "money-usd"
+          },
           "created_at": {
             "title": "DateTime",
             "description": "The date and time the balance was created.",
@@ -34851,7 +35153,7 @@
           "total_due": {
             "nullable": true,
             "title": "double",
-            "description": "Net cash owed for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Usage credits and writeoffs have already been applied; do not subtract the remaining credit balance from this amount. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the api.",
+            "description": "Recorded cash charges for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Credits and writeoffs already assigned to usage are reflected in this amount.\n\nAvailable credits can still reduce eligible usage charges, including usage from earlier billing periods. They are applied when an aggregate usage invoice is generated and again immediately before its first provider export, using monthly credits before stable credits.\n\nThis amount is not a forecast of the next payment. Do not subtract the full remaining credit balance: the total can also include subscription charges and invoices whose provider export has already started, which usage credits cannot reduce. Use `amount_due_after_credits` for the estimate after applicable remaining credits. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the API.",
             "type": "number",
             "format": "money-usd"
           },
@@ -36931,6 +37233,32 @@
           "name"
         ]
       },
+      "FactoryCustomerJobDetail": {
+        "description": "Customer-visible detail for a single Factory job.",
+        "type": "object",
+        "properties": {
+          "current_version": {
+            "nullable": true,
+            "description": "The current version, if the job has one.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FactoryCustomerJobVersion"
+              }
+            ]
+          },
+          "job": {
+            "description": "The same summary returned by the customer job list.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FactoryCustomerJobSummary"
+              }
+            ]
+          }
+        },
+        "required": [
+          "job"
+        ]
+      },
       "FactoryCustomerJobSummary": {
         "description": "Customer-visible summary of a manufacturing job.",
         "type": "object",
@@ -36995,6 +37323,42 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "FactoryCustomerJobVersion": {
+        "description": "Customer-visible snapshot of the current job version. File names are display metadata; no private storage URI or download capability is exposed.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "When this version was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "file_names": {
+            "description": "Names of files attached to this version, without storage locations.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "description": "Identifier of the current version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "specs": {
+            "description": "Customer-visible fields from the version's intake payload."
+          }
+        },
+        "required": [
+          "created_at",
+          "file_names",
+          "id",
+          "specs"
         ]
       },
       "FactoryJobResponse": {

@@ -297,8 +297,9 @@ impl Payments {
 
     #[doc = "Get balance for your org.\n\nThis endpoint requires authentication by any member of \
              an org. It gets the balance information for the authenticated user's \
-             org.\n\n**Parameters:**\n\n- `include_total_due: Option<bool>`: If you would like to \
-             return the total due for a user. This makes the API call take longer so it is off by \
+             org.\n\n**Parameters:**\n\n- `include_total_due: Option<bool>`: Return both recorded \
+             charges (`total_due`) and estimated cash charges after available usage credits \
+             (`amount_due_after_credits`). This makes the API call take longer so it is off by \
              default.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_org() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
              result: kittycad::types::CustomerBalance =\n        \
@@ -1000,13 +1001,13 @@ impl Payments {
 
     #[doc = "Get balance for your user.\n\nThis endpoint requires authentication by any Zoo user. \
              It gets the balance information for the authenticated user.\n\n**Parameters:**\n\n- \
-             `include_total_due: Option<bool>`: If you would like to return the total due for a \
-             user. This makes the API call take longer so it is off by \
-             default.\n\n```rust,no_run\nasync fn example_payments_get_balance_for_user() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::CustomerBalance =\n        \
-             client.payments().get_balance_for_user(Some(true)).await?;\n    println!(\"{:?}\", \
-             result);\n    Ok(())\n}\n```"]
+             `include_total_due: Option<bool>`: Return both recorded charges (`total_due`) and \
+             estimated cash charges after available usage credits (`amount_due_after_credits`). \
+             This makes the API call take longer so it is off by default.\n\n```rust,no_run\nasync \
+             fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance \
+             =\n        client.payments().get_balance_for_user(Some(true)).await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_balance_for_user<'a>(
         &'a self,
