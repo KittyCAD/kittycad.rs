@@ -180,7 +180,7 @@ use std::env;
 static APP_USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), ".rs/", env!("CARGO_PKG_VERSION"),);
 
 /// Entrypoint for interacting with the API client.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[cfg(feature = "requests")]
 pub struct Client {
     token: String,
@@ -199,6 +199,17 @@ pub struct Client {
     #[cfg(not(target_arch = "wasm32"))]
     #[allow(dead_code)]
     client_http1_only: reqwest::Client,
+}
+
+// Not derived so credentials never end up in logs, e.g. via `#[tracing::instrument]`.
+#[cfg(feature = "requests")]
+impl std::fmt::Debug for Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Client")
+            .field("token", &"[REDACTED]")
+            .field("base_url", &self.base_url)
+            .finish_non_exhaustive()
+    }
 }
 
 /// A request builder.
