@@ -745,4 +745,208 @@ impl Projects {
             })
         }
     }
+
+    #[doc = "List a project's saved versions, newest first.\n\nRequires access to the project. Public visibility or link sharing will not grant access to history.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_list_versions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionSummaryResponseResultsPage = client\n        .projects()\n        .list_versions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_versions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_versions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_versions<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        limit: Option<u32>,
+        page_token: Option<String>,
+    ) -> Result<crate::types::ProjectVersionSummaryResponseResultsPage, crate::types::error::Error>
+    {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/versions".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List a project's saved versions, newest first.\n\nRequires access to the project. Public visibility or link sharing will not grant access to history.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_list_versions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionSummaryResponseResultsPage = client\n        .projects()\n        .list_versions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_versions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_versions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_versions_stream<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        limit: Option<u32>,
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::ProjectVersionSummaryResponse, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        let pagination_url_path =
+            ("user/projects/{id}/versions".replace("{id}", &format!("{}", id))).to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        let stream = self . list_versions (id , limit , None) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: ProjectVersionSummaryResponseResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
+    }
+
+    #[doc = "Get metadata and files for a single saved project version.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: Project identifier. (required)\n- `version_id: uuid::Uuid`: Requested version identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_get_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionDetailResponse = client\n        .projects()\n        .get_version(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_version<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        version_id: uuid::Uuid,
+    ) -> Result<crate::types::ProjectVersionDetailResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/versions/{version_id}"
+                    .replace("{id}", &format!("{}", id))
+                    .replace("{version_id}", &format!("{}", version_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Download the files saved in one project version.\n\n**Parameters:**\n\n- `format: \
+             Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to \
+             `tar`.\n- `id: uuid::Uuid`: Project identifier. (required)\n- `version_id: \
+             uuid::Uuid`: Requested version identifier. (required)\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_projects_download_version() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    \
+             client\n        .projects()\n        .download_version(\n            \
+             Some(kittycad::types::ProjectArchiveFormat::Zip),\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn download_version<'a>(
+        &'a self,
+        format: Option<crate::types::ProjectArchiveFormat>,
+        id: uuid::Uuid,
+        version_id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/versions/{version_id}/download"
+                    .replace("{id}", &format!("{}", id))
+                    .replace("{version_id}", &format!("{}", version_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = format {
+            query_params.push(("format", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Fetch the thumbnail for a single saved project version.\n\n**Parameters:**\n\n- `id: \
+             uuid::Uuid`: Project identifier. (required)\n- `version_id: uuid::Uuid`: Requested \
+             version identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_projects_get_version_thumbnail() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .projects()\n        \
+             .get_version_thumbnail(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_version_thumbnail<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        version_id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/versions/{version_id}/thumbnail"
+                    .replace("{id}", &format!("{}", id))
+                    .replace("{version_id}", &format!("{}", version_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
 }

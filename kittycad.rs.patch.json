@@ -1529,6 +1529,38 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions/get/x-rust",
+    "value": {
+      "example": "/// List a project's saved versions, newest first.\n/// \n/// Requires access to the project. Public visibility or link sharing will not grant access to history.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nuse std::str::FromStr;\nasync fn example_projects_list_versions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionSummaryResponseResultsPage = client\n        .projects()\n        .list_versions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_versions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_versions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_versions"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}/get/x-rust",
+    "value": {
+      "example": "/// Get metadata and files for a single saved project version.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionDetailResponse = client\n        .projects()\n        .get_version(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_version"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}~1download/get/x-rust",
+    "value": {
+      "example": "/// Download the files saved in one project version.\n/// \n/// **Parameters:**\n/// \n/// - `format: Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to `tar`.\n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_download_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .download_version(\n            Some(kittycad::types::ProjectArchiveFormat::Zip),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.download_version"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}~1thumbnail/get/x-rust",
+    "value": {
+      "example": "/// Fetch the thumbnail for a single saved project version.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_version_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .get_version_thumbnail(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_version_thumbnail"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1session~1{token}/get/x-rust",
     "value": {
       "example": "/// Get a session for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It returns details of the requested API token for the user.\n/// \n/// **Parameters:**\n/// \n/// - `token: &'astr`: The API token. (required)\nasync fn example_users_get_session_for() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::Session = client.users().get_session_for(\"some-string\").await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",

@@ -12034,6 +12034,35 @@ pub enum KclProjectShareLinkAccessMode {
     OrganizationOnly,
 }
 
+#[doc = "Whether a project's version ancestry is known."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectVersionAncestryStatus {
+    #[doc = "The first version of a new project, with no parent."]
+    #[serde(rename = "root")]
+    #[display("root")]
+    Root,
+    #[doc = "The version has a recorded parent relationship."]
+    #[serde(rename = "recorded")]
+    #[display("recorded")]
+    Recorded,
+    #[doc = "The version's parent was not recorded."]
+    #[serde(rename = "legacy_unknown")]
+    #[display("legacy_unknown")]
+    LegacyUnknown,
+}
+
 #[doc = "Which KCL versions does Zoo support?"]
 #[derive(
     serde :: Serialize,
@@ -20576,6 +20605,240 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "title".into(),
             "updated_at".into(),
         ]
+    }
+}
+
+#[doc = "Metadata and files for one saved project version."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectVersionDetailResponse {
+    #[doc = "Whether this is a root, has a recorded parent, or has unknown ancestry."]
+    pub ancestry_status: KclProjectVersionAncestryStatus,
+    #[doc = "When this version was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Description saved with this version."]
+    pub description: String,
+    #[doc = "Relative path to this version's KCL entrypoint."]
+    pub entrypoint_path: String,
+    #[doc = "Files stored for this version."]
+    pub files: Vec<ProjectFileResponse>,
+    #[doc = "Unique identifier of this version."]
+    pub id: uuid::Uuid,
+    #[doc = "Whether this is the project's current version."]
+    pub is_current: bool,
+    #[doc = "Version this save was based on, when known."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_version_id: Option<uuid::Uuid>,
+    #[doc = "Preview generation state for this version."]
+    pub preview_status: KclProjectPreviewStatus,
+    #[doc = "URL for this version's preview, when a preview file is available."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preview_url: Option<String>,
+    #[doc = "Relative path to this version's project manifest."]
+    pub project_toml_path: String,
+    #[doc = "Title saved with this version."]
+    pub title: String,
+}
+
+impl std::fmt::Display for ProjectVersionDetailResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectVersionDetailResponse {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.ancestry_status).into(),
+            format!("{:?}", self.created_at).into(),
+            self.description.clone().into(),
+            self.entrypoint_path.clone().into(),
+            format!("{:?}", self.files).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_current).into(),
+            if let Some(parent_version_id) = &self.parent_version_id {
+                format!("{:?}", parent_version_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.preview_status).into(),
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
+            } else {
+                String::new().into()
+            },
+            self.project_toml_path.clone().into(),
+            self.title.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "ancestry_status".into(),
+            "created_at".into(),
+            "description".into(),
+            "entrypoint_path".into(),
+            "files".into(),
+            "id".into(),
+            "is_current".into(),
+            "parent_version_id".into(),
+            "preview_status".into(),
+            "preview_url".into(),
+            "project_toml_path".into(),
+            "title".into(),
+        ]
+    }
+}
+
+#[doc = "A saved version in a project's history."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectVersionSummaryResponse {
+    #[doc = "Whether this is a root, has a recorded parent, or has unknown ancestry."]
+    pub ancestry_status: KclProjectVersionAncestryStatus,
+    #[doc = "When this version was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Unique identifier of this version."]
+    pub id: uuid::Uuid,
+    #[doc = "Whether this is the project's current version."]
+    pub is_current: bool,
+    #[doc = "Version this save was based on, when known."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_version_id: Option<uuid::Uuid>,
+    #[doc = "Preview generation state for this version."]
+    pub preview_status: KclProjectPreviewStatus,
+    #[doc = "Title saved with this version."]
+    pub title: String,
+}
+
+impl std::fmt::Display for ProjectVersionSummaryResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectVersionSummaryResponse {
+    const LENGTH: usize = 7;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.ancestry_status).into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_current).into(),
+            if let Some(parent_version_id) = &self.parent_version_id {
+                format!("{:?}", parent_version_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.preview_status).into(),
+            self.title.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "ancestry_status".into(),
+            "created_at".into(),
+            "id".into(),
+            "is_current".into(),
+            "parent_version_id".into(),
+            "preview_status".into(),
+            "title".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectVersionSummaryResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<ProjectVersionSummaryResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ProjectVersionSummaryResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ProjectVersionSummaryResponseResultsPage {
+    type Item = ProjectVersionSummaryResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectVersionSummaryResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
