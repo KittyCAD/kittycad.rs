@@ -767,6 +767,52 @@ impl Ml {
         Ok((upgraded, headers))
     }
 
+    #[doc = "Open a sponsored KCL migration connection. It cannot execute ordinary prompts."]
+    #[tracing::instrument]
+    #[cfg(not(target_arch = "wasm32"))]
+    pub async fn kcl_migration_ws<'a>(
+        &'a self,
+    ) -> Result<(reqwest::Upgraded, http::HeaderMap), crate::types::error::Error> {
+        let mut req = self.client.client_http1_only.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "ws/ml/kcl-migration"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req
+            .header(reqwest::header::CONNECTION, "Upgrade")
+            .header(reqwest::header::UPGRADE, "websocket")
+            .header(reqwest::header::SEC_WEBSOCKET_VERSION, "13")
+            .header(
+                reqwest::header::SEC_WEBSOCKET_KEY,
+                base64::Engine::encode(
+                    &base64::engine::general_purpose::STANDARD,
+                    rand::random::<[u8; 16]>(),
+                ),
+            );
+        let resp = req.send().await?;
+        let headers = resp.headers().clone();
+        if resp.status().is_client_error() || resp.status().is_server_error() {
+            let status = resp.status();
+            let url = resp.url().to_string();
+            let body = resp
+                .text()
+                .await
+                .unwrap_or_else(|_| "<error reading body>".to_owned());
+            return Err(crate::types::error::Error::UnexpectedResponse {
+                url,
+                status,
+                body,
+                headers: Box::new(headers),
+            });
+        }
+
+        let upgraded = resp
+            .upgrade()
+            .await
+            .map_err(crate::types::error::Error::RequestError)?;
+        Ok((upgraded, headers))
+    }
+
     #[doc = "Open a websocket to prompt the ML copilot.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: \
              The ID of the async operation. (required)"]
     #[tracing::instrument]

@@ -1001,8 +1001,13 @@ pub struct AnnotationBasicDimension {
     #[doc = "Entity to measure the dimension from"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub from_entity_id: Option<uuid::Uuid>,
-    #[doc = "Normalized position within the entity to position the dimension from"]
-    pub from_entity_pos: Point2D,
+    #[doc = "Position within the entity to position the dimension leader from"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_entity_leader_pos: Option<AnnotationMbdLeaderPosition>,
+    #[doc = "Normalized position within the entity to position the dimension from Deprecated; \
+             please use `from_entity_leader_pos`"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub from_entity_pos: Option<Point2D>,
     #[doc = "2D Position offset of the annotation within the plane."]
     pub offset: Point2D,
     #[doc = "Orientation plane.  The annotation will lie in this plane which is positioned about \
@@ -1017,8 +1022,13 @@ pub struct AnnotationBasicDimension {
     #[doc = "Entity to measure the dimension to"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub to_entity_id: Option<uuid::Uuid>,
-    #[doc = "Normalized position within the entity to position the dimension to"]
-    pub to_entity_pos: Point2D,
+    #[doc = "Position within the entity to position the dimension leader from"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_entity_leader_pos: Option<AnnotationMbdLeaderPosition>,
+    #[doc = "Normalized position within the entity to position the dimension to Deprecated; \
+             please use `to_entity_leader_pos`"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub to_entity_pos: Option<Point2D>,
 }
 
 impl std::fmt::Display for AnnotationBasicDimension {
@@ -1033,7 +1043,7 @@ impl std::fmt::Display for AnnotationBasicDimension {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationBasicDimension {
-    const LENGTH: usize = 13;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(arrow_scale) = &self.arrow_scale {
@@ -1054,7 +1064,16 @@ impl tabled::Tabled for AnnotationBasicDimension {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.from_entity_pos).into(),
+            if let Some(from_entity_leader_pos) = &self.from_entity_leader_pos {
+                format!("{:?}", from_entity_leader_pos).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(from_entity_pos) = &self.from_entity_pos {
+                format!("{:?}", from_entity_pos).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.offset).into(),
             format!("{:?}", self.plane_id).into(),
             format!("{:?}", self.precision).into(),
@@ -1068,7 +1087,16 @@ impl tabled::Tabled for AnnotationBasicDimension {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.to_entity_pos).into(),
+            if let Some(to_entity_leader_pos) = &self.to_entity_leader_pos {
+                format!("{:?}", to_entity_leader_pos).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(to_entity_pos) = &self.to_entity_pos {
+                format!("{:?}", to_entity_pos).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
@@ -1080,12 +1108,14 @@ impl tabled::Tabled for AnnotationBasicDimension {
             "font_scale".into(),
             "from_edge_reference".into(),
             "from_entity_id".into(),
+            "from_entity_leader_pos".into(),
             "from_entity_pos".into(),
             "offset".into(),
             "plane_id".into(),
             "precision".into(),
             "to_edge_reference".into(),
             "to_entity_id".into(),
+            "to_entity_leader_pos".into(),
             "to_entity_pos".into(),
         ]
     }
@@ -1112,8 +1142,13 @@ pub struct AnnotationFeatureControl {
     #[doc = "Entity to place the annotation leader from"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_id: Option<uuid::Uuid>,
-    #[doc = "Normalized position within the entity to position the annotation leader from"]
-    pub entity_pos: Point2D,
+    #[doc = "Position within the entity to position the annotation leader from"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_leader_pos: Option<AnnotationMbdLeaderPosition>,
+    #[doc = "Normalized position within the entity to position the annotation leader from \
+             Deprecated; please use `entity_leader_pos`"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_pos: Option<Point2D>,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
              values can negatively affect performance."]
     pub font_point_size: u32,
@@ -1151,7 +1186,7 @@ impl std::fmt::Display for AnnotationFeatureControl {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureControl {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(control_frame) = &self.control_frame {
@@ -1179,7 +1214,16 @@ impl tabled::Tabled for AnnotationFeatureControl {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.entity_pos).into(),
+            if let Some(entity_leader_pos) = &self.entity_leader_pos {
+                format!("{:?}", entity_leader_pos).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_pos) = &self.entity_pos {
+                format!("{:?}", entity_pos).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
             if let Some(leader_scale) = &self.leader_scale {
@@ -1211,6 +1255,7 @@ impl tabled::Tabled for AnnotationFeatureControl {
             "dimension".into(),
             "edge_reference".into(),
             "entity_id".into(),
+            "entity_leader_pos".into(),
             "entity_pos".into(),
             "font_point_size".into(),
             "font_scale".into(),
@@ -1237,8 +1282,13 @@ pub struct AnnotationFeatureTag {
     #[doc = "Entity to place the annotation leader from"]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub entity_id: Option<uuid::Uuid>,
-    #[doc = "Normalized position within the entity to position the annotation leader from"]
-    pub entity_pos: Point2D,
+    #[doc = "Position within the entity to position the annotation leader from"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_leader_pos: Option<AnnotationMbdLeaderPosition>,
+    #[doc = "Normalized position within the entity to position the annotation leader from \
+             Deprecated; please use `entity_leader_pos`"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity_pos: Option<Point2D>,
     #[doc = "The point size of the fonts used to generate the annotation label.  Very large \
              values can negatively affect performance."]
     pub font_point_size: u32,
@@ -1274,7 +1324,7 @@ impl std::fmt::Display for AnnotationFeatureTag {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for AnnotationFeatureTag {
-    const LENGTH: usize = 12;
+    const LENGTH: usize = 13;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(edge_reference) = &self.edge_reference {
@@ -1287,7 +1337,16 @@ impl tabled::Tabled for AnnotationFeatureTag {
             } else {
                 String::new().into()
             },
-            format!("{:?}", self.entity_pos).into(),
+            if let Some(entity_leader_pos) = &self.entity_leader_pos {
+                format!("{:?}", entity_leader_pos).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(entity_pos) = &self.entity_pos {
+                format!("{:?}", entity_pos).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.font_point_size).into(),
             format!("{:?}", self.font_scale).into(),
             self.key.clone().into(),
@@ -1308,6 +1367,7 @@ impl tabled::Tabled for AnnotationFeatureTag {
         vec![
             "edge_reference".into(),
             "entity_id".into(),
+            "entity_leader_pos".into(),
             "entity_pos".into(),
             "font_point_size".into(),
             "font_scale".into(),
@@ -1523,6 +1583,22 @@ impl tabled::Tabled for AnnotationMbdControlFrame {
             "tolerance".into(),
         ]
     }
+}
+
+#[doc = "Parameters for defining a specific MBD Leader Position within an Entity"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub enum AnnotationMbdLeaderPosition {
+    #[doc = "Normalized position within the entity to position the annotation leader from"]
+    #[serde(rename = "normalized_pos")]
+    NormalizedPos {
+        #[doc = "The position"]
+        pos: Point2D,
+    },
+    #[doc = "Geometric Center of the entity (such as on the center axis for a cylinder)"]
+    #[serde(rename = "centroid")]
+    Centroid {},
 }
 
 #[doc = "Options for annotations"]
@@ -8067,6 +8143,12 @@ pub enum EntityReference {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         topology_fallback: Option<PrimitiveTopologyFallback>,
     },
+    #[doc = "A uuid referencing a helix."]
+    #[serde(rename = "helix")]
+    Helix {
+        #[doc = "Id of the helix object."]
+        helix_id: uuid::Uuid,
+    },
     #[doc = "A uuid referencing an edge on a solid2d (profile) - used for raw sketch/profile \
              edges. This is distinct from the face-based Edge reference which is used for \
              BRep/swept body edges."]
@@ -8179,6 +8261,9 @@ pub enum EntityType {
     #[serde(rename = "region")]
     #[display("region")]
     Region,
+    #[serde(rename = "patterngroup")]
+    #[display("patterngroup")]
+    Patterngroup,
 }
 
 #[doc = "Error information from a response."]
@@ -9628,11 +9713,6 @@ pub enum Feature {
     #[serde(rename = "sketch_experimental_features")]
     #[display("sketch_experimental_features")]
     SketchExperimentalFeatures,
-    #[doc = "Enables cloud storage for web and desktop. Yes desktop too, the name is old and will \
-             go away soon."]
-    #[serde(rename = "web_app_file_browser")]
-    #[display("web_app_file_browser")]
-    WebAppFileBrowser,
     #[doc = "Enables Zookeeper Pro mode access in ML Copilot."]
     #[serde(rename = "zookeeper_pro_mode")]
     #[display("zookeeper_pro_mode")]
@@ -9645,6 +9725,10 @@ pub enum Feature {
     #[serde(rename = "zookeeper_client_commands")]
     #[display("zookeeper_client_commands")]
     ZookeeperClientCommands,
+    #[doc = "Enables sponsored, time-limited KCL project migration."]
+    #[serde(rename = "zookeeper_kcl_migration")]
+    #[display("zookeeper_kcl_migration")]
+    ZookeeperKclMigration,
     #[doc = "Allow creating a session via an existing API key"]
     #[serde(rename = "unsafe_allow_api_key_auth")]
     #[display("unsafe_allow_api_key_auth")]
@@ -12120,6 +12204,379 @@ impl tabled::Tabled for KclCodeCompletionResponse {
     }
 }
 
+#[doc = "The restricted public migration connection never accepts ordinary prompts."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum KclMigrationClientMessage {
+    #[doc = "Authenticate the connection."]
+    #[serde(rename = "headers")]
+    Headers {
+        headers: std::collections::HashMap<String, String>,
+    },
+    #[doc = "Start or retrieve the same attempt after a delivery retry."]
+    #[serde(rename = "start")]
+    Start {
+        #[doc = "A complete, immutable input snapshot. It does not grant sponsorship itself."]
+        request: KclMigrationRequest,
+    },
+    #[doc = "Read an existing attempt without resuming it or changing its deadline."]
+    #[serde(rename = "status")]
+    Status {
+        #[doc = "A UUID usually v4 or v7"]
+        operation_id: uuid::Uuid,
+    },
+    #[doc = "Cancel an existing attempt. Cancellation is idempotent."]
+    #[serde(rename = "cancel")]
+    Cancel {
+        #[doc = "A UUID usually v4 or v7"]
+        operation_id: uuid::Uuid,
+    },
+    #[doc = "Application heartbeat."]
+    #[serde(rename = "ping")]
+    Ping {},
+}
+
+#[doc = "Persisted operation state, safe to retrieve again without starting new work."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationOperation {
+    #[doc = "Original deadline, including preparation and validation. Never extended."]
+    pub deadline: chrono::DateTime<chrono::Utc>,
+    #[doc = "Same idempotency key supplied by the initiating client."]
+    pub id: uuid::Uuid,
+    #[doc = "Source revision, retained for conflict detection when applying the result."]
+    pub project_snapshot: MlCopilotProjectSnapshotMetadata,
+    #[doc = "Terminal result, if available. The review itself has no execution deadline."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub result: Option<KclMigrationResult>,
+    #[doc = "Current state."]
+    pub status: KclMigrationStatus,
+    #[doc = "Target accepted for this attempt."]
+    pub target: KclMigrationTarget,
+}
+
+impl std::fmt::Display for KclMigrationOperation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationOperation {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.deadline).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.project_snapshot).into(),
+            if let Some(result) = &self.result {
+                format!("{:?}", result).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.target).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "deadline".into(),
+            "id".into(),
+            "project_snapshot".into(),
+            "result".into(),
+            "status".into(),
+            "target".into(),
+        ]
+    }
+}
+
+#[doc = "A complete, immutable input snapshot. It does not grant sponsorship itself."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationRequest {
+    #[doc = "Explicit consent to unstable preview semantics."]
+    #[serde(default)]
+    pub allow_preview: bool,
+    #[doc = "Complete project, including unsaved edits, imports, and settings."]
+    pub current_files: std::collections::HashMap<String, Vec<u8>>,
+    #[doc = "Project-relative KCL file to execute."]
+    pub entrypoint: String,
+    #[doc = "Revision against which the user will review and apply the candidate."]
+    pub project_snapshot: MlCopilotProjectSnapshotMetadata,
+    #[doc = "Client-generated idempotency key. Reuse it when retrying delivery."]
+    pub request_id: uuid::Uuid,
+    #[doc = "Requested target. The worker inspects the actual source version."]
+    pub target: KclMigrationTarget,
+}
+
+impl std::fmt::Display for KclMigrationRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationRequest {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.allow_preview).into(),
+            format!("{:?}", self.current_files).into(),
+            self.entrypoint.clone().into(),
+            format!("{:?}", self.project_snapshot).into(),
+            format!("{:?}", self.request_id).into(),
+            format!("{:?}", self.target).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "allow_preview".into(),
+            "current_files".into(),
+            "entrypoint".into(),
+            "project_snapshot".into(),
+            "request_id".into(),
+            "target".into(),
+        ]
+    }
+}
+
+#[doc = "A worker's terminal candidate, held separately from ordinary project edits."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationResult {
+    #[doc = "Confirmed rejection or failure before conversion started. Only unsuccessful attempts \
+             may set this; API excludes them from the daily attempt allowance. Missing evidence \
+             defaults to counting the attempt."]
+    #[serde(default)]
+    pub conversion_not_started: bool,
+    #[doc = "User-facing outcome or failure explanation."]
+    pub detail: String,
+    #[doc = "Candidate project, returned only after successful validation."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub files: Option<std::collections::HashMap<String, Vec<u8>>>,
+    #[doc = "Terminal state. `running` is not a valid result."]
+    pub status: KclMigrationStatus,
+    #[doc = "Execution and equivalence evidence, required on success."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub validation: Option<KclMigrationValidation>,
+}
+
+impl std::fmt::Display for KclMigrationResult {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationResult {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.conversion_not_started).into(),
+            self.detail.clone().into(),
+            if let Some(files) = &self.files {
+                format!("{:?}", files).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            if let Some(validation) = &self.validation {
+                format!("{:?}", validation).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "conversion_not_started".into(),
+            "detail".into(),
+            "files".into(),
+            "status".into(),
+            "validation".into(),
+        ]
+    }
+}
+
+#[doc = "Public responses never contain ordinary auto-applying tool results."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum KclMigrationServerMessage {
+    #[doc = "Current durable state, including a reviewable candidate when successful."]
+    #[serde(rename = "operation")]
+    Operation {
+        #[doc = "Persisted operation state, safe to retrieve again without starting new work."]
+        operation: KclMigrationOperation,
+    },
+    #[doc = "A rejected request, without starting or charging for work."]
+    #[serde(rename = "error")]
+    Error { detail: String },
+    #[doc = "Heartbeat response."]
+    #[serde(rename = "pong")]
+    Pong {},
+}
+
+#[doc = "Durable state of a migration attempt."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclMigrationStatus {
+    #[doc = "Preparation, conversion, or validation is still running."]
+    #[serde(rename = "running")]
+    #[display("running")]
+    Running,
+    #[doc = "A validated candidate is ready for review. No project has been applied."]
+    #[serde(rename = "succeeded")]
+    #[display("succeeded")]
+    Succeeded,
+    #[doc = "The attempt failed."]
+    #[serde(rename = "failed")]
+    #[display("failed")]
+    Failed,
+    #[doc = "The original execution deadline expired."]
+    #[serde(rename = "timed_out")]
+    #[display("timed_out")]
+    TimedOut,
+    #[doc = "The attempt was cancelled, including loss of its execution connection."]
+    #[serde(rename = "cancelled")]
+    #[display("cancelled")]
+    Cancelled,
+    #[doc = "The source, target, or project is not supported."]
+    #[serde(rename = "unsupported")]
+    #[display("unsupported")]
+    Unsupported,
+    #[doc = "Execution, geometry, or behavioral equivalence could not be established."]
+    #[serde(rename = "validation_failed")]
+    #[display("validation_failed")]
+    ValidationFailed,
+}
+
+#[doc = "A supported migration target. Preview use always requires explicit consent."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclMigrationTarget {
+    #[doc = "Unstable KCL 3 preview."]
+    #[serde(rename = "3.0-preview")]
+    #[display("3.0-preview")]
+    Three0Preview,
+    #[doc = "Stable KCL 3. Availability also depends on the deployed worker and client."]
+    #[serde(rename = "3.0")]
+    #[display("3.0")]
+    Three0,
+}
+
+#[doc = "Evidence required before a candidate may be returned as successful."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationValidation {
+    #[doc = "Relevant parameter and control-flow behavior passed validation."]
+    pub behavior_preserved: bool,
+    #[doc = "Geometry passed the version-pair validation policy."]
+    pub geometry_preserved: bool,
+    #[doc = "Revision of the conversion instructions and validation policy."]
+    pub rules_revision: String,
+    #[doc = "Exact target runtime used for execution and geometry checks."]
+    pub runtime_version: String,
+    #[doc = "The unchanged source project executed successfully."]
+    pub source_executed: bool,
+    #[doc = "Actual source semantics detected and executed by the worker."]
+    pub source_version: String,
+    #[doc = "Reviewable explanation of checks, tolerances, and any accepted differences."]
+    pub summary: String,
+    #[doc = "Target semantics used during validation, which must match the request."]
+    pub target: KclMigrationTarget,
+    #[doc = "The candidate executed successfully under target semantics."]
+    pub target_executed: bool,
+}
+
+impl std::fmt::Display for KclMigrationValidation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationValidation {
+    const LENGTH: usize = 9;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.behavior_preserved).into(),
+            format!("{:?}", self.geometry_preserved).into(),
+            self.rules_revision.clone().into(),
+            self.runtime_version.clone().into(),
+            format!("{:?}", self.source_executed).into(),
+            self.source_version.clone().into(),
+            self.summary.clone().into(),
+            format!("{:?}", self.target).into(),
+            format!("{:?}", self.target_executed).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "behavior_preserved".into(),
+            "geometry_preserved".into(),
+            "rules_revision".into(),
+            "runtime_version".into(),
+            "source_executed".into(),
+            "source_version".into(),
+            "summary".into(),
+            "target".into(),
+            "target_executed".into(),
+        ]
+    }
+}
+
 #[doc = "The response containing the KCL code."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12331,10 +12788,14 @@ pub enum KclVersion {
     #[serde(rename = "2.0")]
     #[display("2.0")]
     Two0,
-    #[doc = "KCL v3 is currently in development."]
+    #[doc = "KCL v3 preview -- used while developing version 3."]
     #[serde(rename = "3.0-preview")]
     #[display("3.0-preview")]
     Three0Preview,
+    #[doc = "KCL v3 releases 2026"]
+    #[serde(rename = "3.0")]
+    #[display("3.0")]
+    Three0,
 }
 
 #[doc = "The response from the `Loft` command."]
@@ -15359,6 +15820,9 @@ pub enum ModelingCmd {
         #[doc = "The default color to use for selection"]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         selection_color: Option<Color>,
+        #[doc = "The default tolerance values."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        tolerance: Option<Tolerance>,
     },
     #[doc = "Get type of the given curve."]
     #[serde(rename = "curve_get_type")]
@@ -15580,6 +16044,36 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The output unit for the surface area."]
         output_unit: UnitArea,
+    },
+    #[doc = "Get mass, density, volume, center of mass, surface area, and bounding box together. \
+             Equivalent to querying each property separately for the same entities, while \
+             allowing the engine to share the intermediate geometry used by the calculations."]
+    #[serde(rename = "physical_properties")]
+    PhysicalProperties {
+        #[doc = "The output unit for the bounding box's dimensions."]
+        bounding_box_output_unit: UnitLength,
+        #[doc = "The output unit for center of mass."]
+        center_of_mass_output_unit: UnitLength,
+        #[doc = "The output unit for density."]
+        density_output_unit: UnitDensity,
+        #[doc = "IDs of the entities to query. If empty, query the default scene, as with the \
+                 individual property commands."]
+        entity_ids: Vec<uuid::Uuid>,
+        #[doc = "The output unit for mass."]
+        mass_output_unit: UnitMass,
+        #[doc = "The material density used to calculate mass."]
+        material_density: f64,
+        #[doc = "The material density unit."]
+        material_density_unit: UnitDensity,
+        #[doc = "The material mass used to calculate density, independently of the calculated \
+                 mass."]
+        material_mass: f64,
+        #[doc = "The material mass unit."]
+        material_mass_unit: UnitMass,
+        #[doc = "The output unit for surface area."]
+        surface_area_output_unit: UnitArea,
+        #[doc = "The output unit for volume."]
+        volume_output_unit: UnitVolume,
     },
     #[doc = "Focus the default camera upon an object in the scene."]
     #[serde(rename = "default_camera_focus_on")]
@@ -17600,6 +18094,12 @@ pub enum OkModelingCmdResponse {
         #[doc = "The center of mass response."]
         data: CenterOfMass,
     },
+    #[serde(rename = "physical_properties")]
+    PhysicalProperties {
+        #[doc = "The physical properties response, containing the same data as the individual \
+                 property responses."]
+        data: PhysicalProperties,
+    },
     #[serde(rename = "get_sketch_mode_plane")]
     GetSketchModePlane {
         #[doc = "The plane for sketch mode."]
@@ -19526,6 +20026,9 @@ pub enum OutputFormat3D {
              prefer ASCII output, you can set that option for the export."]
     #[serde(rename = "gltf")]
     Gltf {
+        #[doc = "Include engine UUIDs in glTF extras. Defaults to false."]
+        #[serde(default)]
+        include_uuids: bool,
         #[doc = "Specifies how the JSON will be presented."]
         presentation: GltfPresentation,
         #[doc = "Specifies which kind of glTF 2.0 will be exported."]
@@ -20251,6 +20754,62 @@ impl tabled::Tabled for PerspectiveCameraParameters {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["fov_y".into(), "z_far".into(), "z_near".into()]
+    }
+}
+
+#[doc = "The physical properties response, containing the same data as the individual property \
+         responses."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct PhysicalProperties {
+    #[doc = "The bounding box's center and dimensions, in the requested bounding box output unit."]
+    pub bounding_box: BoundingBox,
+    #[doc = "The center of mass and its output unit."]
+    pub center_of_mass: CenterOfMass,
+    #[doc = "The density and its output unit."]
+    pub density: Density,
+    #[doc = "The mass and its output unit."]
+    pub mass: Mass,
+    #[doc = "The surface area and its output unit."]
+    pub surface_area: SurfaceArea,
+    #[doc = "The volume and its output unit."]
+    pub volume: Volume,
+}
+
+impl std::fmt::Display for PhysicalProperties {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for PhysicalProperties {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.bounding_box).into(),
+            format!("{:?}", self.center_of_mass).into(),
+            format!("{:?}", self.density).into(),
+            format!("{:?}", self.mass).into(),
+            format!("{:?}", self.surface_area).into(),
+            format!("{:?}", self.volume).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "bounding_box".into(),
+            "center_of_mass".into(),
+            "density".into(),
+            "mass".into(),
+            "surface_area".into(),
+            "volume".into(),
+        ]
     }
 }
 
@@ -25683,6 +26242,37 @@ impl tabled::Tabled for TokenRevokeRequestForm {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["client_id".into(), "client_secret".into(), "token".into()]
+    }
+}
+
+#[doc = "Default tolerance values for modeling operations."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct Tolerance {
+    #[doc = "The distance tolerance for 2D point-point coincidence."]
+    pub point_point_2d_coincident: f64,
+}
+
+impl std::fmt::Display for Tolerance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for Tolerance {
+    const LENGTH: usize = 1;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![format!("{:?}", self.point_point_2d_coincident).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["point_point_2d_coincident".into()]
     }
 }
 

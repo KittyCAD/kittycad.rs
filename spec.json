@@ -31150,6 +31150,49 @@
         "x-dropshot-websocket": {}
       }
     },
+    "/ws/ml/kcl-migration": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Open a sponsored KCL migration connection. It cannot execute ordinary prompts.",
+        "operationId": "kcl_migration_ws",
+        "requestBody": {
+          "description": "Websocket requests",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KclMigrationClientMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "Websocket responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KclMigrationServerMessage"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Negotiating protocol upgrade from HTTP/1.1 to WebSocket"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-websocket": {}
+      }
+    },
     "/ws/ml/reasoning/{id}": {
       "get": {
         "tags": [
@@ -31727,8 +31770,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "from_entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the dimension leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "from_entity_pos": {
-            "description": "Normalized position within the entity to position the dimension from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the dimension from Deprecated; please use `from_entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -31769,8 +31822,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "to_entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the dimension leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "to_entity_pos": {
-            "description": "Normalized position within the entity to position the dimension to",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the dimension to Deprecated; please use `to_entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -31782,11 +31845,9 @@
           "dimension",
           "font_point_size",
           "font_scale",
-          "from_entity_pos",
           "offset",
           "plane_id",
-          "precision",
-          "to_entity_pos"
+          "precision"
         ]
       },
       "AnnotationFeatureControl": {
@@ -31833,8 +31894,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "entity_pos": {
-            "description": "Normalized position within the entity to position the annotation leader from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the annotation leader from Deprecated; please use `entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -31897,7 +31968,6 @@
           }
         },
         "required": [
-          "entity_pos",
           "font_point_size",
           "font_scale",
           "leader_type",
@@ -31925,8 +31995,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "entity_pos": {
-            "description": "Normalized position within the entity to position the annotation leader from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the annotation leader from Deprecated; please use `entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -31985,7 +32065,6 @@
           }
         },
         "required": [
-          "entity_pos",
           "font_point_size",
           "font_scale",
           "key",
@@ -32118,6 +32197,50 @@
         "required": [
           "symbol",
           "tolerance"
+        ]
+      },
+      "AnnotationMbdLeaderPosition": {
+        "description": "Parameters for defining a specific MBD Leader Position within an Entity",
+        "oneOf": [
+          {
+            "description": "Normalized position within the entity to position the annotation leader from",
+            "type": "object",
+            "properties": {
+              "normalized_pos": {
+                "type": "object",
+                "properties": {
+                  "pos": {
+                    "description": "The position",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "pos"
+                ]
+              }
+            },
+            "required": [
+              "normalized_pos"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Geometric Center of the entity (such as on the center axis for a cylinder)",
+            "type": "object",
+            "properties": {
+              "centroid": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "centroid"
+            ],
+            "additionalProperties": false
+          }
         ]
       },
       "AnnotationOptions": {
@@ -37153,6 +37276,27 @@
             ]
           },
           {
+            "description": "A uuid referencing a helix.",
+            "type": "object",
+            "properties": {
+              "helix_id": {
+                "description": "Id of the helix object.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "helix"
+                ]
+              }
+            },
+            "required": [
+              "helix_id",
+              "type"
+            ]
+          },
+          {
             "description": "A uuid referencing an edge on a solid2d (profile) - used for raw sketch/profile edges. This is distinct from the face-based Edge reference which is used for BRep/swept body edges.",
             "type": "object",
             "properties": {
@@ -37269,7 +37413,8 @@
           "face",
           "plane",
           "vertex",
-          "region"
+          "region",
+          "patterngroup"
         ]
       },
       "Error": {
@@ -38391,13 +38536,6 @@
             ]
           },
           {
-            "description": "Enables cloud storage for web and desktop. Yes desktop too, the name is old and will go away soon.",
-            "type": "string",
-            "enum": [
-              "web_app_file_browser"
-            ]
-          },
-          {
             "description": "Enables Zookeeper Pro mode access in ML Copilot.",
             "type": "string",
             "enum": [
@@ -38416,6 +38554,13 @@
             "type": "string",
             "enum": [
               "zookeeper_client_commands"
+            ]
+          },
+          {
+            "description": "Enables sponsored, time-limited KCL project migration.",
+            "type": "string",
+            "enum": [
+              "zookeeper_kcl_migration"
             ]
           },
           {
@@ -40563,6 +40708,465 @@
           "completions"
         ]
       },
+      "KclMigrationClientMessage": {
+        "description": "The restricted public migration connection never accepts ordinary prompts.",
+        "oneOf": [
+          {
+            "description": "Authenticate the connection.",
+            "type": "object",
+            "properties": {
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "headers"
+                ]
+              }
+            },
+            "required": [
+              "headers",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Start or retrieve the same attempt after a delivery retry.",
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/components/schemas/KclMigrationRequest"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "start"
+                ]
+              }
+            },
+            "required": [
+              "request",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Read an existing attempt without resuming it or changing its deadline.",
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "operation_id",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Cancel an existing attempt. Cancellation is idempotent.",
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cancel"
+                ]
+              }
+            },
+            "required": [
+              "operation_id",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Application heartbeat.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ping"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "KclMigrationOperation": {
+        "description": "Persisted operation state, safe to retrieve again without starting new work.",
+        "type": "object",
+        "properties": {
+          "deadline": {
+            "description": "Original deadline, including preparation and validation. Never extended.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "Same idempotency key supplied by the initiating client.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "project_snapshot": {
+            "description": "Source revision, retained for conflict detection when applying the result.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+              }
+            ]
+          },
+          "result": {
+            "nullable": true,
+            "description": "Terminal result, if available. The review itself has no execution deadline.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationResult"
+              }
+            ]
+          },
+          "status": {
+            "description": "Current state.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationStatus"
+              }
+            ]
+          },
+          "target": {
+            "description": "Target accepted for this attempt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          }
+        },
+        "required": [
+          "deadline",
+          "id",
+          "project_snapshot",
+          "status",
+          "target"
+        ]
+      },
+      "KclMigrationRequest": {
+        "description": "A complete, immutable input snapshot. It does not grant sponsorship itself.",
+        "type": "object",
+        "properties": {
+          "allow_preview": {
+            "description": "Explicit consent to unstable preview semantics.",
+            "default": false,
+            "type": "boolean"
+          },
+          "current_files": {
+            "description": "Complete project, including unsaved edits, imports, and settings.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0
+              }
+            }
+          },
+          "entrypoint": {
+            "description": "Project-relative KCL file to execute.",
+            "type": "string"
+          },
+          "project_snapshot": {
+            "description": "Revision against which the user will review and apply the candidate.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+              }
+            ]
+          },
+          "request_id": {
+            "description": "Client-generated idempotency key. Reuse it when retrying delivery.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "target": {
+            "description": "Requested target. The worker inspects the actual source version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          }
+        },
+        "required": [
+          "current_files",
+          "entrypoint",
+          "project_snapshot",
+          "request_id",
+          "target"
+        ],
+        "additionalProperties": false
+      },
+      "KclMigrationResult": {
+        "description": "A worker's terminal candidate, held separately from ordinary project edits.",
+        "type": "object",
+        "properties": {
+          "conversion_not_started": {
+            "description": "Confirmed rejection or failure before conversion started. Only unsuccessful attempts may set this; API excludes them from the daily attempt allowance. Missing evidence defaults to counting the attempt.",
+            "default": false,
+            "type": "boolean"
+          },
+          "detail": {
+            "description": "User-facing outcome or failure explanation.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Candidate project, returned only after successful validation.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0
+              }
+            }
+          },
+          "status": {
+            "description": "Terminal state. `running` is not a valid result.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationStatus"
+              }
+            ]
+          },
+          "validation": {
+            "nullable": true,
+            "description": "Execution and equivalence evidence, required on success.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationValidation"
+              }
+            ]
+          }
+        },
+        "required": [
+          "detail",
+          "status"
+        ]
+      },
+      "KclMigrationServerMessage": {
+        "description": "Public responses never contain ordinary auto-applying tool results.",
+        "oneOf": [
+          {
+            "description": "Current durable state, including a reviewable candidate when successful.",
+            "type": "object",
+            "properties": {
+              "operation": {
+                "$ref": "#/components/schemas/KclMigrationOperation"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "operation"
+                ]
+              }
+            },
+            "required": [
+              "operation",
+              "type"
+            ]
+          },
+          {
+            "description": "A rejected request, without starting or charging for work.",
+            "type": "object",
+            "properties": {
+              "detail": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              }
+            },
+            "required": [
+              "detail",
+              "type"
+            ]
+          },
+          {
+            "description": "Heartbeat response.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "pong"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "KclMigrationStatus": {
+        "description": "Durable state of a migration attempt.",
+        "oneOf": [
+          {
+            "description": "Preparation, conversion, or validation is still running.",
+            "type": "string",
+            "enum": [
+              "running"
+            ]
+          },
+          {
+            "description": "A validated candidate is ready for review. No project has been applied.",
+            "type": "string",
+            "enum": [
+              "succeeded"
+            ]
+          },
+          {
+            "description": "The attempt failed.",
+            "type": "string",
+            "enum": [
+              "failed"
+            ]
+          },
+          {
+            "description": "The original execution deadline expired.",
+            "type": "string",
+            "enum": [
+              "timed_out"
+            ]
+          },
+          {
+            "description": "The attempt was cancelled, including loss of its execution connection.",
+            "type": "string",
+            "enum": [
+              "cancelled"
+            ]
+          },
+          {
+            "description": "The source, target, or project is not supported.",
+            "type": "string",
+            "enum": [
+              "unsupported"
+            ]
+          },
+          {
+            "description": "Execution, geometry, or behavioral equivalence could not be established.",
+            "type": "string",
+            "enum": [
+              "validation_failed"
+            ]
+          }
+        ]
+      },
+      "KclMigrationTarget": {
+        "description": "A supported migration target. Preview use always requires explicit consent.",
+        "oneOf": [
+          {
+            "description": "Unstable KCL 3 preview.",
+            "type": "string",
+            "enum": [
+              "3.0-preview"
+            ]
+          },
+          {
+            "description": "Stable KCL 3. Availability also depends on the deployed worker and client.",
+            "type": "string",
+            "enum": [
+              "3.0"
+            ]
+          }
+        ]
+      },
+      "KclMigrationValidation": {
+        "description": "Evidence required before a candidate may be returned as successful.",
+        "type": "object",
+        "properties": {
+          "behavior_preserved": {
+            "description": "Relevant parameter and control-flow behavior passed validation.",
+            "type": "boolean"
+          },
+          "geometry_preserved": {
+            "description": "Geometry passed the version-pair validation policy.",
+            "type": "boolean"
+          },
+          "rules_revision": {
+            "description": "Revision of the conversion instructions and validation policy.",
+            "type": "string"
+          },
+          "runtime_version": {
+            "description": "Exact target runtime used for execution and geometry checks.",
+            "type": "string"
+          },
+          "source_executed": {
+            "description": "The unchanged source project executed successfully.",
+            "type": "boolean"
+          },
+          "source_version": {
+            "description": "Actual source semantics detected and executed by the worker.",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Reviewable explanation of checks, tolerances, and any accepted differences.",
+            "type": "string"
+          },
+          "target": {
+            "description": "Target semantics used during validation, which must match the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          },
+          "target_executed": {
+            "description": "The candidate executed successfully under target semantics.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "behavior_preserved",
+          "geometry_preserved",
+          "rules_revision",
+          "runtime_version",
+          "source_executed",
+          "source_version",
+          "summary",
+          "target",
+          "target_executed"
+        ]
+      },
       "KclModel": {
         "description": "The response containing the KCL code.",
         "type": "object",
@@ -40745,10 +41349,17 @@
             ]
           },
           {
-            "description": "KCL v3 is currently in development.",
+            "description": "KCL v3 preview -- used while developing version 3.",
             "type": "string",
             "enum": [
               "3.0-preview"
+            ]
+          },
+          {
+            "description": "KCL v3 releases 2026",
+            "type": "string",
+            "enum": [
+              "3.0"
             ]
           }
         ]
@@ -46732,6 +47343,15 @@
                   }
                 ]
               },
+              "tolerance": {
+                "nullable": true,
+                "description": "The default tolerance values.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Tolerance"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -47477,6 +48097,114 @@
               "entity_ids",
               "output_unit",
               "type"
+            ]
+          },
+          {
+            "description": "Get mass, density, volume, center of mass, surface area, and bounding box together. Equivalent to querying each property separately for the same entities, while allowing the engine to share the intermediate geometry used by the calculations.",
+            "type": "object",
+            "properties": {
+              "bounding_box_output_unit": {
+                "description": "The output unit for the bounding box's dimensions.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "center_of_mass_output_unit": {
+                "description": "The output unit for center of mass.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "density_output_unit": {
+                "description": "The output unit for density.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ]
+              },
+              "entity_ids": {
+                "description": "IDs of the entities to query. If empty, query the default scene, as with the individual property commands.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "mass_output_unit": {
+                "description": "The output unit for mass.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ]
+              },
+              "material_density": {
+                "description": "The material density used to calculate mass.",
+                "type": "number",
+                "format": "double"
+              },
+              "material_density_unit": {
+                "description": "The material density unit.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ]
+              },
+              "material_mass": {
+                "description": "The material mass used to calculate density, independently of the calculated mass.",
+                "type": "number",
+                "format": "double"
+              },
+              "material_mass_unit": {
+                "description": "The material mass unit.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ]
+              },
+              "surface_area_output_unit": {
+                "description": "The output unit for surface area.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitArea"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "physical_properties"
+                ]
+              },
+              "volume_output_unit": {
+                "description": "The output unit for volume.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitVolume"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "bounding_box_output_unit",
+              "center_of_mass_output_unit",
+              "density_output_unit",
+              "entity_ids",
+              "mass_output_unit",
+              "material_density",
+              "material_density_unit",
+              "material_mass",
+              "material_mass_unit",
+              "surface_area_output_unit",
+              "type",
+              "volume_output_unit"
             ]
           },
           {
@@ -51544,6 +52272,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/PhysicalProperties"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "physical_properties"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/GetSketchModePlane"
               },
               "type": {
@@ -53810,6 +54556,11 @@
             "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ASCII output, you can set that option for the export.",
             "type": "object",
             "properties": {
+              "include_uuids": {
+                "description": "Include engine UUIDs in glTF extras. Defaults to false.",
+                "default": false,
+                "type": "boolean"
+              },
               "presentation": {
                 "description": "Specifies how the JSON will be presented.",
                 "allOf": [
@@ -54695,6 +55446,68 @@
             "format": "float"
           }
         }
+      },
+      "PhysicalProperties": {
+        "description": "The physical properties response, containing the same data as the individual property responses.",
+        "type": "object",
+        "properties": {
+          "bounding_box": {
+            "description": "The bounding box's center and dimensions, in the requested bounding box output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BoundingBox"
+              }
+            ]
+          },
+          "center_of_mass": {
+            "description": "The center of mass and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CenterOfMass"
+              }
+            ]
+          },
+          "density": {
+            "description": "The density and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Density"
+              }
+            ]
+          },
+          "mass": {
+            "description": "The mass and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Mass"
+              }
+            ]
+          },
+          "surface_area": {
+            "description": "The surface area and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurfaceArea"
+              }
+            ]
+          },
+          "volume": {
+            "description": "The volume and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Volume"
+              }
+            ]
+          }
+        },
+        "required": [
+          "bounding_box",
+          "center_of_mass",
+          "density",
+          "mass",
+          "surface_area",
+          "volume"
+        ]
       },
       "PlanInterval": {
         "description": "A plan's interval.",
@@ -58452,6 +59265,23 @@
         "required": [
           "client_id",
           "token"
+        ]
+      },
+      "Tolerance": {
+        "description": "Default tolerance values for modeling operations.",
+        "type": "object",
+        "properties": {
+          "point_point_2d_coincident": {
+            "description": "The distance tolerance for 2D point-point coincidence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LengthUnit"
+              }
+            ]
+          }
+        },
+        "required": [
+          "point_point_2d_coincident"
         ]
       },
       "Transform": {
