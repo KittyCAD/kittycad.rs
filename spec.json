@@ -13340,8 +13340,30 @@
           "payments"
         ],
         "summary": "List payment methods for your org.",
-        "description": "This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.",
+        "description": "This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org, with the valid default card first.",
         "operationId": "list_payment_methods_for_org",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -13414,11 +13436,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PaymentMethod",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PaymentMethod"
-                  }
+                  "$ref": "#/components/schemas/PaymentMethodResultsPage"
                 }
               }
             }
@@ -13430,7 +13448,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/org/payment/methods/{id}": {
@@ -15613,8 +15634,30 @@
         "tags": [
           "orgs"
         ],
-        "summary": "List every skill that belongs to the caller's organization.",
+        "summary": "List every skill that belongs to the caller's organization, ordered by name.",
         "operationId": "list_org_skills",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -15687,11 +15730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_OrgSkillResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgSkillResponse"
-                  }
+                  "$ref": "#/components/schemas/OrgSkillResponseResultsPage"
                 }
               }
             }
@@ -15703,7 +15742,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -16179,6 +16221,28 @@
         ],
         "summary": "List publicly visible community projects for the website/gallery.",
         "operationId": "list_public_projects",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16250,11 +16314,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PublicProjectResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicProjectResponse"
-                  }
+                  "$ref": "#/components/schemas/PublicProjectResponseResultsPage"
                 }
               }
             }
@@ -16266,7 +16326,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -21375,8 +21438,30 @@
           "factory"
         ],
         "summary": "List finishes currently available for customer Factory submissions.",
-        "description": "Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
+        "description": "Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
         "operationId": "get_user_factory_finishes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -21449,11 +21534,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_FactoryCustomerCatalogOption",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
-                  }
+                  "$ref": "#/components/schemas/FactoryCustomerCatalogOptionResultsPage"
                 }
               }
             }
@@ -21465,7 +21546,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -22080,8 +22164,30 @@
           "factory"
         ],
         "summary": "List materials currently available for customer Factory submissions.",
-        "description": "Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
+        "description": "Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
         "operationId": "get_user_factory_materials",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -22154,11 +22260,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_FactoryCustomerCatalogOption",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
-                  }
+                  "$ref": "#/components/schemas/FactoryCustomerCatalogOptionResultsPage"
                 }
               }
             }
@@ -22170,7 +22272,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -24356,8 +24461,30 @@
           "payments"
         ],
         "summary": "List payment methods for your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user, with the valid default card first.",
         "operationId": "list_payment_methods_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -24430,11 +24557,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PaymentMethod",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PaymentMethod"
-                  }
+                  "$ref": "#/components/schemas/PaymentMethodResultsPage"
                 }
               }
             }
@@ -24446,7 +24569,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/user/payment/methods/{id}": {
@@ -26858,6 +26984,26 @@
             "schema": {
               "$ref": "#/components/schemas/Uuid"
             }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -26932,11 +27078,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectShareLinkResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectShareLinkResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectShareLinkResponseResultsPage"
                 }
               }
             }
@@ -26948,7 +27090,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "post": {
         "tags": [
@@ -38122,6 +38267,27 @@
         },
         "required": [
           "name"
+        ]
+      },
+      "FactoryCustomerCatalogOptionResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "FactoryCustomerJobDetail": {
@@ -54398,6 +54564,27 @@
           "name"
         ]
       },
+      "OrgSkillResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgSkillResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "OrientToFace": {
         "description": "The response from the `OrientToFace` command.",
         "type": "object",
@@ -55411,6 +55598,27 @@
           }
         }
       },
+      "PaymentMethodResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethod"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "PaymentMethodType": {
         "description": "An enum representing the possible values of an `PaymentMethod`'s `type` field.",
         "oneOf": [
@@ -56147,6 +56355,27 @@
           "url"
         ]
       },
+      "ProjectShareLinkResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectShareLinkResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "ProjectSummaryResponse": {
         "description": "Owner-visible project summary payload.",
         "type": "object",
@@ -56529,6 +56758,27 @@
           "owner",
           "published_at",
           "title"
+        ]
+      },
+      "PublicProjectResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProjectResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "PublicProjectVoteResponse": {
