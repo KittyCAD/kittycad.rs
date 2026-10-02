@@ -2725,6 +2725,37 @@ pub enum AsyncApiCallOutput {
         #[doc = "The user ID of the user who created the API call."]
         user_id: uuid::Uuid,
     },
+    #[doc = "A file bounding box."]
+    #[serde(rename = "file_bounding_box")]
+    FileBoundingBox {
+        #[doc = "The resulting axis-aligned bounding box in the KittyCAD coordinate system (+Z \
+                 up, -Y forward)."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        bounding_box: Option<BoundingBox>,
+        #[doc = "The time and date the API call was completed."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        completed_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The time and date the API call was created."]
+        created_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The error the function returned, if any."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        error: Option<String>,
+        #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+        id: uuid::Uuid,
+        #[doc = "The output unit for the bounding box."]
+        output_unit: UnitLength,
+        #[doc = "The source format of the file."]
+        src_format: FileImportFormat,
+        #[doc = "The time and date the API call was started."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        started_at: Option<chrono::DateTime<chrono::Utc>>,
+        #[doc = "The status of the API call."]
+        status: ApiCallStatus,
+        #[doc = "The time and date the API call was last updated."]
+        updated_at: chrono::DateTime<chrono::Utc>,
+        #[doc = "The user ID of the user who created the API call."]
+        user_id: uuid::Uuid,
+    },
     #[doc = "Text to CAD."]
     #[serde(rename = "text_to_cad")]
     TextToCad {
@@ -9822,6 +9853,102 @@ pub enum Feature {
     #[serde(rename = "zoo_corp_auth")]
     #[display("zoo_corp_auth")]
     ZooCorpAuth,
+}
+
+#[doc = "A file bounding box result."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FileBoundingBox {
+    #[doc = "The resulting axis-aligned bounding box in the KittyCAD coordinate system (+Z up, -Y \
+             forward)."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bounding_box: Option<BoundingBox>,
+    #[doc = "The time and date the API call was completed."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The time and date the API call was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The error the function returned, if any."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    #[doc = "The unique identifier of the API call.\n\nThis is the same as the API call ID."]
+    pub id: uuid::Uuid,
+    #[doc = "The output unit for the bounding box."]
+    pub output_unit: UnitLength,
+    #[doc = "The source format of the file."]
+    pub src_format: FileImportFormat,
+    #[doc = "The time and date the API call was started."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub started_at: Option<chrono::DateTime<chrono::Utc>>,
+    #[doc = "The status of the API call."]
+    pub status: ApiCallStatus,
+    #[doc = "The time and date the API call was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "The user ID of the user who created the API call."]
+    pub user_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for FileBoundingBox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FileBoundingBox {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(bounding_box) = &self.bounding_box {
+                format!("{:?}", bounding_box).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(completed_at) = &self.completed_at {
+                format!("{:?}", completed_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.created_at).into(),
+            if let Some(error) = &self.error {
+                format!("{:?}", error).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.output_unit).into(),
+            format!("{:?}", self.src_format).into(),
+            if let Some(started_at) = &self.started_at {
+                format!("{:?}", started_at).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+            format!("{:?}", self.updated_at).into(),
+            format!("{:?}", self.user_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "bounding_box".into(),
+            "completed_at".into(),
+            "created_at".into(),
+            "error".into(),
+            "id".into(),
+            "output_unit".into(),
+            "src_format".into(),
+            "started_at".into(),
+            "status".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
 }
 
 #[doc = "A file center of mass result."]
