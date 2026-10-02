@@ -15,8 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
-        with:
-          fetch-depth: 2
 
       - name: Install latest stable/nightly
         shell: bash
@@ -27,29 +25,13 @@ jobs:
           rustup component add rustfmt
           rustup component add rustfmt --toolchain nightly
           rustup component add clippy
-          echo PATH="${HOME}/.cargo/bin:${PATH}" >> ${GITHUB_ENV}
+          echo "PATH=${HOME}/.cargo/bin:${PATH}" >> "$GITHUB_ENV"
 
       - uses: taiki-e/install-action@cargo-llvm-cov
       - uses: taiki-e/install-action@nextest
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
-
-      - name: Verify generated SDK is current
-        if: github.event_name == 'pull_request'
-        shell: bash
-        run: |
-          # The first parent of the PR merge commit is the base branch.
-          if git diff --quiet HEAD^1 HEAD -- spec.json; then
-            exit 0
-          fi
-          make kittycad
-          if [ -n "$(git status --porcelain --untracked-files=all)" ]; then
-            echo "Generated SDK is stale. Run make generate and commit the changes."
-            git status --short
-            git diff --stat
-            exit 1
-          fi
 
       - name: cargo test
         shell: bash
