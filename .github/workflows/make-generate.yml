@@ -1,23 +1,34 @@
 on:
   pull_request:
-    paths:
-      - spec.json
-      - .github/workflows/make-generate.yml
-      - VERSION.txt
 permissions:
   contents: write
 name: make-generate
 jobs:
   makegenerate:
-    # Check if the PR is not from a fork
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     name: make generate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 2
+      - name: Check generation inputs
+        id: inputs
+        shell: bash
+        run: |
+          # The PR merge commit's first parent is the current base branch.
+          changed=$(git diff --name-only HEAD^1 HEAD -- spec.json VERSION.txt Makefile Cargo.toml Cargo.lock openapitor .github/workflows/make-generate.yml)
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Check out PR branch
+        if: steps.inputs.outputs.changed == 'true'
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Install latest stable/nightly
+        if: steps.inputs.outputs.changed == 'true'
         shell: bash
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
@@ -26,34 +37,56 @@ jobs:
           rustup component add rustfmt
           rustup component add rustfmt --toolchain nightly
           rustup component add clippy
-          echo PATH="${HOME}/.cargo/bin:${PATH}" >> ${GITHUB_ENV}
+          echo "PATH=${HOME}/.cargo/bin:${PATH}" >> "$GITHUB_ENV"
       - name: Cache cargo registry
+        if: steps.inputs.outputs.changed == 'true'
         uses: actions/cache@v6.1.0
         with:
           path: ~/.cargo/registry
           key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
       - name: Cache cargo index
+        if: steps.inputs.outputs.changed == 'true'
         uses: actions/cache@v6.1.0
         with:
           path: ~/.cargo/git
           key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
       - name: Cache cargo build
+        if: steps.inputs.outputs.changed == 'true'
         uses: actions/cache@v6.1.0
         with:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
       - uses: taiki-e/install-action@nextest
+        if: steps.inputs.outputs.changed == 'true'
       - name: Run make generate
+        if: steps.inputs.outputs.changed == 'true'
         run: |
           export EXPECTORATE=overwrite
           make generate
         env:
-          KITTYCAD_API_TOKEN: ${{secrets.KITTYCAD_API_TOKEN}}
+          KITTYCAD_API_TOKEN: ${{ github.event.pull_request.head.repo.full_name == github.repository && secrets.KITTYCAD_API_TOKEN || '' }}
         shell: bash
       - name: Commit generated files
+        id: commit
+        if: steps.inputs.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
         uses: KittyCAD/gha-actions-public/pr-commit@main
         with:
           app-id: ${{ secrets.GH_ORG_APP_ID }}
           private-key: ${{ secrets.GH_ORG_APP_PRIVATE_KEY }}
           commit-message: "I have generated the latest library!"
 
+      - name: Verify generated changes are committed
+        if: steps.inputs.outputs.changed == 'true'
+        shell: bash
+        env:
+          COMMITTED: ${{ steps.commit.outputs.commited }}
+        run: |
+          if [[ "$COMMITTED" == true ]]; then
+            echo "Generated changes pushed; checks will run on the updated PR head." >&2
+            exit 1
+          fi
+          if [[ -n "$(git status --porcelain --untracked-files=all)" ]]; then
+            git status --short
+            echo "Generated SDK files must be committed before this check can pass." >&2
+            exit 1
+          fi
