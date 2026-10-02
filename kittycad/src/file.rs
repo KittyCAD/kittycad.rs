@@ -12,6 +12,59 @@ impl File {
         Self { client }
     }
 
+    #[doc = "Get CAD file bounding box.\n\nImport the CAD file into the modeling engine and \
+             calculate its bounding box.\n\nThis endpoint returns the axis-aligned bounding box as \
+             a center and dimensions in the output units, using KittyCAD coordinates (+Z up, -Y \
+             forward).\n\nThis operation is always performed asynchronously, regardless of file \
+             size. The request returns the `id` of the operation. Use this `id` to get the status \
+             and bounding box from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- \
+             `output_unit: Option<crate::types::UnitLength>`: The output unit for the bounding \
+             box.\n- `src_format: crate::types::FileImportFormat`: The format of the file. \
+             (required)\n\n```rust,no_run\nasync fn example_file_create_bounding_box() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
+             result: kittycad::types::FileBoundingBox = client\n        .file()\n        \
+             .create_bounding_box(\n            Some(kittycad::types::UnitLength::M),\n            \
+             kittycad::types::FileImportFormat::Parasolid,\n            \
+             &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_bounding_box<'a>(
+        &'a self,
+        output_unit: Option<crate::types::UnitLength>,
+        src_format: crate::types::FileImportFormat,
+        body: &bytes::Bytes,
+    ) -> Result<crate::types::FileBoundingBox, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "file/bounding-box"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![("src_format", format!("{}", src_format))];
+        if let Some(p) = output_unit {
+            query_params.push(("output_unit", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        req = req.body(body.clone());
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get CAD file center of mass.\n\nWe assume any file given to us has one consistent unit throughout. We also assume the file is at the proper scale.\n\nThis endpoint returns the cartesian coordinate in the KittyCAD coordinate system (+Z up, -Y forward) using the requested measure units.\n\nIn the future, we will use the units inside the file if they are given and do any conversions if necessary for the calculation. But currently, that is not supported.\n\nGet the center of mass of an object in a CAD file. If the file is larger than 25MB, it will be performed asynchronously.\n\nIf the operation is performed asynchronously, the `id` of the operation will be returned. You can use the `id` returned from the request to get status information about the async operation from the `/async/operations/{id}` endpoint.\n\n**Parameters:**\n\n- `output_unit: Option<crate::types::UnitLength>`: The output unit for the center of mass.\n- `src_format: crate::types::FileImportFormat`: The format of the file. (required)\n\n```rust,no_run\nasync fn example_file_create_center_of_mass() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileCenterOfMass = client\n        .file()\n        .create_center_of_mass(\n            Some(kittycad::types::UnitLength::M),\n            kittycad::types::FileImportFormat::Parasolid,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn create_center_of_mass<'a>(
