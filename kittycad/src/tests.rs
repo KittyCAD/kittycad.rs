@@ -543,6 +543,19 @@ fn test_empty_phone_number() {
     );
 }
 
+#[test]
+fn test_client_debug_redacts_token() {
+    let token = "secret-api-token-1041";
+    let client = crate::Client::new(token);
+
+    // Endpoint methods are `#[tracing::instrument]`ed, which records `self`
+    // (and so the client) using its `Debug` impl.
+    for debug in [format!("{client:?}"), format!("{:?}", client.users())] {
+        assert!(!debug.contains(token), "token leaked: {debug}");
+        assert!(debug.contains("[REDACTED]"), "{debug}");
+    }
+}
+
 #[tokio::test]
 async fn test_user_self() {
     let Some(client) = test_client("test_user_self") else {
