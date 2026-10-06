@@ -38974,13 +38974,6 @@
             ]
           },
           {
-            "description": "Allows explicitly selecting the CPU-only engine pool for non-WebRTC modeling sessions.",
-            "type": "string",
-            "enum": [
-              "cpu_engine_pool"
-            ]
-          },
-          {
             "description": "Disable signup through email or OAuth.",
             "type": "string",
             "enum": [
@@ -38992,13 +38985,6 @@
             "type": "string",
             "enum": [
               "email_with_s_e_s"
-            ]
-          },
-          {
-            "description": "Quarantine engine-manager sessions when an engine is observed misbehaving.",
-            "type": "string",
-            "enum": [
-              "engine_manager_quarantine"
             ]
           },
           {
