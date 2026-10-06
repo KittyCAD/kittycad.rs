@@ -4,7 +4,7 @@
     "path": "/info/x-rust",
     "value": {
       "client": "// Authenticate via an API token.\nlet client = kittycad::Client::new(\"$TOKEN\");\n\n// - OR -\n\n// Authenticate with your token and host parsed from the environment variables:\n// `KITTYCAD_API_TOKEN`.\nlet client = kittycad::Client::new_from_env();",
-      "install": "[dependencies]\nkittycad = \"0.5.2\""
+      "install": "[dependencies]\nkittycad = \"0.5.4\""
     }
   },
   {
@@ -109,6 +109,14 @@
     "value": {
       "example": "/// Authorize an inbound auth request from our Community page.\n/// \n/// **Parameters:**\n/// \n/// - `sig: &'astr`: The signature for the given payload (required)\n/// - `sso: &'astr`: The nonce and redirect URL sent to us by Discourse (required)\nasync fn example_meta_community_sso() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .meta()\n        .community_sso(\"some-string\", \"some-string\")\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/meta/struct.Meta.html#method.community_sso"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1file~1bounding-box/post/x-rust",
+    "value": {
+      "example": "/// Get CAD file bounding box.\n/// \n/// Import the CAD file into the modeling engine and calculate its bounding box.\n/// \n/// This endpoint returns the axis-aligned bounding box as a center and dimensions in the output units, using KittyCAD coordinates (+Z up, -Y forward).\n/// \n/// This operation is always performed asynchronously, regardless of file size. The request returns the `id` of the operation. Use this `id` to get the status and bounding box from the `/async/operations/{id}` endpoint.\n/// \n/// **Parameters:**\n/// \n/// - `output_unit: Option<crate::types::UnitLength>`: The output unit for the bounding box.\n/// - `src_format: crate::types::FileImportFormat`: The format of the file. (required)\nasync fn example_file_create_bounding_box() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FileBoundingBox = client\n        .file()\n        .create_bounding_box(\n            Some(kittycad::types::UnitLength::M),\n            kittycad::types::FileImportFormat::Parasolid,\n            &bytes::Bytes::from(\"some-string\"),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/file/struct.File.html#method.create_bounding_box"
     }
   },
   {
@@ -221,14 +229,6 @@
     "value": {
       "example": "/// Update mutable metadata (name, system prompt) for a custom ML model owned by the caller's organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_ml_update_custom_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomModel = client\n        .ml()\n        .update_custom_model(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::UpdateCustomModel {\n                name: Some(\"some-string\".to_string()),\n                system_prompt: Some(\"some-string\".to_string()),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.update_custom_model"
-    }
-  },
-  {
-    "op": "add",
-    "path": "/paths/~1ml~1custom~1models~1{id}~1datasets/get/x-rust",
-    "value": {
-      "example": "/// List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_ml_list_org_datasets_for_model() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgDataset> = client\n        .ml()\n        .list_org_datasets_for_model(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/ml/struct.Ml.html#method.list_org_datasets_for_model"
     }
   },
   {
@@ -561,6 +561,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1factory~1jobs~1{job_id}/get/x-rust",
+    "value": {
+      "example": "/// Get an organization-owned Factory job for any current member.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The requested job's identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_get_org_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobDetail = client\n        .factory()\n        .get_org_job(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_org_job"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1members/get/x-rust",
     "value": {
       "example": "/// List members of your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists the members of the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n/// - `role: Option<crate::types::UserOrgRole>`: The organization role to filter by.\n/// - `sort_by: Option<crate::types::CreatedAtSortMode>`\nasync fn example_orgs_list_members() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgMemberResultsPage = client\n        .orgs()\n        .list_members(\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n            Some(kittycad::types::UserOrgRole::Member),\n            Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_members_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_members_stream(\n        Some(4 as u32),\n        Some(kittycad::types::UserOrgRole::Member),\n        Some(kittycad::types::CreatedAtSortMode::CreatedAtDescending),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
@@ -675,7 +683,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1balance/get/x-rust",
     "value": {
-      "example": "/// Get balance for your org.\n/// \n/// This endpoint requires authentication by any member of an org. It gets the balance information for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_org(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get balance for your org.\n/// \n/// This endpoint requires authentication by any member of an org. It gets the balance information for the authenticated user's org.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_org(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_balance_for_org"
     }
   },
@@ -707,7 +715,7 @@
     "op": "add",
     "path": "/paths/~1org~1payment~1methods/get/x-rust",
     "value": {
-      "example": "/// List payment methods for your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.\nasync fn example_payments_list_methods_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> = client.payments().list_methods_for_org().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List payment methods for your org.\n/// \n/// This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org, with the valid default card first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_payments_list_methods_for_org() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentMethodResultsPage = client\n        .payments()\n        .list_methods_for_org(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_payments_list_methods_for_org_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut payments = client.payments();\n    let mut stream = payments.list_methods_for_org_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.list_methods_for_org"
     }
   },
@@ -843,7 +851,7 @@
     "op": "add",
     "path": "/paths/~1org~1skills/get/x-rust",
     "value": {
-      "example": "/// List every skill that belongs to the caller's organization.\nasync fn example_orgs_list_skills() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::OrgSkillResponse> = client.orgs().list_skills().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List every skill that belongs to the caller's organization, ordered by name.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_orgs_list_skills() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::OrgSkillResponseResultsPage = client\n        .orgs()\n        .list_skills(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_orgs_list_skills_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut orgs = client.orgs();\n    let mut stream = orgs.list_skills_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.list_skills"
     }
   },
@@ -875,7 +883,7 @@
     "op": "add",
     "path": "/paths/~1projects~1public/get/x-rust",
     "value": {
-      "example": "/// List publicly visible community projects for the website/gallery.\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PublicProjectResponse> = client.projects().list_public().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List publicly visible community projects for the website/gallery.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PublicProjectResponseResultsPage = client\n        .projects()\n        .list_public(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_public_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_public"
     }
   },
@@ -1187,7 +1195,7 @@
     "op": "add",
     "path": "/paths/~1user~1factory~1finishes/get/x-rust",
     "value": {
-      "example": "/// List finishes currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\nasync fn example_factory_get_user_finishes() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::FactoryCustomerCatalogOption> =\n        client.factory().get_user_finishes().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List finishes currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_factory_get_user_finishes() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerCatalogOptionResultsPage = client\n        .factory()\n        .get_user_finishes(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_factory_get_user_finishes_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut factory = client.factory();\n    let mut stream = factory.get_user_finishes_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_finishes"
     }
   },
@@ -1209,9 +1217,17 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1factory~1jobs~1{job_id}/get/x-rust",
+    "value": {
+      "example": "/// Get a personal Factory job and its current customer-visible specifications.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The requested job's identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_get_user_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobDetail = client\n        .factory()\n        .get_user_job(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_job"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1factory~1materials/get/x-rust",
     "value": {
-      "example": "/// List materials currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\nasync fn example_factory_get_user_materials() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::FactoryCustomerCatalogOption> =\n        client.factory().get_user_materials().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List materials currently available for customer Factory submissions.\n/// \n/// Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_factory_get_user_materials() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerCatalogOptionResultsPage = client\n        .factory()\n        .get_user_materials(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_factory_get_user_materials_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut factory = client.factory();\n    let mut stream = factory.get_user_materials_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_materials"
     }
   },
@@ -1315,7 +1331,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1balance/get/x-rust",
     "value": {
-      "example": "/// Get balance for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: If you would like to return the total due for a user. This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_user(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Get balance for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It gets the balance information for the authenticated user.\n/// \n/// **Parameters:**\n/// \n/// - `include_total_due: Option<bool>`: Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.\nasync fn example_payments_get_balance_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CustomerBalance =\n        client.payments().get_balance_for_user(Some(true)).await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.get_balance_for_user"
     }
   },
@@ -1347,7 +1363,7 @@
     "op": "add",
     "path": "/paths/~1user~1payment~1methods/get/x-rust",
     "value": {
-      "example": "/// List payment methods for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::PaymentMethod> =\n        client.payments().list_methods_for_user().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List payment methods for your user.\n/// \n/// This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user, with the valid default card first.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_payments_list_methods_for_user() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PaymentMethodResultsPage = client\n        .payments()\n        .list_methods_for_user(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_payments_list_methods_for_user_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut payments = client.payments();\n    let mut stream = payments.list_methods_for_user_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/payments/struct.Payments.html#method.list_methods_for_user"
     }
   },
@@ -1491,7 +1507,7 @@
     "op": "add",
     "path": "/paths/~1user~1projects~1{id}~1share-links/get/x-rust",
     "value": {
-      "example": "/// List share links for one of the authenticated user's projects.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_list_share_links() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ProjectShareLinkResponse> = client\n        .projects()\n        .list_share_links(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List share links for one of the authenticated user's projects.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nuse std::str::FromStr;\nasync fn example_projects_list_share_links() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectShareLinkResponseResultsPage = client\n        .projects()\n        .list_share_links(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_share_links_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_share_links_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_share_links"
     }
   },
@@ -1517,6 +1533,46 @@
     "value": {
       "example": "/// Fetch the authenticated owner's current project thumbnail.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .get_thumbnail(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_thumbnail"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions/get/x-rust",
+    "value": {
+      "example": "/// List a project's saved versions, newest first.\n/// \n/// Requires access to the project. Public visibility or link sharing will not grant access to history.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nuse std::str::FromStr;\nasync fn example_projects_list_versions() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionSummaryResponseResultsPage = client\n        .projects()\n        .list_versions(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_versions_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_versions_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_versions"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions/post/x-rust",
+    "value": {
+      "example": "/// Save an alternate project version without changing the current version.\n/// \n/// For a history A -> B -> C with C current, saving D with B as its parent creates a second child of B. C stays current. Publications and share links keep pointing to their existing versions.\n/// \n/// Send a multipart request with a JSON `body` part and file parts. Upload the complete replacement snapshot, including unchanged files. Each uploaded filename must be its relative project path.\n/// \n/// Example JSON for the `body` part (replace the parent placeholder with B's UUID):\n/// \n/// ```ignorejson {   \"parent_version_id\": \"<B_VERSION_ID>\",   \"title\": \"Alternative design\",   \"description\": \"Trying another shape\",   \"entrypoint_path\": \"main.kcl\",   \"deleted_paths\": [\"obsolete.kcl\"] } ```ignore\n/// \n/// `parent_version_id` and `title` are required. Description defaults to an empty string, and the entrypoint defaults to `main.kcl`. When supplying `deleted_paths`, list all files removed from the chosen parent B, regardless of the files in current C. An empty list declares that no files were removed; omitting the field skips this deletion-intent check.\n/// \n/// Save the JSON as `save-metadata.json`. With D's files in the working directory, set `API_BASE_URL`, `API_TOKEN`, and `PROJECT_ID`, then generate `SAVE_KEY` once for this save (for example, using `uuidgen`):\n/// \n/// ```ignoresh curl --fail-with-body \\   --request POST \"${API_BASE_URL}/user/projects/${PROJECT_ID}/versions\" \\   --header \"Authorization: Bearer ${API_TOKEN}\" \\   --header \"Idempotency-Key: ${SAVE_KEY}\" \\   --form 'body=<save-metadata.json;type=application/json' \\   --form 'file-0=@project.toml;filename=project.toml' \\   --form 'file-1=@main.kcl;filename=main.kcl' \\   --form 'file-2=@part.kcl;filename=part.kcl' ```ignore\n/// \n/// The HTTP 200 response contains `version_id` (D) and `current_version_id` (C, or the current version when the response is prepared). Read D through `GET /user/projects/{id}/versions/{version_id}` and download it through `GET /user/projects/{id}/versions/{version_id}/download`. Downloads default to TAR; use `?format=zip` for ZIP.\n/// \n/// `Idempotency-Key` is optional for all clients. Use a unique key for each save to avoid duplicate versions when retrying. Retain the key, metadata, and submitted file contents across app restarts until the save's outcome is known. Within 24 hours of a successful save, retrying with the same key and contents returns the same version. Changed contents require a new key; reusing an unexpired key with different contents returns HTTP 409 with `IdempotencyConflict`. Without a key, or after its window expires, resending the request can create another version.\n/// \n/// Write access to the project is required, including for retries. A public listing or share link does not grant access to private version history. There is no endpoint to promote an existing alternate version directly to current.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_create_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateProjectVersionResponse = client\n        .projects()\n        .create_version(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.create_version"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}/get/x-rust",
+    "value": {
+      "example": "/// Get metadata and files for a single saved project version.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionDetailResponse = client\n        .projects()\n        .get_version(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_version"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}~1download/get/x-rust",
+    "value": {
+      "example": "/// Download the files saved in one project version.\n/// \n/// **Parameters:**\n/// \n/// - `format: Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to `tar`.\n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_download_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .download_version(\n            Some(kittycad::types::ProjectArchiveFormat::Zip),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.download_version"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1projects~1{id}~1versions~1{version_id}~1thumbnail/get/x-rust",
+    "value": {
+      "example": "/// Fetch the thumbnail for a single saved project version.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: Project identifier. (required)\n/// - `version_id: uuid::Uuid`: Requested version identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_get_version_thumbnail() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .get_version_thumbnail(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.get_version_thumbnail"
     }
   },
   {
@@ -1671,6 +1727,11 @@
   {
     "op": "add",
     "path": "/paths/~1ws~1ml~1copilot/get/x-rust",
+    "value": {}
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1ws~1ml~1kcl-migration/get/x-rust",
     "value": {}
   },
   {

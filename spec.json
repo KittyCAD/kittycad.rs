@@ -1705,6 +1705,217 @@
         "x-billable": false
       }
     },
+    "/file/bounding-box": {
+      "post": {
+        "tags": [
+          "file"
+        ],
+        "summary": "Get CAD file bounding box.",
+        "description": "Import the CAD file into the modeling engine and calculate its bounding box.\n\nThis endpoint returns the axis-aligned bounding box as a center and dimensions in the output units, using KittyCAD coordinates (+Z up, -Y forward).\n\nThis operation is always performed asynchronously, regardless of file size. The request returns the `id` of the operation. Use this `id` to get the status and bounding box from the `/async/operations/{id}` endpoint.",
+        "operationId": "create_file_bounding_box",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "src_format",
+            "description": "The format of the file.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/FileImportFormat"
+            }
+          },
+          {
+            "in": "query",
+            "name": "output_unit",
+            "description": "The output unit for the bounding box.",
+            "schema": {
+              "$ref": "#/components/schemas/UnitLength"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileBoundingBox"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": true
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_file_bounding_box",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/file/center-of-mass": {
       "post": {
         "tags": [
@@ -4439,115 +4650,6 @@
                 "required": true,
                 "schema": {
                   "type": "string"
-                }
-              }
-            }
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-billable": false
-      }
-    },
-    "/ml/custom/models/{id}/datasets": {
-      "get": {
-        "tags": [
-          "ml"
-        ],
-        "summary": "List the org datasets that are currently attached to a custom ML model owned by the caller’s organization.",
-        "operationId": "list_org_datasets_for_model",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "description": "The identifier.",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "headers": {
-              "Access-Control-Allow-Credentials": {
-                "description": "Access-Control-Allow-Credentials header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Headers": {
-                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Methods": {
-                "description": "Access-Control-Allow-Methods header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Content-Location": {
-                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Location": {
-                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "Set-Cookie": {
-                "description": "Set-Cookie header.",
-                "style": "simple",
-                "schema": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "X-Api-Call-Id": {
-                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
-                "style": "simple",
-                "required": true,
-                "schema": {
-                  "type": "string"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Array_of_OrgDataset",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgDataset"
-                  }
                 }
               }
             }
@@ -10702,6 +10804,208 @@
         "x-billable": false
       }
     },
+    "/org/factory/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Get an organization-owned Factory job for any current member.",
+        "operationId": "get_org_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobDetail"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_org_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/org/members": {
       "get": {
         "tags": [
@@ -12660,7 +12964,7 @@
           {
             "in": "query",
             "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "description": "Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.",
             "schema": {
               "type": "boolean"
             }
@@ -13247,8 +13551,30 @@
           "payments"
         ],
         "summary": "List payment methods for your org.",
-        "description": "This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org.",
+        "description": "This endpoint requires authentication by an org admin. It lists payment methods for the authenticated user's org, with the valid default card first.",
         "operationId": "list_payment_methods_for_org",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -13321,11 +13647,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PaymentMethod",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PaymentMethod"
-                  }
+                  "$ref": "#/components/schemas/PaymentMethodResultsPage"
                 }
               }
             }
@@ -13337,7 +13659,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/org/payment/methods/{id}": {
@@ -15520,8 +15845,30 @@
         "tags": [
           "orgs"
         ],
-        "summary": "List every skill that belongs to the caller's organization.",
+        "summary": "List every skill that belongs to the caller's organization, ordered by name.",
         "operationId": "list_org_skills",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -15594,11 +15941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_OrgSkillResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/OrgSkillResponse"
-                  }
+                  "$ref": "#/components/schemas/OrgSkillResponseResultsPage"
                 }
               }
             }
@@ -15610,7 +15953,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -16086,6 +16432,28 @@
         ],
         "summary": "List publicly visible community projects for the website/gallery.",
         "operationId": "list_public_projects",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16157,11 +16525,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PublicProjectResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PublicProjectResponse"
-                  }
+                  "$ref": "#/components/schemas/PublicProjectResponseResultsPage"
                 }
               }
             }
@@ -16173,7 +16537,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -21282,8 +21649,30 @@
           "factory"
         ],
         "summary": "List finishes currently available for customer Factory submissions.",
-        "description": "Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
+        "description": "Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
         "operationId": "get_user_factory_finishes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -21356,11 +21745,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_FactoryCustomerCatalogOption",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
-                  }
+                  "$ref": "#/components/schemas/FactoryCustomerCatalogOptionResultsPage"
                 }
               }
             }
@@ -21372,7 +21757,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -21779,14 +22167,24 @@
         "x-billable": false
       }
     },
-    "/user/factory/materials": {
+    "/user/factory/jobs/{job_id}": {
       "get": {
         "tags": [
           "factory"
         ],
-        "summary": "List materials currently available for customer Factory submissions.",
-        "description": "Internal-only entries are omitted. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
-        "operationId": "get_user_factory_materials",
+        "summary": "Get a personal Factory job and its current customer-visible specifications.",
+        "operationId": "get_user_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -21859,11 +22257,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_FactoryCustomerCatalogOption",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
-                  }
+                  "$ref": "#/components/schemas/FactoryCustomerJobDetail"
                 }
               }
             }
@@ -21876,6 +22270,223 @@
           }
         },
         "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_user_factory_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/factory/materials": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "List materials currently available for customer Factory submissions.",
+        "description": "Internal-only entries are omitted. Results are ordered alphabetically, ignoring case, with \"Other\" last. Clients should refetch this endpoint after a catalog validation error before asking the customer to choose again.",
+        "operationId": "get_user_factory_materials",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerCatalogOptionResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -23474,7 +24085,7 @@
           {
             "in": "query",
             "name": "include_total_due",
-            "description": "If you would like to return the total due for a user. This makes the API call take longer so it is off by default.",
+            "description": "Return both recorded charges (`total_due`) and estimated cash charges after available usage credits (`amount_due_after_credits`). This makes the API call take longer so it is off by default.",
             "schema": {
               "type": "boolean"
             }
@@ -24061,8 +24672,30 @@
           "payments"
         ],
         "summary": "List payment methods for your user.",
-        "description": "This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user.",
+        "description": "This endpoint requires authentication by any Zoo user. It lists payment methods for the authenticated user, with the valid default card first.",
         "operationId": "list_payment_methods_for_user",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -24135,11 +24768,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_PaymentMethod",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PaymentMethod"
-                  }
+                  "$ref": "#/components/schemas/PaymentMethodResultsPage"
                 }
               }
             }
@@ -24151,7 +24780,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/user/payment/methods/{id}": {
@@ -26563,6 +27195,26 @@
             "schema": {
               "$ref": "#/components/schemas/Uuid"
             }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -26637,11 +27289,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectShareLinkResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectShareLinkResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectShareLinkResponseResultsPage"
                 }
               }
             }
@@ -26653,7 +27301,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "post": {
         "tags": [
@@ -27121,6 +27772,867 @@
             "in": "path",
             "name": "id",
             "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/projects/{id}/versions": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "List a project's saved versions, newest first.",
+        "description": "Requires access to the project. Public visibility or link sharing will not grant access to history.",
+        "operationId": "list_project_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectVersionSummaryResponseResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Save an alternate project version without changing the current version.",
+        "description": "For a history A -> B -> C with C current, saving D with B as its parent creates a second child of B. C stays current. Publications and share links keep pointing to their existing versions.\n\nSend a multipart request with a JSON `body` part and file parts. Upload the complete replacement snapshot, including unchanged files. Each uploaded filename must be its relative project path.\n\nExample JSON for the `body` part (replace the parent placeholder with B's UUID):\n\n```json {   \"parent_version_id\": \"<B_VERSION_ID>\",   \"title\": \"Alternative design\",   \"description\": \"Trying another shape\",   \"entrypoint_path\": \"main.kcl\",   \"deleted_paths\": [\"obsolete.kcl\"] } ```\n\n`parent_version_id` and `title` are required. Description defaults to an empty string, and the entrypoint defaults to `main.kcl`. When supplying `deleted_paths`, list all files removed from the chosen parent B, regardless of the files in current C. An empty list declares that no files were removed; omitting the field skips this deletion-intent check.\n\nSave the JSON as `save-metadata.json`. With D's files in the working directory, set `API_BASE_URL`, `API_TOKEN`, and `PROJECT_ID`, then generate `SAVE_KEY` once for this save (for example, using `uuidgen`):\n\n```sh curl --fail-with-body \\   --request POST \"${API_BASE_URL}/user/projects/${PROJECT_ID}/versions\" \\   --header \"Authorization: Bearer ${API_TOKEN}\" \\   --header \"Idempotency-Key: ${SAVE_KEY}\" \\   --form 'body=<save-metadata.json;type=application/json' \\   --form 'file-0=@project.toml;filename=project.toml' \\   --form 'file-1=@main.kcl;filename=main.kcl' \\   --form 'file-2=@part.kcl;filename=part.kcl' ```\n\nThe HTTP 200 response contains `version_id` (D) and `current_version_id` (C, or the current version when the response is prepared). Read D through `GET /user/projects/{id}/versions/{version_id}` and download it through `GET /user/projects/{id}/versions/{version_id}/download`. Downloads default to TAR; use `?format=zip` for ZIP.\n\n`Idempotency-Key` is optional for all clients. Use a unique key for each save to avoid duplicate versions when retrying. Retain the key, metadata, and submitted file contents across app restarts until the save's outcome is known. Within 24 hours of a successful save, retrying with the same key and contents returns the same version. Changed contents require a new key; reusing an unexpired key with different contents returns HTTP 409 with `IdempotencyConflict`. Without a key, or after its window expires, resending the request can create another version.\n\nWrite access to the project is required, including for retries. A public listing or share link does not grant access to private version history. There is no endpoint to promote an existing alternate version directly to current.",
+        "operationId": "create_project_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateProjectVersionResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_project_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/projects/{id}/versions/{version_id}": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get metadata and files for a single saved project version.",
+        "operationId": "get_project_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectVersionDetailResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_project_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/projects/{id}/versions/{version_id}/download": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Download the files saved in one project version.",
+        "operationId": "download_project_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "description": "Archive format to return. Defaults to `tar`.",
+            "schema": {
+              "$ref": "#/components/schemas/ProjectArchiveFormat"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_download_project_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/projects/{id}/versions/{version_id}/thumbnail": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Fetch the thumbnail for a single saved project version.",
+        "operationId": "get_project_version_thumbnail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_project_version_thumbnail",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Project identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "description": "Requested version identifier.",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Uuid"
@@ -30109,6 +31621,49 @@
         "x-dropshot-websocket": {}
       }
     },
+    "/ws/ml/kcl-migration": {
+      "get": {
+        "tags": [
+          "ml"
+        ],
+        "summary": "Open a sponsored KCL migration connection. It cannot execute ordinary prompts.",
+        "operationId": "kcl_migration_ws",
+        "requestBody": {
+          "description": "Websocket requests",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KclMigrationClientMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "Websocket responses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KclMigrationServerMessage"
+                }
+              }
+            }
+          },
+          "101": {
+            "description": "Negotiating protocol upgrade from HTTP/1.1 to WebSocket"
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-websocket": {}
+      }
+    },
     "/ws/ml/reasoning/{id}": {
       "get": {
         "tags": [
@@ -30686,8 +32241,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "from_entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the dimension leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "from_entity_pos": {
-            "description": "Normalized position within the entity to position the dimension from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the dimension from Deprecated; please use `from_entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -30728,8 +32293,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "to_entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the dimension leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "to_entity_pos": {
-            "description": "Normalized position within the entity to position the dimension to",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the dimension to Deprecated; please use `to_entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -30741,11 +32316,9 @@
           "dimension",
           "font_point_size",
           "font_scale",
-          "from_entity_pos",
           "offset",
           "plane_id",
-          "precision",
-          "to_entity_pos"
+          "precision"
         ]
       },
       "AnnotationFeatureControl": {
@@ -30792,8 +32365,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "entity_pos": {
-            "description": "Normalized position within the entity to position the annotation leader from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the annotation leader from Deprecated; please use `entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -30856,7 +32439,6 @@
           }
         },
         "required": [
-          "entity_pos",
           "font_point_size",
           "font_scale",
           "leader_type",
@@ -30884,8 +32466,18 @@
             "type": "string",
             "format": "uuid"
           },
+          "entity_leader_pos": {
+            "nullable": true,
+            "description": "Position within the entity to position the annotation leader from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AnnotationMbdLeaderPosition"
+              }
+            ]
+          },
           "entity_pos": {
-            "description": "Normalized position within the entity to position the annotation leader from",
+            "nullable": true,
+            "description": "Normalized position within the entity to position the annotation leader from Deprecated; please use `entity_leader_pos`",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Point2d"
@@ -30944,7 +32536,6 @@
           }
         },
         "required": [
-          "entity_pos",
           "font_point_size",
           "font_scale",
           "key",
@@ -31077,6 +32668,50 @@
         "required": [
           "symbol",
           "tolerance"
+        ]
+      },
+      "AnnotationMbdLeaderPosition": {
+        "description": "Parameters for defining a specific MBD Leader Position within an Entity",
+        "oneOf": [
+          {
+            "description": "Normalized position within the entity to position the annotation leader from",
+            "type": "object",
+            "properties": {
+              "normalized_pos": {
+                "type": "object",
+                "properties": {
+                  "pos": {
+                    "description": "The position",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Point2d"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "pos"
+                ]
+              }
+            },
+            "required": [
+              "normalized_pos"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Geometric Center of the entity (such as on the center axis for a cylinder)",
+            "type": "object",
+            "properties": {
+              "centroid": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "centroid"
+            ],
+            "additionalProperties": false
+          }
         ]
       },
       "AnnotationOptions": {
@@ -32318,6 +33953,108 @@
                 "type": "string",
                 "enum": [
                   "file_surface_area"
+                ]
+              },
+              "updated_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was last updated.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "user_id": {
+                "description": "The user ID of the user who created the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "created_at",
+              "id",
+              "output_unit",
+              "src_format",
+              "status",
+              "type",
+              "updated_at",
+              "user_id"
+            ]
+          },
+          {
+            "description": "A file bounding box.",
+            "type": "object",
+            "properties": {
+              "bounding_box": {
+                "nullable": true,
+                "description": "The resulting axis-aligned bounding box in the KittyCAD coordinate system (+Z up, -Y forward).",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/BoundingBox"
+                  }
+                ]
+              },
+              "completed_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was completed.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "created_at": {
+                "title": "DateTime",
+                "description": "The time and date the API call was created.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "error": {
+                "nullable": true,
+                "description": "The error the function returned, if any.",
+                "type": "string"
+              },
+              "id": {
+                "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "output_unit": {
+                "description": "The output unit for the bounding box.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "src_format": {
+                "description": "The source format of the file.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/FileImportFormat"
+                  }
+                ]
+              },
+              "started_at": {
+                "nullable": true,
+                "title": "DateTime",
+                "description": "The time and date the API call was started.",
+                "type": "string",
+                "format": "date-time"
+              },
+              "status": {
+                "description": "The status of the API call.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ApiCallStatus"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "file_bounding_box"
                 ]
               },
               "updated_at": {
@@ -34411,6 +36148,32 @@
           }
         }
       },
+      "CreateProjectVersionResponse": {
+        "description": "Result of saving an alternate project version.",
+        "type": "object",
+        "properties": {
+          "current_version_id": {
+            "description": "Project's current version when this response was prepared.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "version_id": {
+            "description": "Version created by this save or returned by a retry.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "current_version_id",
+          "version_id"
+        ]
+      },
       "CreateRegion": {
         "description": "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command.",
         "type": "object",
@@ -34797,6 +36560,13 @@
         "description": "A balance for a customer.\n\nThis holds information about the financial balance for the customer.",
         "type": "object",
         "properties": {
+          "amount_due_after_credits": {
+            "nullable": true,
+            "title": "double",
+            "description": "Estimated cash charges after applying currently available monthly and stable API credits to eligible usage, including usage from earlier billing periods. Credits cannot reduce subscription charges or invoices whose provider export has already started. Credits are counted once and never beyond eligible usage.\n\nThis read does not reserve or spend credits. The amount can change as credits are granted, spent, or refreshed, or as new charges arrive. Use this field directly instead of subtracting the credit balance from `total_due`. Like `total_due`, this is only returned when the amount due is requested and the payment provider is available; otherwise it is `null`.",
+            "type": "number",
+            "format": "money-usd"
+          },
           "created_at": {
             "title": "DateTime",
             "description": "The date and time the balance was created.",
@@ -34851,7 +36621,7 @@
           "total_due": {
             "nullable": true,
             "title": "double",
-            "description": "Net cash owed for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Usage credits and writeoffs have already been applied; do not subtract the remaining credit balance from this amount. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the api.",
+            "description": "Recorded cash charges for completed API usage awaiting invoicing, outstanding invoices, and pending invoice items. Credits and writeoffs already assigned to usage are reflected in this amount.\n\nAvailable credits can still reduce eligible usage charges, including usage from earlier billing periods. They are applied when an aggregate usage invoice is generated and again immediately before its first provider export, using monthly credits before stable credits.\n\nThis amount is not a forecast of the next payment. Do not subtract the full remaining credit balance: the total can also include subscription charges and invoices whose provider export has already started, which usage credits cannot reduce. Use `amount_due_after_credits` for the estimate after applicable remaining credits. Ongoing sessions and usage still being priced are not included. This amount is only returned if requested from the API.",
             "type": "number",
             "format": "money-usd"
           },
@@ -36105,6 +37875,27 @@
             ]
           },
           {
+            "description": "A uuid referencing a helix.",
+            "type": "object",
+            "properties": {
+              "helix_id": {
+                "description": "Id of the helix object.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "helix"
+                ]
+              }
+            },
+            "required": [
+              "helix_id",
+              "type"
+            ]
+          },
+          {
             "description": "A uuid referencing an edge on a solid2d (profile) - used for raw sketch/profile edges. This is distinct from the face-based Edge reference which is used for BRep/swept body edges.",
             "type": "object",
             "properties": {
@@ -36221,7 +38012,8 @@
           "face",
           "plane",
           "vertex",
-          "region"
+          "region",
+          "patterngroup"
         ]
       },
       "Error": {
@@ -36931,6 +38723,53 @@
           "name"
         ]
       },
+      "FactoryCustomerCatalogOptionResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FactoryCustomerCatalogOption"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "FactoryCustomerJobDetail": {
+        "description": "Customer-visible detail for a single Factory job.",
+        "type": "object",
+        "properties": {
+          "current_version": {
+            "nullable": true,
+            "description": "The current version, if the job has one.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FactoryCustomerJobVersion"
+              }
+            ]
+          },
+          "job": {
+            "description": "The same summary returned by the customer job list.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FactoryCustomerJobSummary"
+              }
+            ]
+          }
+        },
+        "required": [
+          "job"
+        ]
+      },
       "FactoryCustomerJobSummary": {
         "description": "Customer-visible summary of a manufacturing job.",
         "type": "object",
@@ -36995,6 +38834,42 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "FactoryCustomerJobVersion": {
+        "description": "Customer-visible snapshot of the current job version. File names are display metadata; no private storage URI or download capability is exposed.",
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "title": "DateTime",
+            "description": "When this version was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "file_names": {
+            "description": "Names of files attached to this version, without storage locations.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "description": "Identifier of the current version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "specs": {
+            "description": "Customer-visible fields from the version's intake payload."
+          }
+        },
+        "required": [
+          "created_at",
+          "file_names",
+          "id",
+          "specs"
         ]
       },
       "FactoryJobResponse": {
@@ -37281,13 +39156,6 @@
             ]
           },
           {
-            "description": "Enables cloud storage for web and desktop. Yes desktop too, the name is old and will go away soon.",
-            "type": "string",
-            "enum": [
-              "web_app_file_browser"
-            ]
-          },
-          {
             "description": "Enables Zookeeper Pro mode access in ML Copilot.",
             "type": "string",
             "enum": [
@@ -37306,6 +39174,13 @@
             "type": "string",
             "enum": [
               "zookeeper_client_commands"
+            ]
+          },
+          {
+            "description": "Enables sponsored, time-limited KCL project migration.",
+            "type": "string",
+            "enum": [
+              "zookeeper_kcl_migration"
             ]
           },
           {
@@ -37329,6 +39204,101 @@
               "zoo_corp_auth"
             ]
           }
+        ]
+      },
+      "FileBoundingBox": {
+        "description": "A file bounding box result.",
+        "type": "object",
+        "properties": {
+          "bounding_box": {
+            "nullable": true,
+            "description": "The resulting axis-aligned bounding box in the KittyCAD coordinate system (+Z up, -Y forward).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BoundingBox"
+              }
+            ]
+          },
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was completed.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "nullable": true,
+            "description": "The error the function returned, if any.",
+            "type": "string"
+          },
+          "id": {
+            "description": "The unique identifier of the API call.\n\nThis is the same as the API call ID.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "output_unit": {
+            "description": "The output unit for the bounding box.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UnitLength"
+              }
+            ]
+          },
+          "src_format": {
+            "description": "The source format of the file.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FileImportFormat"
+              }
+            ]
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "The time and date the API call was started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "description": "The status of the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ApiCallStatus"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "The time and date the API call was last updated.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_id": {
+            "description": "The user ID of the user who created the API call.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "created_at",
+          "id",
+          "output_unit",
+          "src_format",
+          "status",
+          "updated_at",
+          "user_id"
         ]
       },
       "FileCenterOfMass": {
@@ -39453,6 +41423,498 @@
           "completions"
         ]
       },
+      "KclMigrationClientMessage": {
+        "description": "The restricted public migration connection never accepts ordinary prompts.",
+        "oneOf": [
+          {
+            "description": "Authenticate the connection.",
+            "type": "object",
+            "properties": {
+              "headers": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "headers"
+                ]
+              }
+            },
+            "required": [
+              "headers",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Start or retrieve the same attempt after a delivery retry.",
+            "type": "object",
+            "properties": {
+              "request": {
+                "$ref": "#/components/schemas/KclMigrationRequest"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "start"
+                ]
+              }
+            },
+            "required": [
+              "request",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Read an existing attempt without resuming it or changing its deadline.",
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "operation_id",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Cancel an existing attempt. Cancellation is idempotent.",
+            "type": "object",
+            "properties": {
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cancel"
+                ]
+              }
+            },
+            "required": [
+              "operation_id",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Application heartbeat.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ping"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "KclMigrationOperation": {
+        "description": "Persisted operation state, safe to retrieve again without starting new work.",
+        "type": "object",
+        "properties": {
+          "deadline": {
+            "description": "Original deadline, including preparation and validation. Never extended.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "Same idempotency key supplied by the initiating client.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "project_snapshot": {
+            "description": "Source revision, retained for conflict detection when applying the result.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+              }
+            ]
+          },
+          "result": {
+            "nullable": true,
+            "description": "Terminal result, if available. The review itself has no execution deadline.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationResult"
+              }
+            ]
+          },
+          "status": {
+            "description": "Current state.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationStatus"
+              }
+            ]
+          },
+          "target": {
+            "description": "Target accepted for this attempt.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          }
+        },
+        "required": [
+          "deadline",
+          "id",
+          "project_snapshot",
+          "status",
+          "target"
+        ]
+      },
+      "KclMigrationRequest": {
+        "description": "A complete, immutable input snapshot. It does not grant sponsorship itself.",
+        "type": "object",
+        "properties": {
+          "allow_preview": {
+            "description": "Explicit consent to unstable preview semantics.",
+            "default": false,
+            "type": "boolean"
+          },
+          "current_files": {
+            "description": "Complete project, including unsaved edits, imports, and settings.",
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0
+              }
+            }
+          },
+          "entrypoint": {
+            "description": "Project-relative KCL file to execute.",
+            "type": "string"
+          },
+          "project_snapshot": {
+            "description": "Revision against which the user will review and apply the candidate.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
+              }
+            ]
+          },
+          "request_id": {
+            "description": "Client-generated idempotency key. Reuse it when retrying delivery.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "target": {
+            "description": "Requested target. The worker inspects the actual source version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          }
+        },
+        "required": [
+          "current_files",
+          "entrypoint",
+          "project_snapshot",
+          "request_id",
+          "target"
+        ],
+        "additionalProperties": false
+      },
+      "KclMigrationResult": {
+        "description": "A worker's terminal candidate, held separately from ordinary project edits.",
+        "type": "object",
+        "properties": {
+          "conversion_not_started": {
+            "description": "Confirmed rejection or failure before conversion started. Only unsuccessful attempts may set this; API excludes them from the daily attempt allowance. Missing evidence defaults to counting the attempt.",
+            "default": false,
+            "type": "boolean"
+          },
+          "detail": {
+            "description": "User-facing outcome or failure explanation.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Candidate project, returned only after successful validation.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0
+              }
+            }
+          },
+          "status": {
+            "description": "Terminal state. `running` is not a valid result.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationStatus"
+              }
+            ]
+          },
+          "validation": {
+            "nullable": true,
+            "description": "Execution and equivalence evidence, required on success.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationValidation"
+              }
+            ]
+          }
+        },
+        "required": [
+          "detail",
+          "status"
+        ]
+      },
+      "KclMigrationServerMessage": {
+        "description": "Public responses never contain ordinary auto-applying tool results.",
+        "oneOf": [
+          {
+            "description": "Current durable state, including a reviewable candidate when successful.",
+            "type": "object",
+            "properties": {
+              "operation": {
+                "$ref": "#/components/schemas/KclMigrationOperation"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "operation"
+                ]
+              }
+            },
+            "required": [
+              "operation",
+              "type"
+            ]
+          },
+          {
+            "description": "Best-effort, display-only progress on the execution connection. Only text, informational and supported reasoning messages are forwarded; candidate edits are returned solely in a validated terminal operation.",
+            "type": "object",
+            "properties": {
+              "message": {
+                "description": "Existing Copilot display message. Never dispatch it as a project edit.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/MlCopilotServerMessage"
+                  }
+                ]
+              },
+              "operation_id": {
+                "description": "The initiating request ID, used to keep progress with its migration.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "progress"
+                ]
+              }
+            },
+            "required": [
+              "message",
+              "operation_id",
+              "type"
+            ]
+          },
+          {
+            "description": "A rejected request, without starting or charging for work.",
+            "type": "object",
+            "properties": {
+              "detail": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "error"
+                ]
+              }
+            },
+            "required": [
+              "detail",
+              "type"
+            ]
+          },
+          {
+            "description": "Heartbeat response.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "pong"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
+        ]
+      },
+      "KclMigrationStatus": {
+        "description": "Durable state of a migration attempt.",
+        "oneOf": [
+          {
+            "description": "Preparation, conversion, or validation is still running.",
+            "type": "string",
+            "enum": [
+              "running"
+            ]
+          },
+          {
+            "description": "A validated candidate is ready for review. No project has been applied.",
+            "type": "string",
+            "enum": [
+              "succeeded"
+            ]
+          },
+          {
+            "description": "The attempt failed.",
+            "type": "string",
+            "enum": [
+              "failed"
+            ]
+          },
+          {
+            "description": "The original execution deadline expired.",
+            "type": "string",
+            "enum": [
+              "timed_out"
+            ]
+          },
+          {
+            "description": "The attempt was cancelled, including loss of its execution connection.",
+            "type": "string",
+            "enum": [
+              "cancelled"
+            ]
+          },
+          {
+            "description": "The source, target, or project is not supported.",
+            "type": "string",
+            "enum": [
+              "unsupported"
+            ]
+          },
+          {
+            "description": "Execution, geometry, or behavioral equivalence could not be established.",
+            "type": "string",
+            "enum": [
+              "validation_failed"
+            ]
+          }
+        ]
+      },
+      "KclMigrationTarget": {
+        "description": "A supported migration target. Preview use always requires explicit consent.",
+        "oneOf": [
+          {
+            "description": "Unstable KCL 3 preview.",
+            "type": "string",
+            "enum": [
+              "3.0-preview"
+            ]
+          },
+          {
+            "description": "Stable KCL 3. Availability also depends on the deployed worker and client.",
+            "type": "string",
+            "enum": [
+              "3.0"
+            ]
+          }
+        ]
+      },
+      "KclMigrationValidation": {
+        "description": "Evidence required before a candidate may be returned as successful.",
+        "type": "object",
+        "properties": {
+          "behavior_preserved": {
+            "description": "Relevant parameter and control-flow behavior passed validation.",
+            "type": "boolean"
+          },
+          "geometry_preserved": {
+            "description": "Geometry passed the version-pair validation policy.",
+            "type": "boolean"
+          },
+          "rules_revision": {
+            "description": "Revision of the conversion instructions and validation policy.",
+            "type": "string"
+          },
+          "runtime_version": {
+            "description": "Exact target runtime used for execution and geometry checks.",
+            "type": "string"
+          },
+          "source_executed": {
+            "description": "The unchanged source project executed successfully.",
+            "type": "boolean"
+          },
+          "source_version": {
+            "description": "Actual source semantics detected and executed by the worker.",
+            "type": "string"
+          },
+          "summary": {
+            "description": "Reviewable explanation of checks, tolerances, and any accepted differences.",
+            "type": "string"
+          },
+          "target": {
+            "description": "Target semantics used during validation, which must match the request.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationTarget"
+              }
+            ]
+          },
+          "target_executed": {
+            "description": "The candidate executed successfully under target semantics.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "behavior_preserved",
+          "geometry_preserved",
+          "rules_revision",
+          "runtime_version",
+          "source_executed",
+          "source_version",
+          "summary",
+          "target",
+          "target_executed"
+        ]
+      },
       "KclModel": {
         "description": "The response containing the KCL code.",
         "type": "object",
@@ -39591,6 +42053,32 @@
           }
         ]
       },
+      "KclProjectVersionAncestryStatus": {
+        "description": "Whether a project's version ancestry is known.",
+        "oneOf": [
+          {
+            "description": "The first version of a new project, with no parent.",
+            "type": "string",
+            "enum": [
+              "root"
+            ]
+          },
+          {
+            "description": "The version has a recorded parent relationship.",
+            "type": "string",
+            "enum": [
+              "recorded"
+            ]
+          },
+          {
+            "description": "The version's parent was not recorded.",
+            "type": "string",
+            "enum": [
+              "legacy_unknown"
+            ]
+          }
+        ]
+      },
       "KclVersion": {
         "description": "Which KCL versions does Zoo support?",
         "oneOf": [
@@ -39609,10 +42097,17 @@
             ]
           },
           {
-            "description": "KCL v3 is currently in development.",
+            "description": "KCL v3 preview -- used while developing version 3.",
             "type": "string",
             "enum": [
               "3.0-preview"
+            ]
+          },
+          {
+            "description": "KCL v3 releases 2026",
+            "type": "string",
+            "enum": [
+              "3.0"
             ]
           }
         ]
@@ -45596,6 +48091,15 @@
                   }
                 ]
               },
+              "tolerance": {
+                "nullable": true,
+                "description": "The default tolerance values.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Tolerance"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -46341,6 +48845,114 @@
               "entity_ids",
               "output_unit",
               "type"
+            ]
+          },
+          {
+            "description": "Get mass, density, volume, center of mass, surface area, and bounding box together. Equivalent to querying each property separately for the same entities, while allowing the engine to share the intermediate geometry used by the calculations.",
+            "type": "object",
+            "properties": {
+              "bounding_box_output_unit": {
+                "description": "The output unit for the bounding box's dimensions.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "center_of_mass_output_unit": {
+                "description": "The output unit for center of mass.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              },
+              "density_output_unit": {
+                "description": "The output unit for density.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ]
+              },
+              "entity_ids": {
+                "description": "IDs of the entities to query. If empty, query the default scene, as with the individual property commands.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "mass_output_unit": {
+                "description": "The output unit for mass.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ]
+              },
+              "material_density": {
+                "description": "The material density used to calculate mass.",
+                "type": "number",
+                "format": "double"
+              },
+              "material_density_unit": {
+                "description": "The material density unit.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitDensity"
+                  }
+                ]
+              },
+              "material_mass": {
+                "description": "The material mass used to calculate density, independently of the calculated mass.",
+                "type": "number",
+                "format": "double"
+              },
+              "material_mass_unit": {
+                "description": "The material mass unit.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitMass"
+                  }
+                ]
+              },
+              "surface_area_output_unit": {
+                "description": "The output unit for surface area.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitArea"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "physical_properties"
+                ]
+              },
+              "volume_output_unit": {
+                "description": "The output unit for volume.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitVolume"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "bounding_box_output_unit",
+              "center_of_mass_output_unit",
+              "density_output_unit",
+              "entity_ids",
+              "mass_output_unit",
+              "material_density",
+              "material_density_unit",
+              "material_mass",
+              "material_mass_unit",
+              "surface_area_output_unit",
+              "type",
+              "volume_output_unit"
             ]
           },
           {
@@ -50408,6 +53020,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/PhysicalProperties"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "physical_properties"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/GetSketchModePlane"
               },
               "type": {
@@ -52516,6 +55146,27 @@
           "name"
         ]
       },
+      "OrgSkillResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrgSkillResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "OrientToFace": {
         "description": "The response from the `OrientToFace` command.",
         "type": "object",
@@ -52674,6 +55325,11 @@
             "description": "glTF 2.0. We refer to this as glTF since that is how our customers refer to it, although by default it will be in binary format and thus technically (glb). If you prefer ASCII output, you can set that option for the export.",
             "type": "object",
             "properties": {
+              "include_uuids": {
+                "description": "Include engine UUIDs in glTF extras. Defaults to false.",
+                "default": false,
+                "type": "boolean"
+              },
               "presentation": {
                 "description": "Specifies how the JSON will be presented.",
                 "allOf": [
@@ -53524,6 +56180,27 @@
           }
         }
       },
+      "PaymentMethodResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethod"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "PaymentMethodType": {
         "description": "An enum representing the possible values of an `PaymentMethod`'s `type` field.",
         "oneOf": [
@@ -53559,6 +56236,68 @@
             "format": "float"
           }
         }
+      },
+      "PhysicalProperties": {
+        "description": "The physical properties response, containing the same data as the individual property responses.",
+        "type": "object",
+        "properties": {
+          "bounding_box": {
+            "description": "The bounding box's center and dimensions, in the requested bounding box output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BoundingBox"
+              }
+            ]
+          },
+          "center_of_mass": {
+            "description": "The center of mass and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CenterOfMass"
+              }
+            ]
+          },
+          "density": {
+            "description": "The density and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Density"
+              }
+            ]
+          },
+          "mass": {
+            "description": "The mass and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Mass"
+              }
+            ]
+          },
+          "surface_area": {
+            "description": "The surface area and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SurfaceArea"
+              }
+            ]
+          },
+          "volume": {
+            "description": "The volume and its output unit.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Volume"
+              }
+            ]
+          }
+        },
+        "required": [
+          "bounding_box",
+          "center_of_mass",
+          "density",
+          "mass",
+          "surface_area",
+          "volume"
+        ]
       },
       "PlanInterval": {
         "description": "A plan's interval.",
@@ -54198,6 +56937,27 @@
           "url"
         ]
       },
+      "ProjectShareLinkResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectShareLinkResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "ProjectSummaryResponse": {
         "description": "Owner-visible project summary payload.",
         "type": "object",
@@ -54301,6 +57061,177 @@
           "revision",
           "title",
           "updated_at"
+        ]
+      },
+      "ProjectVersionDetailResponse": {
+        "description": "Metadata and files for one saved project version.",
+        "type": "object",
+        "properties": {
+          "ancestry_status": {
+            "description": "Whether this is a root, has a recorded parent, or has unknown ancestry.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectVersionAncestryStatus"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "When this version was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "description": "Description saved with this version.",
+            "type": "string"
+          },
+          "entrypoint_path": {
+            "description": "Relative path to this version's KCL entrypoint.",
+            "type": "string"
+          },
+          "files": {
+            "description": "Files stored for this version.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectFileResponse"
+            }
+          },
+          "id": {
+            "description": "Unique identifier of this version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "is_current": {
+            "description": "Whether this is the project's current version.",
+            "type": "boolean"
+          },
+          "parent_version_id": {
+            "nullable": true,
+            "description": "Version this save was based on, when known.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "preview_status": {
+            "description": "Preview generation state for this version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectPreviewStatus"
+              }
+            ]
+          },
+          "preview_url": {
+            "nullable": true,
+            "description": "URL for this version's preview, when a preview file is available.",
+            "type": "string"
+          },
+          "project_toml_path": {
+            "description": "Relative path to this version's project manifest.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title saved with this version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ancestry_status",
+          "created_at",
+          "description",
+          "entrypoint_path",
+          "files",
+          "id",
+          "is_current",
+          "preview_status",
+          "project_toml_path",
+          "title"
+        ]
+      },
+      "ProjectVersionSummaryResponse": {
+        "description": "A saved version in a project's history.",
+        "type": "object",
+        "properties": {
+          "ancestry_status": {
+            "description": "Whether this is a root, has a recorded parent, or has unknown ancestry.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectVersionAncestryStatus"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "When this version was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "Unique identifier of this version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "is_current": {
+            "description": "Whether this is the project's current version.",
+            "type": "boolean"
+          },
+          "parent_version_id": {
+            "nullable": true,
+            "description": "Version this save was based on, when known.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "preview_status": {
+            "description": "Preview generation state for this version.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectPreviewStatus"
+              }
+            ]
+          },
+          "title": {
+            "description": "Title saved with this version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ancestry_status",
+          "created_at",
+          "id",
+          "is_current",
+          "preview_status",
+          "title"
+        ]
+      },
+      "ProjectVersionSummaryResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectVersionSummaryResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "PublicEmailMarketingConsentRequest": {
@@ -54409,6 +57340,27 @@
           "owner",
           "published_at",
           "title"
+        ]
+      },
+      "PublicProjectResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProjectResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "PublicProjectVoteResponse": {
@@ -57145,6 +60097,23 @@
         "required": [
           "client_id",
           "token"
+        ]
+      },
+      "Tolerance": {
+        "description": "Default tolerance values for modeling operations.",
+        "type": "object",
+        "properties": {
+          "point_point_2d_coincident": {
+            "description": "The distance tolerance for 2D point-point coincidence.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LengthUnit"
+              }
+            ]
+          }
+        },
+        "required": [
+          "point_point_2d_coincident"
         ]
       },
       "Transform": {
