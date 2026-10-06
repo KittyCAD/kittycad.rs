@@ -9570,10 +9570,6 @@ pub enum Feature {
     #[serde(rename = "billing")]
     #[display("billing")]
     Billing,
-    #[doc = "Allows explicitly selecting the CPU-only engine pool for non-WebRTC modeling sessions."]
-    #[serde(rename = "cpu_engine_pool")]
-    #[display("cpu_engine_pool")]
-    CpuEnginePool,
     #[doc = "Disable signup through email or OAuth."]
     #[serde(rename = "disallow_self_signup")]
     #[display("disallow_self_signup")]
@@ -9582,10 +9578,6 @@ pub enum Feature {
     #[serde(rename = "email_with_s_e_s")]
     #[display("email_with_s_e_s")]
     EmailWithSES,
-    #[doc = "Quarantine engine-manager sessions when an engine is observed misbehaving."]
-    #[serde(rename = "engine_manager_quarantine")]
-    #[display("engine_manager_quarantine")]
-    EngineManagerQuarantine,
     #[doc = "Grants access to the internal execution jobs API."]
     #[serde(rename = "execution_jobs")]
     #[display("execution_jobs")]
