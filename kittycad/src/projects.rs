@@ -1059,6 +1059,48 @@ impl Projects {
         }
     }
 
+    #[doc = "Save an alternate project version without changing the current version.\n\nFor a history A -> B -> C with C current, saving D with B as its parent creates a second child of B. C stays current. Publications and share links keep pointing to their existing versions.\n\nSend a multipart request with a JSON `body` part and file parts. Upload the complete replacement snapshot, including unchanged files. Each uploaded filename must be its relative project path.\n\nExample JSON for the `body` part (replace the parent placeholder with B's UUID):\n\n```ignorejson {   \"parent_version_id\": \"<B_VERSION_ID>\",   \"title\": \"Alternative design\",   \"description\": \"Trying another shape\",   \"entrypoint_path\": \"main.kcl\",   \"deleted_paths\": [\"obsolete.kcl\"] } ```ignore\n\n`parent_version_id` and `title` are required. Description defaults to an empty string, and the entrypoint defaults to `main.kcl`. When supplying `deleted_paths`, list all files removed from the chosen parent B, regardless of the files in current C. An empty list declares that no files were removed; omitting the field skips this deletion-intent check.\n\nSave the JSON as `save-metadata.json`. With D's files in the working directory, set `API_BASE_URL`, `API_TOKEN`, and `PROJECT_ID`, then generate `SAVE_KEY` once for this save (for example, using `uuidgen`):\n\n```ignoresh curl --fail-with-body \\   --request POST \"${API_BASE_URL}/user/projects/${PROJECT_ID}/versions\" \\   --header \"Authorization: Bearer ${API_TOKEN}\" \\   --header \"Idempotency-Key: ${SAVE_KEY}\" \\   --form 'body=<save-metadata.json;type=application/json' \\   --form 'file-0=@project.toml;filename=project.toml' \\   --form 'file-1=@main.kcl;filename=main.kcl' \\   --form 'file-2=@part.kcl;filename=part.kcl' ```ignore\n\nThe HTTP 200 response contains `version_id` (D) and `current_version_id` (C, or the current version when the response is prepared). Read D through `GET /user/projects/{id}/versions/{version_id}` and download it through `GET /user/projects/{id}/versions/{version_id}/download`. Downloads default to TAR; use `?format=zip` for ZIP.\n\n`Idempotency-Key` is optional for all clients. Use a unique key for each save to avoid duplicate versions when retrying. Retain the key, metadata, and submitted file contents across app restarts until the save's outcome is known. Within 24 hours of a successful save, retrying with the same key and contents returns the same version. Changed contents require a new key; reusing an unexpired key with different contents returns HTTP 409 with `IdempotencyConflict`. Without a key, or after its window expires, resending the request can create another version.\n\nWrite access to the project is required, including for retries. A public listing or share link does not grant access to private version history. There is no endpoint to promote an existing alternate version directly to current.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_create_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::CreateProjectVersionResponse = client\n        .projects()\n        .create_version(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_version<'a>(
+        &'a self,
+        attachments: Vec<crate::types::multipart::Attachment>,
+        id: uuid::Uuid,
+    ) -> Result<crate::types::CreateProjectVersionResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/projects/{id}/versions".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        use std::convert::TryInto;
+        let mut form = reqwest::multipart::Form::new();
+        for attachment in attachments {
+            form = form.part(attachment.name.clone(), attachment.try_into()?);
+        }
+
+        req = req.multipart(form);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Get metadata and files for a single saved project version.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: Project identifier. (required)\n- `version_id: uuid::Uuid`: Requested version identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_get_version() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectVersionDetailResponse = client\n        .projects()\n        .get_version(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn get_version<'a>(

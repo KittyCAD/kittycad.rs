@@ -5494,6 +5494,42 @@ impl tabled::Tabled for CreateProjectShareLinkRequest {
     }
 }
 
+#[doc = "Result of saving an alternate project version."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateProjectVersionResponse {
+    #[doc = "Project's current version when this response was prepared."]
+    pub current_version_id: uuid::Uuid,
+    #[doc = "Version created by this save or returned by a retry."]
+    pub version_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for CreateProjectVersionResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateProjectVersionResponse {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.current_version_id).into(),
+            format!("{:?}", self.version_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["current_version_id".into(), "version_id".into()]
+    }
+}
+
 #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of \
          the 'CreateRegion' modeling command."]
 #[derive(
@@ -12639,6 +12675,16 @@ pub enum KclMigrationServerMessage {
     Operation {
         #[doc = "Persisted operation state, safe to retrieve again without starting new work."]
         operation: KclMigrationOperation,
+    },
+    #[doc = "Best-effort, display-only progress on the execution connection. Only text, \
+             informational and supported reasoning messages are forwarded; candidate edits are \
+             returned solely in a validated terminal operation."]
+    #[serde(rename = "progress")]
+    Progress {
+        #[doc = "Existing Copilot display message. Never dispatch it as a project edit."]
+        message: MlCopilotServerMessage,
+        #[doc = "The initiating request ID, used to keep progress with its migration."]
+        operation_id: uuid::Uuid,
     },
     #[doc = "A rejected request, without starting or charging for work."]
     #[serde(rename = "error")]
