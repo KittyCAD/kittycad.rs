@@ -203,8 +203,30 @@
           "meta"
         ],
         "summary": "List all active announcements.",
-        "description": "No authentication is required.",
+        "description": "No authentication is required. Results are ordered newest first, with the announcement ID breaking ties.",
         "operationId": "get_announcements",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -277,7 +299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnnouncementList"
+                  "$ref": "#/components/schemas/AnnouncementResultsPage"
                 }
               }
             }
@@ -289,7 +311,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/api-calls/{id}": {
@@ -16249,6 +16274,28 @@
         ],
         "summary": "List the active categories available for project submissions.",
         "operationId": "list_project_categories",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16320,11 +16367,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectCategoryResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectCategoryResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectCategoryResponseResultsPage"
                 }
               }
             }
@@ -16336,7 +16379,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -25946,6 +25992,28 @@
         ],
         "summary": "List the authenticated user's projects.",
         "operationId": "list_projects",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -26018,11 +26086,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectSummaryResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectSummaryResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectSummaryResponseResultsPage"
                 }
               }
             }
@@ -26034,7 +26098,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "post": {
         "tags": [
@@ -32916,20 +32983,25 @@
           "updated_at"
         ]
       },
-      "AnnouncementList": {
-        "description": "Response containing active announcements.",
+      "AnnouncementResultsPage": {
+        "description": "A single page of results",
         "type": "object",
         "properties": {
-          "announcements": {
-            "description": "The list of active announcements.",
+          "items": {
+            "description": "list of items on this page of results",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Announcement"
             }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
           }
         },
         "required": [
-          "announcements"
+          "items"
         ]
       },
       "ApiCallStatus": {
@@ -56628,6 +56700,27 @@
           "sort_order"
         ]
       },
+      "ProjectCategoryResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCategoryResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
       "ProjectEntityToPlane": {
         "description": "The response from the `ProjectEntityToPlane` command.",
         "type": "object",
@@ -57047,6 +57140,27 @@
           "revision",
           "title",
           "updated_at"
+        ]
+      },
+      "ProjectSummaryResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectSummaryResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "ProjectVersionDetailResponse": {
