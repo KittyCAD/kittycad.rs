@@ -1877,19 +1877,16 @@ impl tabled::Tabled for Announcement {
     }
 }
 
-#[doc = "A single page of results"]
+#[doc = "Response containing active announcements."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct AnnouncementResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<Announcement>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
+pub struct AnnouncementList {
+    #[doc = "The list of active announcements."]
+    pub announcements: Vec<Announcement>,
 }
 
-impl std::fmt::Display for AnnouncementResultsPage {
+impl std::fmt::Display for AnnouncementList {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -1899,62 +1896,15 @@ impl std::fmt::Display for AnnouncementResultsPage {
     }
 }
 
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for AnnouncementResultsPage {
-    type Item = Announcement;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        self.next_page_with_param(req, "next_page")
-    }
-
-    fn next_page_with_param(
-        &self,
-        req: reqwest::Request,
-        page_param: &str,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for AnnouncementResultsPage {
-    const LENGTH: usize = 2;
+impl tabled::Tabled for AnnouncementList {
+    const LENGTH: usize = 1;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
+        vec![format!("{:?}", self.announcements).into()]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
+        vec!["announcements".into()]
     }
 }
 
@@ -9644,10 +9594,6 @@ pub enum Feature {
     #[serde(rename = "kcl_cek_executor")]
     #[display("kcl_cek_executor")]
     KclCekExecutor,
-    #[doc = "New KCL lexer and parser."]
-    #[serde(rename = "kcl_new_lexer_parser")]
-    #[display("kcl_new_lexer_parser")]
-    KclNewLexerParser,
     #[doc = "Immediately redirect to our Govcloud environment (zoogov.dev)."]
     #[serde(rename = "redirect_to_govcloud")]
     #[display("redirect_to_govcloud")]
@@ -12240,6 +12186,71 @@ impl tabled::Tabled for KclCodeCompletionResponse {
     }
 }
 
+#[doc = "A revision-fenced acknowledgement from the client that owns the project files."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationApplication {
+    #[doc = "Starts at zero. Each accepted state change increments it once."]
+    pub revision: u32,
+    #[doc = "Last reported state; not independent verification of local files."]
+    pub status: KclMigrationApplicationStatus,
+}
+
+impl std::fmt::Display for KclMigrationApplication {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationApplication {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.revision).into(),
+            format!("{:?}", self.status).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["revision".into(), "status".into()]
+    }
+}
+
+#[doc = "Client-reported application state, separate from conversion success."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclMigrationApplicationStatus {
+    #[doc = "The client has not confirmed application. API does not infer project state."]
+    #[serde(rename = "not_applied")]
+    #[display("not_applied")]
+    NotApplied,
+    #[doc = "The client reports completing the guarded project write (or redo)."]
+    #[serde(rename = "applied")]
+    #[display("applied")]
+    Applied,
+    #[doc = "The client reports undoing the migration."]
+    #[serde(rename = "undone")]
+    #[display("undone")]
+    Undone,
+}
+
 #[doc = "The restricted public migration connection never accepts ordinary prompts."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -12270,9 +12281,98 @@ pub enum KclMigrationClientMessage {
         #[doc = "A UUID usually v4 or v7"]
         operation_id: uuid::Uuid,
     },
+    #[doc = "Read linked migration summaries, newest first, without loading or applying files."]
+    #[serde(rename = "history")]
+    History {
+        #[doc = "A UUID usually v4 or v7"]
+        conversation_id: uuid::Uuid,
+    },
+    #[doc = "Acknowledge a successful local apply/undo/redo. Does not execute or charge work."]
+    #[serde(rename = "application")]
+    Application {
+        #[doc = "The revision read before making the local change. Retrying is idempotent."]
+        expected_revision: u32,
+        #[doc = "A UUID usually v4 or v7"]
+        operation_id: uuid::Uuid,
+        #[doc = "Client-reported application state, separate from conversion success."]
+        status: KclMigrationApplicationStatus,
+    },
     #[doc = "Application heartbeat."]
     #[serde(rename = "ping")]
     Ping {},
+}
+
+#[doc = "Read-only conversation entry. It contains no files, edits or provider checkpoints."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclMigrationHistoryEntry {
+    #[doc = "Place this entry after this ordinary prompt when replaying the conversation."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub after_prompt_id: Option<uuid::Uuid>,
+    #[doc = "Most recent client acknowledgement."]
+    pub application: KclMigrationApplication,
+    #[doc = "Conversation that owns this entry."]
+    pub conversation_id: uuid::Uuid,
+    #[doc = "Admission time, used for chronological display."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Outcome summary for display and subsequent model context."]
+    pub detail: String,
+    #[doc = "Migration request ID. Use the status command to retrieve a candidate explicitly."]
+    pub operation_id: uuid::Uuid,
+    #[doc = "Persisted Copilot prompt, when this migration has a conversation transcript."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_id: Option<uuid::Uuid>,
+    #[doc = "Conversion outcome. Success alone does not mean files were applied."]
+    pub status: KclMigrationStatus,
+}
+
+impl std::fmt::Display for KclMigrationHistoryEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclMigrationHistoryEntry {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(after_prompt_id) = &self.after_prompt_id {
+                format!("{:?}", after_prompt_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.application).into(),
+            format!("{:?}", self.conversation_id).into(),
+            format!("{:?}", self.created_at).into(),
+            self.detail.clone().into(),
+            format!("{:?}", self.operation_id).into(),
+            if let Some(prompt_id) = &self.prompt_id {
+                format!("{:?}", prompt_id).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.status).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "after_prompt_id".into(),
+            "application".into(),
+            "conversation_id".into(),
+            "created_at".into(),
+            "detail".into(),
+            "operation_id".into(),
+            "prompt_id".into(),
+            "status".into(),
+        ]
+    }
 }
 
 #[doc = "Persisted operation state, safe to retrieve again without starting new work."]
@@ -12343,6 +12443,9 @@ pub struct KclMigrationRequest {
     #[doc = "Explicit consent to unstable preview semantics."]
     #[serde(default)]
     pub allow_preview: bool,
+    #[doc = "Existing customer conversation to link and use as background context. API verifies ownership; migration keeps its own sponsored execution record."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<uuid::Uuid>,
     #[doc = "Complete project, including unsaved edits, imports, and settings."]
     pub current_files: std::collections::HashMap<String, Vec<u8>>,
     #[doc = "Project-relative KCL file to execute."]
@@ -12367,10 +12470,15 @@ impl std::fmt::Display for KclMigrationRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for KclMigrationRequest {
-    const LENGTH: usize = 6;
+    const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.allow_preview).into(),
+            if let Some(conversation_id) = &self.conversation_id {
+                format!("{:?}", conversation_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.current_files).into(),
             self.entrypoint.clone().into(),
             format!("{:?}", self.project_snapshot).into(),
@@ -12382,6 +12490,7 @@ impl tabled::Tabled for KclMigrationRequest {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             "allow_preview".into(),
+            "conversation_id".into(),
             "current_files".into(),
             "entrypoint".into(),
             "project_snapshot".into(),
@@ -12472,6 +12581,21 @@ pub enum KclMigrationServerMessage {
         #[doc = "Existing Copilot display message. Never dispatch it as a project edit."]
         message: MlCopilotServerMessage,
         #[doc = "The initiating request ID, used to keep progress with its migration."]
+        operation_id: uuid::Uuid,
+    },
+    #[doc = "Read-only history; never route these entries through file-edit handlers."]
+    #[serde(rename = "history")]
+    History {
+        #[doc = "A UUID usually v4 or v7"]
+        conversation_id: uuid::Uuid,
+        entries: Vec<KclMigrationHistoryEntry>,
+    },
+    #[doc = "Current durable application acknowledgement."]
+    #[serde(rename = "application")]
+    Application {
+        #[doc = "A revision-fenced acknowledgement from the client that owns the project files."]
+        application: KclMigrationApplication,
+        #[doc = "A UUID usually v4 or v7"]
         operation_id: uuid::Uuid,
     },
     #[doc = "A rejected request, without starting or charging for work."]
@@ -12838,6 +12962,10 @@ pub enum KclVersion {
     #[serde(rename = "3.0")]
     #[display("3.0")]
     Three0,
+    #[doc = "KCL v4 preview -- used while developing and testing version 4."]
+    #[serde(rename = "4.0-preview")]
+    #[display("4.0-preview")]
+    Four0Preview,
 }
 
 #[doc = "The response from the `Loft` command."]
@@ -16118,6 +16246,12 @@ pub enum ModelingCmd {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         version: Option<RegionVersion>,
     },
+    #[doc = "Enable or disable graphics. Warning: enabling graphics slows down the engine."]
+    #[serde(rename = "toggle_graphics")]
+    ToggleGraphics {
+        #[doc = "Should graphics be enabled?"]
+        graphics_enabled: bool,
+    },
     #[doc = "Create a planar surface bounded by the connection of various paths and curves. 'CreatePlanarSurface' modeling command."]
     #[serde(rename = "create_planar_surface")]
     CreatePlanarSurface {
@@ -17938,6 +18072,11 @@ pub enum OkModelingCmdResponse {
     CreateRegion {
         #[doc = "The response from the 'CreateRegion'. The region should have an ID taken from the ID of the 'CreateRegion' modeling command."]
         data: CreateRegion,
+    },
+    #[serde(rename = "toggle_graphics")]
+    ToggleGraphics {
+        #[doc = "The response from the 'ToggleGraphics'."]
+        data: ToggleGraphics,
     },
     #[serde(rename = "create_planar_surface")]
     CreatePlanarSurface {
@@ -21166,87 +21305,6 @@ impl tabled::Tabled for ProjectCategoryResponse {
     }
 }
 
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ProjectCategoryResponseResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<ProjectCategoryResponse>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for ProjectCategoryResponseResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for ProjectCategoryResponseResultsPage {
-    type Item = ProjectCategoryResponse;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        self.next_page_with_param(req, "next_page")
-    }
-
-    fn next_page_with_param(
-        &self,
-        req: reqwest::Request,
-        page_param: &str,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ProjectCategoryResponseResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
-    }
-}
-
 #[doc = "The response from the `ProjectEntityToPlane` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -21769,87 +21827,6 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "title".into(),
             "updated_at".into(),
         ]
-    }
-}
-
-#[doc = "A single page of results"]
-#[derive(
-    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
-)]
-pub struct ProjectSummaryResponseResultsPage {
-    #[doc = "list of items on this page of results"]
-    pub items: Vec<ProjectSummaryResponse>,
-    #[doc = "token used to fetch the next page of results (if any)"]
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub next_page: Option<String>,
-}
-
-impl std::fmt::Display for ProjectSummaryResponseResultsPage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}",
-            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
-        )
-    }
-}
-
-#[cfg(feature = "requests")]
-impl crate::types::paginate::Pagination for ProjectSummaryResponseResultsPage {
-    type Item = ProjectSummaryResponse;
-    fn has_more_pages(&self) -> bool {
-        self.next_page.is_some()
-    }
-
-    fn next_page_token(&self) -> Option<String> {
-        self.next_page.clone()
-    }
-
-    fn next_page(
-        &self,
-        req: reqwest::Request,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        self.next_page_with_param(req, "next_page")
-    }
-
-    fn next_page_with_param(
-        &self,
-        req: reqwest::Request,
-        page_param: &str,
-    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
-        let mut req = req.try_clone().ok_or_else(|| {
-            crate::types::error::Error::InvalidRequest(format!(
-                "failed to clone request: {:?}",
-                req
-            ))
-        })?;
-        req.url_mut()
-            .query_pairs_mut()
-            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
-        Ok(req)
-    }
-
-    fn items(&self) -> Vec<Self::Item> {
-        self.items.clone()
-    }
-}
-
-#[cfg(feature = "tabled")]
-impl tabled::Tabled for ProjectSummaryResponseResultsPage {
-    const LENGTH: usize = 2;
-    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![
-            format!("{:?}", self.items).into(),
-            if let Some(next_page) = &self.next_page {
-                format!("{:?}", next_page).into()
-            } else {
-                String::new().into()
-            },
-        ]
-    }
-
-    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -26250,6 +26227,34 @@ impl tabled::Tabled for TextToCadResponseResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "The response from the 'ToggleGraphics'."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ToggleGraphics {}
+
+impl std::fmt::Display for ToggleGraphics {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ToggleGraphics {
+    const LENGTH: usize = 0;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![]
     }
 }
 

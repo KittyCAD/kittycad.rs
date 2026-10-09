@@ -203,30 +203,8 @@
           "meta"
         ],
         "summary": "List all active announcements.",
-        "description": "No authentication is required. Results are ordered newest first, with the announcement ID breaking ties.",
+        "description": "No authentication is required.",
         "operationId": "get_announcements",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -299,7 +277,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnnouncementResultsPage"
+                  "$ref": "#/components/schemas/AnnouncementList"
                 }
               }
             }
@@ -311,10 +289,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false,
-        "x-dropshot-pagination": {
-          "required": []
-        }
+        "x-billable": false
       }
     },
     "/api-calls/{id}": {
@@ -16274,28 +16249,6 @@
         ],
         "summary": "List the active categories available for project submissions.",
         "operationId": "list_project_categories",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16367,7 +16320,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectCategoryResponseResultsPage"
+                  "title": "Array_of_ProjectCategoryResponse",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectCategoryResponse"
+                  }
                 }
               }
             }
@@ -16379,10 +16336,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false,
-        "x-dropshot-pagination": {
-          "required": []
-        }
+        "x-billable": false
       },
       "options": {
         "tags": [
@@ -25992,28 +25946,6 @@
         ],
         "summary": "List the authenticated user's projects.",
         "operationId": "list_projects",
-        "parameters": [
-          {
-            "in": "query",
-            "name": "limit",
-            "description": "Maximum number of items returned by a single call",
-            "schema": {
-              "nullable": true,
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "page_token",
-            "description": "Token returned by previous call to retrieve the subsequent page",
-            "schema": {
-              "nullable": true,
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -26086,7 +26018,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectSummaryResponseResultsPage"
+                  "title": "Array_of_ProjectSummaryResponse",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSummaryResponse"
+                  }
                 }
               }
             }
@@ -26098,10 +26034,7 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false,
-        "x-dropshot-pagination": {
-          "required": []
-        }
+        "x-billable": false
       },
       "post": {
         "tags": [
@@ -32983,25 +32916,20 @@
           "updated_at"
         ]
       },
-      "AnnouncementResultsPage": {
-        "description": "A single page of results",
+      "AnnouncementList": {
+        "description": "Response containing active announcements.",
         "type": "object",
         "properties": {
-          "items": {
-            "description": "list of items on this page of results",
+          "announcements": {
+            "description": "The list of active announcements.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Announcement"
             }
-          },
-          "next_page": {
-            "nullable": true,
-            "description": "token used to fetch the next page of results (if any)",
-            "type": "string"
           }
         },
         "required": [
-          "items"
+          "announcements"
         ]
       },
       "ApiCallStatus": {
@@ -39088,13 +39016,6 @@
             ]
           },
           {
-            "description": "New KCL lexer and parser.",
-            "type": "string",
-            "enum": [
-              "kcl_new_lexer_parser"
-            ]
-          },
-          {
             "description": "Immediately redirect to our Govcloud environment (zoogov.dev).",
             "type": "string",
             "enum": [
@@ -41481,6 +41402,56 @@
           "completions"
         ]
       },
+      "KclMigrationApplication": {
+        "description": "A revision-fenced acknowledgement from the client that owns the project files.",
+        "type": "object",
+        "properties": {
+          "revision": {
+            "description": "Starts at zero. Each accepted state change increments it once.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "status": {
+            "description": "Last reported state; not independent verification of local files.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationApplicationStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "revision",
+          "status"
+        ]
+      },
+      "KclMigrationApplicationStatus": {
+        "description": "Client-reported application state, separate from conversion success.",
+        "oneOf": [
+          {
+            "description": "The client has not confirmed application. API does not infer project state.",
+            "type": "string",
+            "enum": [
+              "not_applied"
+            ]
+          },
+          {
+            "description": "The client reports completing the guarded project write (or redo).",
+            "type": "string",
+            "enum": [
+              "applied"
+            ]
+          },
+          {
+            "description": "The client reports undoing the migration.",
+            "type": "string",
+            "enum": [
+              "undone"
+            ]
+          }
+        ]
+      },
       "KclMigrationClientMessage": {
         "description": "The restricted public migration connection never accepts ordinary prompts.",
         "oneOf": [
@@ -41568,6 +41539,57 @@
             "additionalProperties": false
           },
           {
+            "description": "Read linked migration summaries, newest first, without loading or applying files.",
+            "type": "object",
+            "properties": {
+              "conversation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "history"
+                ]
+              }
+            },
+            "required": [
+              "conversation_id",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Acknowledge a successful local apply/undo/redo. Does not execute or charge work.",
+            "type": "object",
+            "properties": {
+              "expected_revision": {
+                "description": "The revision read before making the local change. Retrying is idempotent.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "status": {
+                "$ref": "#/components/schemas/KclMigrationApplicationStatus"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "application"
+                ]
+              }
+            },
+            "required": [
+              "expected_revision",
+              "operation_id",
+              "status",
+              "type"
+            ],
+            "additionalProperties": false
+          },
+          {
             "description": "Application heartbeat.",
             "type": "object",
             "properties": {
@@ -41583,6 +41605,79 @@
             ],
             "additionalProperties": false
           }
+        ]
+      },
+      "KclMigrationHistoryEntry": {
+        "description": "Read-only conversation entry. It contains no files, edits or provider checkpoints.",
+        "type": "object",
+        "properties": {
+          "after_prompt_id": {
+            "nullable": true,
+            "description": "Place this entry after this ordinary prompt when replaying the conversation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "application": {
+            "description": "Most recent client acknowledgement.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationApplication"
+              }
+            ]
+          },
+          "conversation_id": {
+            "description": "Conversation that owns this entry.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "created_at": {
+            "description": "Admission time, used for chronological display.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "detail": {
+            "description": "Outcome summary for display and subsequent model context.",
+            "type": "string"
+          },
+          "operation_id": {
+            "description": "Migration request ID. Use the status command to retrieve a candidate explicitly.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "prompt_id": {
+            "nullable": true,
+            "description": "Persisted Copilot prompt, when this migration has a conversation transcript.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "status": {
+            "description": "Conversion outcome. Success alone does not mean files were applied.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclMigrationStatus"
+              }
+            ]
+          }
+        },
+        "required": [
+          "application",
+          "conversation_id",
+          "created_at",
+          "detail",
+          "operation_id",
+          "status"
         ]
       },
       "KclMigrationOperation": {
@@ -41652,6 +41747,15 @@
             "description": "Explicit consent to unstable preview semantics.",
             "default": false,
             "type": "boolean"
+          },
+          "conversation_id": {
+            "nullable": true,
+            "description": "Existing customer conversation to link and use as background context. API verifies ownership; migration keeps its own sponsored execution record.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
           },
           "current_files": {
             "description": "Complete project, including unsaved edits, imports, and settings.",
@@ -41803,6 +41907,55 @@
             },
             "required": [
               "message",
+              "operation_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Read-only history; never route these entries through file-edit handlers.",
+            "type": "object",
+            "properties": {
+              "conversation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/KclMigrationHistoryEntry"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "history"
+                ]
+              }
+            },
+            "required": [
+              "conversation_id",
+              "entries",
+              "type"
+            ]
+          },
+          {
+            "description": "Current durable application acknowledgement.",
+            "type": "object",
+            "properties": {
+              "application": {
+                "$ref": "#/components/schemas/KclMigrationApplication"
+              },
+              "operation_id": {
+                "$ref": "#/components/schemas/Uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "application"
+                ]
+              }
+            },
+            "required": [
+              "application",
               "operation_id",
               "type"
             ]
@@ -42166,6 +42319,13 @@
             "type": "string",
             "enum": [
               "3.0"
+            ]
+          },
+          {
+            "description": "KCL v4 preview -- used while developing and testing version 4.",
+            "type": "string",
+            "enum": [
+              "4.0-preview"
             ]
           }
         ]
@@ -49847,6 +50007,26 @@
             ]
           },
           {
+            "description": "Enable or disable graphics. Warning: enabling graphics slows down the engine.",
+            "type": "object",
+            "properties": {
+              "graphics_enabled": {
+                "description": "Should graphics be enabled?",
+                "type": "boolean"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "toggle_graphics"
+                ]
+              }
+            },
+            "required": [
+              "graphics_enabled",
+              "type"
+            ]
+          },
+          {
             "description": "Create a planar surface bounded by the connection of various paths and curves. 'CreatePlanarSurface' modeling command.",
             "type": "object",
             "properties": {
@@ -53600,6 +53780,24 @@
             "type": "object",
             "properties": {
               "data": {
+                "$ref": "#/components/schemas/ToggleGraphics"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "toggle_graphics"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
                 "$ref": "#/components/schemas/CreatePlanarSurface"
               },
               "type": {
@@ -56700,27 +56898,6 @@
           "sort_order"
         ]
       },
-      "ProjectCategoryResponseResultsPage": {
-        "description": "A single page of results",
-        "type": "object",
-        "properties": {
-          "items": {
-            "description": "list of items on this page of results",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectCategoryResponse"
-            }
-          },
-          "next_page": {
-            "nullable": true,
-            "description": "token used to fetch the next page of results (if any)",
-            "type": "string"
-          }
-        },
-        "required": [
-          "items"
-        ]
-      },
       "ProjectEntityToPlane": {
         "description": "The response from the `ProjectEntityToPlane` command.",
         "type": "object",
@@ -57140,27 +57317,6 @@
           "revision",
           "title",
           "updated_at"
-        ]
-      },
-      "ProjectSummaryResponseResultsPage": {
-        "description": "A single page of results",
-        "type": "object",
-        "properties": {
-          "items": {
-            "description": "list of items on this page of results",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProjectSummaryResponse"
-            }
-          },
-          "next_page": {
-            "nullable": true,
-            "description": "token used to fetch the next page of results (if any)",
-            "type": "string"
-          }
-        },
-        "required": [
-          "items"
         ]
       },
       "ProjectVersionDetailResponse": {
@@ -60174,6 +60330,10 @@
         "required": [
           "items"
         ]
+      },
+      "ToggleGraphics": {
+        "description": "The response from the 'ToggleGraphics'.",
+        "type": "object"
       },
       "TokenRevokeRequestForm": {
         "description": "The request parameters for the OAuth 2.0 token revocation flow.",
