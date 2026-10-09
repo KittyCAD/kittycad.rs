@@ -29,6 +29,6 @@ jobs:
           key: ${{ runner.os }}-cargo-doc-target-${{ hashFiles('**/Cargo.lock') }}
       - name: Run cargo doc
         run: |
-          cargo doc --all
+          cargo doc --all --no-deps
           cargo test --doc
         shell: bash
