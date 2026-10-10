@@ -1269,7 +1269,7 @@ version = "0.5.7"
 dependencies = [
  "anyhow",
  "async-trait",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bigdecimal",
  "bytes",
  "chrono",
