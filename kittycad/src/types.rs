@@ -5458,6 +5458,39 @@ impl tabled::Tabled for CreatePlanarSurface {
     }
 }
 
+#[doc = "Request to create a cloud project library."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateProjectLibraryRequest {
+    #[doc = "Display name for the library."]
+    pub name: String,
+    #[doc = "Whether the library belongs to the user or their active organization."]
+    pub scope: ProjectLibraryScope,
+}
+
+impl std::fmt::Display for CreateProjectLibraryRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateProjectLibraryRequest {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![self.name.clone().into(), format!("{:?}", self.scope).into()]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["name".into(), "scope".into()]
+    }
+}
+
 #[doc = "Request payload for creating a new project share link."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9827,6 +9860,10 @@ pub enum Feature {
     #[serde(rename = "named_views_ui")]
     #[display("named_views_ui")]
     NamedViewsUi,
+    #[doc = "Enables the Scene browser and model tree UI in Zoo Design Studio."]
+    #[serde(rename = "scene_browser")]
+    #[display("scene_browser")]
+    SceneBrowser,
     #[doc = "Enables plugins in Zoo Design Studio."]
     #[serde(rename = "plugins")]
     #[display("plugins")]
@@ -9835,15 +9872,6 @@ pub enum Feature {
     #[serde(rename = "proprietary_to_kcl_conversion_beta")]
     #[display("proprietary_to_kcl_conversion_beta")]
     ProprietaryToKclConversionBeta,
-    #[doc = "Enables the topological segments-based region API for point-and-click in Zoo Design \
-             Studio."]
-    #[serde(rename = "segments_based_regions")]
-    #[display("segments_based_regions")]
-    SegmentsBasedRegions,
-    #[doc = "Allows legacy sketches to be edited using point-and-click in Zoo Design Studio."]
-    #[serde(rename = "legacy_sketch_mode")]
-    #[display("legacy_sketch_mode")]
-    LegacySketchMode,
     #[doc = "Enables sketch solve experimental features in Zoo Design Studio."]
     #[serde(rename = "sketch_experimental_features")]
     #[display("sketch_experimental_features")]
@@ -22081,6 +22109,185 @@ impl tabled::Tabled for ProjectFileResponse {
     }
 }
 
+#[doc = "A cloud project library visible to the caller."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectLibraryResponse {
+    #[doc = "Whether the caller may rename or delete this library."]
+    pub can_manage: bool,
+    #[doc = "When the library was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Unique library identifier."]
+    pub id: uuid::Uuid,
+    #[doc = "Display name, preserving the owner's capitalization."]
+    pub name: String,
+    #[doc = "Organization owner; null for a personal library."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub org_id: Option<uuid::Uuid>,
+    #[doc = "Opaque revision token required when renaming or deleting the library."]
+    pub revision: String,
+    #[doc = "When the library was last updated."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Personal owner; null for an organization library."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for ProjectLibraryResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectLibraryResponse {
+    const LENGTH: usize = 8;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.can_manage).into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            self.name.clone().into(),
+            if let Some(org_id) = &self.org_id {
+                format!("{:?}", org_id).into()
+            } else {
+                String::new().into()
+            },
+            self.revision.clone().into(),
+            format!("{:?}", self.updated_at).into(),
+            if let Some(user_id) = &self.user_id {
+                format!("{:?}", user_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "can_manage".into(),
+            "created_at".into(),
+            "id".into(),
+            "name".into(),
+            "org_id".into(),
+            "revision".into(),
+            "updated_at".into(),
+            "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectLibraryResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<ProjectLibraryResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ProjectLibraryResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ProjectLibraryResponseResultsPage {
+    type Item = ProjectLibraryResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectLibraryResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Ownership of a new cloud project library."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum ProjectLibraryScope {
+    #[doc = "Owned personally by the authenticated user."]
+    #[serde(rename = "personal")]
+    #[display("personal")]
+    Personal,
+    #[doc = "Owned by the active organization; requires organization-admin access."]
+    #[serde(rename = "organization")]
+    #[display("organization")]
+    Organization,
+}
+
 #[doc = "The response from the `ProjectPointsToPlane` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -23422,6 +23629,42 @@ impl tabled::Tabled for RemoveSceneObjects {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "Request to rename a cloud project library."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct RenameProjectLibraryRequest {
+    #[doc = "Revision returned by the last library read."]
+    pub expected_revision: String,
+    #[doc = "New display name."]
+    pub name: String,
+}
+
+impl std::fmt::Display for RenameProjectLibraryRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for RenameProjectLibraryRequest {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.expected_revision.clone().into(),
+            self.name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["expected_revision".into(), "name".into()]
     }
 }
 
