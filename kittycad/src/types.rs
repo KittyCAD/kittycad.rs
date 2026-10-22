@@ -22409,6 +22409,9 @@ pub struct ProjectResponse {
     pub files: Vec<ProjectFileResponse>,
     #[doc = "Unique project identifier."]
     pub id: uuid::Uuid,
+    #[doc = "Named library containing the project; null means unassigned."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub library_id: Option<uuid::Uuid>,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
     #[doc = "Stable authenticated thumbnail URL, when one exists."]
@@ -22440,7 +22443,7 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.access).into(),
@@ -22450,6 +22453,11 @@ impl tabled::Tabled for ProjectResponse {
             self.entrypoint_path.clone().into(),
             format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
+            if let Some(library_id) = &self.library_id {
+                format!("{:?}", library_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.preview_status).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -22474,6 +22482,7 @@ impl tabled::Tabled for ProjectResponse {
             "entrypoint_path".into(),
             "files".into(),
             "id".into(),
+            "library_id".into(),
             "preview_status".into(),
             "preview_url".into(),
             "project_toml_path".into(),
@@ -22635,6 +22644,9 @@ pub struct ProjectSummaryResponse {
     pub entrypoint_path: String,
     #[doc = "Unique project identifier."]
     pub id: uuid::Uuid,
+    #[doc = "Named library containing the project; null means unassigned."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub library_id: Option<uuid::Uuid>,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
     #[doc = "Stable authenticated thumbnail URL, when one exists."]
@@ -22666,7 +22678,7 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 14;
+    const LENGTH: usize = 15;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.access).into(),
@@ -22675,6 +22687,11 @@ impl tabled::Tabled for ProjectSummaryResponse {
             self.description.clone().into(),
             self.entrypoint_path.clone().into(),
             format!("{:?}", self.id).into(),
+            if let Some(library_id) = &self.library_id {
+                format!("{:?}", library_id).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.preview_status).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -22698,6 +22715,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "description".into(),
             "entrypoint_path".into(),
             "id".into(),
+            "library_id".into(),
             "preview_status".into(),
             "preview_url".into(),
             "project_toml_path".into(),
@@ -22707,6 +22725,87 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "title".into(),
             "updated_at".into(),
         ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectSummaryResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<ProjectSummaryResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ProjectSummaryResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ProjectSummaryResponseResultsPage {
+    type Item = ProjectSummaryResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectSummaryResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
