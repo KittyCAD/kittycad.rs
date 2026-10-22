@@ -1465,9 +1465,17 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1project-libraries~1{id}~1projects/get/x-rust",
+    "value": {
+      "example": "/// List projects in a cloud library, newest first.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nuse std::str::FromStr;\nasync fn example_projects_list_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectSummaryResponseResultsPage = client\n        .projects()\n        .list_library(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_library_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_library_stream(\n        uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_library"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1projects/get/x-rust",
     "value": {
-      "example": "/// List the authenticated user's projects.\nasync fn example_projects_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ProjectSummaryResponse> = client.projects().list().await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// List the authenticated user's projects.\n/// \n/// **Parameters:**\n/// \n/// - `scope: Option<crate::types::ProjectAccessScope>`: Restrict results to personal projects or the active organization's projects. When omitted, include all accessible projects.\n/// - `unassigned: Option<bool>`: Return only projects that have no named library assigned.\nasync fn example_projects_list() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: Vec<kittycad::types::ProjectSummaryResponse> = client\n        .projects()\n        .list(\n            Some(kittycad::types::ProjectAccessScope::Organization),\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list"
     }
   },
