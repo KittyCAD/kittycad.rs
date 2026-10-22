@@ -883,7 +883,7 @@
     "op": "add",
     "path": "/paths/~1projects~1public/get/x-rust",
     "value": {
-      "example": "/// List publicly visible community projects for the website/gallery.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PublicProjectResponseResultsPage = client\n        .projects()\n        .list_public(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_public_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "example": "/// List publicly visible community projects for the website/gallery.\n/// \n/// **Parameters:**\n/// \n/// - `category_id: Option<uuid::Uuid>`: Return only projects assigned to this category. Omit to return all categories.\n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nuse std::str::FromStr;\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PublicProjectResponseResultsPage = client\n        .projects()\n        .list_public(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_public_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_public"
     }
   },
@@ -1429,6 +1429,38 @@
     "value": {
       "example": "/// Update the user's privacy settings.\n/// \n/// This endpoint requires authentication by any Zoo user. It updates the privacy settings for the user.\nasync fn example_users_update_privacy_settings() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PrivacySettings = client\n        .users()\n        .update_privacy_settings(&kittycad::types::PrivacySettings {\n            can_train_on_data: true,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.update_privacy_settings"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1project-libraries/get/x-rust",
+    "value": {
+      "example": "/// List personal libraries and libraries belonging to the active organization.\n/// \n/// **Parameters:**\n/// \n/// - `limit: Option<u32>`: Maximum number of items returned by a single call\n/// - `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\nasync fn example_projects_list_libraries() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectLibraryResponseResultsPage = client\n        .projects()\n        .list_libraries(Some(4 as u32), Some(\"some-string\".to_string()))\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_libraries_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_libraries_stream(Some(4 as u32));\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.list_libraries"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1project-libraries/post/x-rust",
+    "value": {
+      "example": "/// Create a personal library or a library owned by the active organization.\nasync fn example_projects_create_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectLibraryResponse = client\n        .projects()\n        .create_library(&kittycad::types::CreateProjectLibraryRequest {\n            name: \"some-string\".to_string(),\n            scope: kittycad::types::ProjectLibraryScope::Organization,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.create_library"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1project-libraries~1{id}/delete/x-rust",
+    "value": {
+      "example": "/// Delete an empty cloud project library.\n/// \n/// **Parameters:**\n/// \n/// - `expected_revision: &'astr`: Revision returned by the last library read. (required)\n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_delete_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .projects()\n        .delete_library(\n            \"some-string\",\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.delete_library"
+    }
+  },
+  {
+    "op": "add",
+    "path": "/paths/~1user~1project-libraries~1{id}/patch/x-rust",
+    "value": {
+      "example": "/// Rename a library owned by the user or their active organization.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_projects_rename_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectLibraryResponse = client\n        .projects()\n        .rename_library(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::RenameProjectLibraryRequest {\n                expected_revision: \"some-string\".to_string(),\n                name: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/projects/struct.Projects.html#method.rename_library"
     }
   },
   {

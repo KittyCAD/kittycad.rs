@@ -46,21 +46,11 @@ impl Projects {
         }
     }
 
-    #[doc = "List publicly visible community projects for the \
-             website/gallery.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of \
-             items returned by a single call\n- `page_token: Option<String>`: Token returned by \
-             previous call to retrieve the subsequent page\n\n```rust,no_run\nuse \
-             futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut \
-             projects = client.projects();\n    let mut stream = \
-             projects.list_public_stream(Some(4 as u32));\n    loop {\n        match \
-             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
-             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
-             break;\n            }\n            Err(err) => {\n                return \
-             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List publicly visible community projects for the website/gallery.\n\n**Parameters:**\n\n- `category_id: Option<uuid::Uuid>`: Return only projects assigned to this category. Omit to return all categories.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PublicProjectResponseResultsPage = client\n        .projects()\n        .list_public(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_public_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn list_public<'a>(
         &'a self,
+        category_id: Option<uuid::Uuid>,
         limit: Option<u32>,
         page_token: Option<String>,
     ) -> Result<crate::types::PublicProjectResponseResultsPage, crate::types::error::Error> {
@@ -70,6 +60,10 @@ impl Projects {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
+        if let Some(p) = category_id {
+            query_params.push(("category_id", format!("{}", p)));
+        }
+
         if let Some(p) = limit {
             query_params.push(("limit", format!("{}", p)));
         }
@@ -98,22 +92,12 @@ impl Projects {
         }
     }
 
-    #[doc = "List publicly visible community projects for the \
-             website/gallery.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of \
-             items returned by a single call\n- `page_token: Option<String>`: Token returned by \
-             previous call to retrieve the subsequent page\n\n```rust,no_run\nuse \
-             futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut \
-             projects = client.projects();\n    let mut stream = \
-             projects.list_public_stream(Some(4 as u32));\n    loop {\n        match \
-             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
-             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
-             break;\n            }\n            Err(err) => {\n                return \
-             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[doc = "List publicly visible community projects for the website/gallery.\n\n**Parameters:**\n\n- `category_id: Option<uuid::Uuid>`: Return only projects assigned to this category. Omit to return all categories.\n- `limit: Option<u32>`: Maximum number of items returned by a single call\n- `page_token: Option<String>`: Token returned by previous call to retrieve the subsequent page\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_list_public() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::PublicProjectResponseResultsPage = client\n        .projects()\n        .list_public(\n            Some(uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?),\n            Some(4 as u32),\n            Some(\"some-string\".to_string()),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n\n\n/// - OR -\n\n/// Get a stream of results.\n///\n/// This allows you to paginate through all the items.\nuse futures_util::TryStreamExt;\nasync fn example_projects_list_public_stream() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut projects = client.projects();\n    let mut stream = projects.list_public_stream(\n        Some(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?),\n        Some(4 as u32),\n    );\n    loop {\n        match stream.try_next().await {\n            Ok(Some(item)) => {\n                println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                break;\n            }\n            Err(err) => {\n                return Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     #[cfg(not(feature = "js"))]
     pub fn list_public_stream<'a>(
         &'a self,
+        category_id: Option<uuid::Uuid>,
         limit: Option<u32>,
     ) -> impl futures::Stream<
         Item = Result<crate::types::PublicProjectResponse, crate::types::error::Error>,
@@ -124,12 +108,16 @@ impl Projects {
         use crate::types::paginate::Pagination;
         let pagination_url_path = ("projects/public").to_string();
         let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = category_id.as_ref() {
+            pagination_query_params.push(("category_id", format!("{}", p)));
+        }
+
         if let Some(p) = limit.as_ref() {
             pagination_query_params.push(("limit", format!("{}", p)));
         }
 
         let stream = self
-            .list_public(limit, None)
+            .list_public(category_id, limit, None)
             .map_ok(move |result| {
                 let items = futures::stream::iter(result.items().into_iter().map(Ok));
                 let next_pages = futures::stream::try_unfold(
@@ -375,6 +363,275 @@ impl Projects {
             ),
         );
         req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List personal libraries and libraries belonging to the active \
+             organization.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items \
+             returned by a single call\n- `page_token: Option<String>`: Token returned by previous \
+             call to retrieve the subsequent page\n\n```rust,no_run\nuse \
+             futures_util::TryStreamExt;\nasync fn example_projects_list_libraries_stream() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut \
+             projects = client.projects();\n    let mut stream = \
+             projects.list_libraries_stream(Some(4 as u32));\n    loop {\n        match \
+             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
+             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
+             break;\n            }\n            Err(err) => {\n                return \
+             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn list_libraries<'a>(
+        &'a self,
+        limit: Option<u32>,
+        page_token: Option<String>,
+    ) -> Result<crate::types::ProjectLibraryResponseResultsPage, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!("{}/{}", self.client.base_url, "user/project-libraries"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![];
+        if let Some(p) = limit {
+            query_params.push(("limit", format!("{}", p)));
+        }
+
+        if let Some(p) = page_token {
+            query_params.push(("page_token", p));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "List personal libraries and libraries belonging to the active \
+             organization.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of items \
+             returned by a single call\n- `page_token: Option<String>`: Token returned by previous \
+             call to retrieve the subsequent page\n\n```rust,no_run\nuse \
+             futures_util::TryStreamExt;\nasync fn example_projects_list_libraries_stream() -> \
+             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let mut \
+             projects = client.projects();\n    let mut stream = \
+             projects.list_libraries_stream(Some(4 as u32));\n    loop {\n        match \
+             stream.try_next().await {\n            Ok(Some(item)) => {\n                \
+             println!(\"{:?}\", item);\n            }\n            Ok(None) => {\n                \
+             break;\n            }\n            Err(err) => {\n                return \
+             Err(err.into());\n            }\n        }\n    }\n\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    #[cfg(not(feature = "js"))]
+    pub fn list_libraries_stream<'a>(
+        &'a self,
+        limit: Option<u32>,
+    ) -> impl futures::Stream<
+        Item = Result<crate::types::ProjectLibraryResponse, crate::types::error::Error>,
+    > + Unpin
+           + '_ {
+        use futures::{StreamExt, TryFutureExt, TryStreamExt};
+
+        use crate::types::paginate::Pagination;
+        let pagination_url_path = ("user/project-libraries").to_string();
+        let mut pagination_query_params: Vec<(&str, String)> = Vec::new();
+        if let Some(p) = limit.as_ref() {
+            pagination_query_params.push(("limit", format!("{}", p)));
+        }
+
+        let stream = self
+            .list_libraries(limit, None)
+            .map_ok(move |result| {
+                let items = futures::stream::iter(result.items().into_iter().map(Ok));
+                let next_pages = futures::stream::try_unfold(
+                    (None, result),
+                    move |(prev_page_token, new_result)| {
+                        let pagination_url_path = pagination_url_path.clone();
+                        let pagination_query_params = pagination_query_params.clone();
+                        async move {
+                            if new_result.has_more_pages()
+                                && !new_result.items().is_empty()
+                                && prev_page_token != new_result.next_page_token()
+                            {
+                                async {
+                                    let mut req = self.client.client.request(
+                                        http::Method::GET,
+                                        format!(
+                                            "{}/{}",
+                                            self.client.base_url,
+                                            pagination_url_path.clone()
+                                        ),
+                                    );
+                                    req = req.bearer_auth(&self.client.token);
+                                    let query_params = pagination_query_params.clone();
+                                    req = req.query(&query_params);
+                                    let mut request = req.build()?;
+                                    request =
+                                        new_result.next_page_with_param(request, "page_token")?;
+                                    let resp = self.client.client.execute(request).await?;
+                                    let status = resp.status();
+                                    if status.is_success() {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        serde_json::from_str(&text).map_err(|err| {
+                                            crate::types::error::Error::from_serde_error(
+                                                format_serde_error::SerdeError::new(
+                                                    text.to_string(),
+                                                    err,
+                                                ),
+                                                status,
+                                            )
+                                        })
+                                    } else {
+                                        let text = resp.text().await.unwrap_or_default();
+                                        Err(crate::types::error::Error::Server {
+                                            body: text.to_string(),
+                                            status,
+                                        })
+                                    }
+                                }
+                                .map_ok(
+                                    |result: crate::types::ProjectLibraryResponseResultsPage| {
+                                        Some((
+                                            futures::stream::iter(
+                                                result.items().into_iter().map(Ok),
+                                            ),
+                                            (new_result.next_page_token(), result),
+                                        ))
+                                    },
+                                )
+                                .await
+                            } else {
+                                Ok(None)
+                            }
+                        }
+                    },
+                )
+                .try_flatten();
+                items.chain(next_pages)
+            })
+            .try_flatten_stream();
+        #[cfg(target_arch = "wasm32")]
+        {
+            stream.boxed_local()
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            stream.boxed()
+        }
+    }
+
+    #[doc = "Create a personal library or a library owned by the active organization.\n\n```rust,no_run\nasync fn example_projects_create_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectLibraryResponse = client\n        .projects()\n        .create_library(&kittycad::types::CreateProjectLibraryRequest {\n            name: \"some-string\".to_string(),\n            scope: kittycad::types::ProjectLibraryScope::Organization,\n        })\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn create_library<'a>(
+        &'a self,
+        body: &crate::types::CreateProjectLibraryRequest,
+    ) -> Result<crate::types::ProjectLibraryResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!("{}/{}", self.client.base_url, "user/project-libraries"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Delete an empty cloud project library.\n\n**Parameters:**\n\n- `expected_revision: \
+             &'astr`: Revision returned by the last library read. (required)\n- `id: uuid::Uuid`: \
+             The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_projects_delete_library() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client\n        .projects()\n        \
+             .delete_library(\n            \"some-string\",\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
+             .await?;\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn delete_library<'a>(
+        &'a self,
+        expected_revision: &'a str,
+        id: uuid::Uuid,
+    ) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/project-libraries/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let query_params = vec![("expected_revision", expected_revision.to_string())];
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
+    #[doc = "Rename a library owned by the user or their active organization.\n\n**Parameters:**\n\n- `id: uuid::Uuid`: The identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_projects_rename_library() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::ProjectLibraryResponse = client\n        .projects()\n        .rename_library(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            &kittycad::types::RenameProjectLibraryRequest {\n                expected_revision: \"some-string\".to_string(),\n                name: \"some-string\".to_string(),\n            },\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn rename_library<'a>(
+        &'a self,
+        id: uuid::Uuid,
+        body: &crate::types::RenameProjectLibraryRequest,
+    ) -> Result<crate::types::ProjectLibraryResponse, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::PATCH,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/project-libraries/{id}".replace("{id}", &format!("{}", id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        req = req.json(body);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
