@@ -56626,6 +56626,15 @@
                   }
                 ]
               },
+              "schema": {
+                "description": "STEP application protocol schema. Defaults to AP242.",
+                "default": "ap242",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/StepSchema"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -57634,6 +57643,7 @@
         "enum": [
           "phosphor",
           "ssao",
+          "retrocad",
           "noeffect"
         ]
       },
@@ -60414,6 +60424,32 @@
             "type": "string",
             "enum": [
               "pretty"
+            ]
+          }
+        ]
+      },
+      "StepSchema": {
+        "description": "Specifies the STEP application protocol schema for export.",
+        "oneOf": [
+          {
+            "description": "AP203 edition 2.",
+            "type": "string",
+            "enum": [
+              "ap203"
+            ]
+          },
+          {
+            "description": "AP214.",
+            "type": "string",
+            "enum": [
+              "ap214"
+            ]
+          },
+          {
+            "description": "AP242.\n\nThis is the default setting.",
+            "type": "string",
+            "enum": [
+              "ap242"
             ]
           }
         ]
