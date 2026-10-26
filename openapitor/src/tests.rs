@@ -443,7 +443,9 @@ fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     };
 
     let mut cmd = std::process::Command::new("cargo");
-    // Test against the workspace runtime before it is published.
+    // Temporary clients do not inherit the workspace's [patch.crates-io]. Use
+    // this test-only override to test the local runtime, including before
+    // publication.
     let runtime_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../openapitor-runtime")
         .canonicalize()?;
