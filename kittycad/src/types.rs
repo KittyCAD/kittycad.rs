@@ -20613,6 +20613,9 @@ pub enum OutputFormat3D {
         #[doc = "Presentation style."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         presentation: Option<StepPresentation>,
+        #[doc = "STEP application protocol schema. Defaults to AP242."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        schema: Option<StepSchema>,
         #[doc = "Export length unit.\n\nDefaults to meters."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         units: Option<UnitLength>,
@@ -21765,6 +21768,9 @@ pub enum PostEffectType {
     #[serde(rename = "ssao")]
     #[display("ssao")]
     Ssao,
+    #[serde(rename = "retrocad")]
+    #[display("retrocad")]
+    Retrocad,
     #[serde(rename = "noeffect")]
     #[display("noeffect")]
     Noeffect,
@@ -26387,6 +26393,35 @@ pub enum StepPresentation {
     #[serde(rename = "pretty")]
     #[display("pretty")]
     Pretty,
+}
+
+#[doc = "Specifies the STEP application protocol schema for export."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum StepSchema {
+    #[doc = "AP203 edition 2."]
+    #[serde(rename = "ap203")]
+    #[display("ap203")]
+    Ap203,
+    #[doc = "AP214."]
+    #[serde(rename = "ap214")]
+    #[display("ap214")]
+    Ap214,
+    #[doc = "AP242.\n\nThis is the default setting."]
+    #[serde(rename = "ap242")]
+    #[display("ap242")]
+    Ap242,
 }
 
 #[doc = "Export storage."]

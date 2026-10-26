@@ -140,6 +140,7 @@ async fn create_async_file_conversion(client: &crate::Client) -> crate::types::F
     let body = include_bytes!("../../assets/in_obj.obj");
     let conversion_params = crate::types::ConversionParams {
         output_format: crate::types::OutputFormat3D::Step {
+            schema: Default::default(),
             coords: Some(kittycad_coord_system()),
             created: None,
             presentation: None,
