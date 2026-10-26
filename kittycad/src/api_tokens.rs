@@ -45,7 +45,7 @@ impl ApiTokens {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -116,7 +116,7 @@ impl ApiTokens {
                                         let text = resp.text().await.unwrap_or_default();
                                         serde_json::from_str(&text).map_err(|err| {
                                             crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
+                                                crate::types::error::SerdeError::new(
                                                     text.to_string(),
                                                     err,
                                                 ),
@@ -182,7 +182,7 @@ impl ApiTokens {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -223,7 +223,7 @@ impl ApiTokens {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })

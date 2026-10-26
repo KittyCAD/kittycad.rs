@@ -80,7 +80,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -111,7 +111,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -142,7 +142,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -209,7 +209,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -260,7 +260,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -336,7 +336,7 @@ impl Orgs {
                                         let text = resp.text().await.unwrap_or_default();
                                         serde_json::from_str(&text).map_err(|err| {
                                             crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
+                                                crate::types::error::SerdeError::new(
                                                     text.to_string(),
                                                     err,
                                                 ),
@@ -397,7 +397,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -438,7 +438,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -474,7 +474,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -619,7 +619,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -680,7 +680,7 @@ impl Orgs {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        let stream = self . list_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
+        let stream = self . list_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (crate :: types :: error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
         #[cfg(target_arch = "wasm32")]
         {
             stream.boxed_local()
@@ -716,7 +716,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -910,7 +910,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -972,7 +972,7 @@ impl Orgs {
             pagination_query_params.push(("sort_by", format!("{}", p)));
         }
 
-        let stream = self . search_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (format_serde_error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
+        let stream = self . search_dataset_conversions (params_for_call) . map_ok (move | result | { let items = futures :: stream :: iter (result . items () . into_iter () . map (Ok)) ; let next_pages = futures :: stream :: try_unfold ((None , result) , move | (prev_page_token , new_result) | { let pagination_url_path = pagination_url_path . clone () ; let pagination_query_params = pagination_query_params . clone () ; async move { if new_result . has_more_pages () && ! new_result . items () . is_empty () && prev_page_token != new_result . next_page_token () { async { let mut req = self . client . client . request (http :: Method :: GET , format ! ("{}/{}" , self . client . base_url , pagination_url_path . clone ()) ,) ; req = req . bearer_auth (& self . client . token) ; let query_params = pagination_query_params . clone () ; req = req . query (& query_params) ; let mut request = req . build () ? ; request = new_result . next_page_with_param (request , "page_token") ? ; let resp = self . client . client . execute (request) . await ? ; let status = resp . status () ; if status . is_success () { let text = resp . text () . await . unwrap_or_default () ; serde_json :: from_str (& text) . map_err (| err | crate :: types :: error :: Error :: from_serde_error (crate :: types :: error :: SerdeError :: new (text . to_string () , err) , status)) } else { let text = resp . text () . await . unwrap_or_default () ; Err (crate :: types :: error :: Error :: Server { body : text . to_string () , status }) } } . map_ok (| result : crate :: types :: OrgDatasetFileConversionSummaryResultsPage | { Some ((futures :: stream :: iter (result . items () . into_iter () . map (Ok) ,) , (new_result . next_page_token () , result) ,)) }) . await } else { Ok (None) } } }) . try_flatten () ; items . chain (next_pages) }) . try_flatten_stream () ;
         #[cfg(target_arch = "wasm32")]
         {
             stream.boxed_local()
@@ -1025,7 +1025,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1067,7 +1067,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1109,7 +1109,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1160,7 +1160,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1236,7 +1236,7 @@ impl Orgs {
                                         let text = resp.text().await.unwrap_or_default();
                                         serde_json::from_str(&text).map_err(|err| {
                                             crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
+                                                crate::types::error::SerdeError::new(
                                                     text.to_string(),
                                                     err,
                                                 ),
@@ -1309,7 +1309,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1351,7 +1351,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1387,7 +1387,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1458,7 +1458,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1496,7 +1496,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1529,7 +1529,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1560,7 +1560,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1591,7 +1591,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1661,7 +1661,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1732,7 +1732,7 @@ impl Orgs {
                                         let text = resp.text().await.unwrap_or_default();
                                         serde_json::from_str(&text).map_err(|err| {
                                             crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
+                                                crate::types::error::SerdeError::new(
                                                     text.to_string(),
                                                     err,
                                                 ),
@@ -1803,7 +1803,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })
@@ -1870,7 +1870,7 @@ impl Orgs {
                                         let text = resp.text().await.unwrap_or_default();
                                         serde_json::from_str(&text).map_err(|err| {
                                             crate::types::error::Error::from_serde_error(
-                                                format_serde_error::SerdeError::new(
+                                                crate::types::error::SerdeError::new(
                                                     text.to_string(),
                                                     err,
                                                 ),
@@ -1934,7 +1934,7 @@ impl Orgs {
             let text = resp.text().await.unwrap_or_default();
             serde_json::from_str(&text).map_err(|err| {
                 crate::types::error::Error::from_serde_error(
-                    format_serde_error::SerdeError::new(text.to_string(), err),
+                    crate::types::error::SerdeError::new(text.to_string(), err),
                     status,
                 )
             })

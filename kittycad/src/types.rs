@@ -371,7 +371,7 @@ pub mod error {
         #[doc = " An expected response whose deserialization failed."]
         SerdeError {
             #[doc = " The error."]
-            error: format_serde_error::SerdeError,
+            error: SerdeError,
             #[doc = " The response status."]
             status: reqwest::StatusCode,
         },
@@ -425,10 +425,7 @@ pub mod error {
         }
 
         #[doc = " Creates a new error from a response status and a serde error."]
-        pub fn from_serde_error(
-            e: format_serde_error::SerdeError,
-            status: reqwest::StatusCode,
-        ) -> Self {
+        pub fn from_serde_error(e: SerdeError, status: reqwest::StatusCode) -> Self {
             Self::SerdeError { error: e, status }
         }
     }
@@ -449,7 +446,7 @@ pub mod error {
     impl From<serde_json::Error> for Error {
         fn from(e: serde_json::Error) -> Self {
             Self::SerdeError {
-                error: format_serde_error::SerdeError::new(String::new(), e),
+                error: SerdeError::new(String::new(), e),
                 status: reqwest::StatusCode::INTERNAL_SERVER_ERROR,
             }
         }
@@ -510,6 +507,144 @@ pub mod error {
             }
         }
     }
+
+    #[doc = " A JSON deserialization error formatted with context from the response body."]
+    #[derive(Debug)]
+    pub struct SerdeError {
+        input: String,
+        message: String,
+        line: Option<usize>,
+        column: Option<usize>,
+        contextualize: bool,
+        context_lines: usize,
+        context_characters: usize,
+    }
+
+    impl SerdeError {
+        #[doc = " Creates an error with three context lines and 30 context characters."]
+        pub fn new(input: String, error: serde_json::Error) -> Self {
+            Self {
+                input,
+                message: error.to_string(),
+                line: Some(error.line()),
+                column: Some(error.column()),
+                contextualize: true,
+                context_lines: 3,
+                context_characters: 30,
+            }
+        }
+
+        #[doc = " Enables or disables context lines and shortening of long error lines."]
+        pub fn set_contextualize(&mut self, contextualize: bool) -> &mut Self {
+            self.contextualize = contextualize;
+            self
+        }
+
+        #[doc = " Returns whether contextualization is enabled, which is true by default."]
+        pub fn get_contextualize(&self) -> bool {
+            self.contextualize
+        }
+
+        #[doc = " Sets the number of lines shown before and after the error line."]
+        pub fn set_context_lines(&mut self, context_lines: usize) -> &mut Self {
+            self.context_lines = context_lines;
+            self
+        }
+
+        #[doc = " Returns the number of context lines, which is three by default."]
+        pub fn get_context_lines(&self) -> usize {
+            self.context_lines
+        }
+
+        #[doc = " Sets the number of characters shown on each side of a long-line error."]
+        pub fn set_context_characters(&mut self, context_characters: usize) -> &mut Self {
+            self.context_characters = context_characters;
+            self
+        }
+
+        #[doc = " Returns the number of context characters, which is 30 by default."]
+        pub fn get_context_characters(&self) -> usize {
+            self.context_characters
+        }
+    }
+
+    impl std::fmt::Display for SerdeError {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            use colored::Colorize;
+            use unicode_segmentation::UnicodeSegmentation;
+            let error_line = self.line.unwrap_or_default();
+            let error_column = self.column.unwrap_or_default();
+            let skip = error_line.saturating_sub(self.context_lines.saturating_add(1));
+            let take = self.context_lines.saturating_mul(2).saturating_add(1);
+            let lines: Vec<_> = self
+                .input
+                .lines()
+                .enumerate()
+                .skip(skip)
+                .take(take)
+                .collect();
+            if lines.is_empty() {
+                return writeln!(f, "{}", self.message.red().bold());
+            }
+            let indentation = lines
+                .iter()
+                .map(|(_, line)| line.chars().take_while(|c| c.is_whitespace()).count())
+                .min()
+                .unwrap_or_default();
+            let separator = " | ".blue().bold();
+            let width = error_line.to_string().len();
+            writeln!(f)?;
+            for (index, line) in lines {
+                let text = line
+                    .chars()
+                    .skip(indentation)
+                    .collect::<String>()
+                    .replace('\t', " ");
+                let line_number = index + 1;
+                if line_number != error_line {
+                    if self.contextualize {
+                        writeln!(f, " {:>width$}{}{}", "", separator, text.yellow())?;
+                    }
+                    continue;
+                }
+                let length = self.context_characters.saturating_mul(2).saturating_add(1);
+                let shorten = self.contextualize && text.len() > length;
+                let start = if shorten {
+                    error_column.saturating_sub(self.context_characters.saturating_add(1))
+                } else {
+                    0
+                };
+                let before = start != 0;
+                let after = shorten && start.saturating_add(length) < text.graphemes(true).count();
+                let text = if shorten {
+                    text.graphemes(true)
+                        .skip(start)
+                        .take(length)
+                        .collect::<String>()
+                } else {
+                    text
+                };
+                write!(f, " {}{}", line_number.to_string().blue().bold(), separator)?;
+                if before {
+                    write!(f, "{}", "...".blue().bold())?;
+                }
+                write!(f, "{}", text)?;
+                if after {
+                    write!(f, "{}", "...".blue().bold())?;
+                }
+                writeln!(f)?;
+                let column = error_column
+                    .saturating_sub(start)
+                    .saturating_sub(indentation)
+                    .saturating_add(if before { 3 } else { 0 });
+                let pointer = format!("{:>column$}^ {}", "", self.message);
+                writeln!(f, " {:>width$}{}{}", "", separator, pointer.red().bold())?;
+            }
+            Ok(())
+        }
+    }
+
+    impl std::error::Error for SerdeError {}
 }
 
 #[doc = "An account provider."]

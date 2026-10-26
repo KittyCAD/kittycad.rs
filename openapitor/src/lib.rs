@@ -42,7 +42,7 @@ pub fn load_json_spec(s: &str) -> Result<openapiv3::OpenAPI> {
 
 /// Parse an OpenAPI v3 spec YAML string as an OpenAPI struct.
 pub fn load_yaml_spec(s: &str) -> Result<openapiv3::OpenAPI> {
-    serde_yaml::from_str(s).map_err(|e| anyhow::anyhow!(e))
+    yaml_serde::from_str(s).map_err(|e| anyhow::anyhow!(e))
 }
 
 /// Parse a file as an OpenAPI spec.
@@ -598,9 +598,9 @@ base64 = "0.22"
 bigdecimal = {{ version = "0.4", features = ["serde"] }}
 bytes = {{ version = "1", features = ["serde"] }}
 clap = {{ version = "4", features = ["cargo", "derive", "env", "unicode"], optional = true }}
+colored = {{ version = "2.2", optional = true }}
 data-encoding = "^2"
 dirs = {{ version = "^6", optional = true }}
-format_serde_error = {{ version = "^0.3.0", optional = true }}
 futures = {{ version = "0.3", optional = true }}
 http = {{ version = "1", optional = true }}
 itertools = "0.14"
@@ -622,6 +622,7 @@ serde_urlencoded = {{ version = "^0.7", optional = true }}
 tabled = {{ version = "0.22", features = ["ansi"], optional = true }}
 thiserror = "2"
 tracing = {{ version = "^0.1", optional = true }}
+unicode-segmentation = {{ version = "1", optional = true }}
 url = {{ version = "2", features = ["serde"] }}
 uuid = {{ version = "1", features = ["serde", "v4", "v7"] }}
 
@@ -648,7 +649,7 @@ default = ["requests", "retry", "default-tls"]
 default-tls = ["reqwest/rustls"]
 clap = ["dep:clap"]
 tabled = ["dep:tabled"]
-requests = ["dep:async-trait", "dep:format_serde_error", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
+requests = ["dep:async-trait", "dep:colored", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing", "dep:unicode-segmentation"]
 retry = ["dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
 js = ["uuid/js", "getrandom/wasm_js"]
 
