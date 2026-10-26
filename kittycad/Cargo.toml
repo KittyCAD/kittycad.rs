@@ -15,7 +15,6 @@ base64 = "0.22"
 bigdecimal = { version = "0.4", features = ["serde"] }
 bytes = { version = "1", features = ["serde"] }
 clap = { version = "4", features = ["cargo", "derive", "env", "unicode"], optional = true }
-colored = { version = "2.2", optional = true }
 data-encoding = "^2"
 dirs = { version = "^6", optional = true }
 futures = { version = "0.3", optional = true }
@@ -23,6 +22,7 @@ http = { version = "1", optional = true }
 itertools = "0.14"
 log = { version = "^0.4", features = ["serde"], optional = true }
 mime_guess = "2"
+openapitor-runtime = { version = "0.1.0", optional = true }
 parse-display = "0.11"
 phonenumber = "0.3"
 rand = { version = "0.9", optional = true }
@@ -39,7 +39,6 @@ serde_urlencoded = { version = "^0.7", optional = true }
 tabled = { version = "0.22", features = ["ansi"], optional = true }
 thiserror = "2"
 tracing = { version = "^0.1", optional = true }
-unicode-segmentation = { version = "1", optional = true }
 url = { version = "2", features = ["serde"] }
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
@@ -66,7 +65,7 @@ default = ["requests", "retry", "default-tls"]
 default-tls = ["reqwest/rustls"]
 clap = ["dep:clap"]
 tabled = ["dep:tabled"]
-requests = ["dep:async-trait", "dep:colored", "dep:futures", "dep:http", "dep:log", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing", "dep:unicode-segmentation"]
+requests = ["dep:async-trait", "dep:futures", "dep:http", "dep:log", "dep:openapitor-runtime", "dep:rand", "dep:reqwest", "dep:serde_urlencoded", "dep:tracing"]
 retry = ["dep:reqwest-retry", "dep:reqwest-middleware", "dep:reqwest-tracing"]
 js = ["uuid/js", "getrandom/wasm_js"]
 

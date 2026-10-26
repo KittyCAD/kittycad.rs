@@ -1,3 +1,6 @@
 [workspace]
 members = ["kittycad", "openapitor", "openapitor-runtime"]
 resolver = "2"
+
+[patch.crates-io]
+openapitor-runtime = { path = "openapitor-runtime" }

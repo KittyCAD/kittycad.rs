@@ -3,7 +3,7 @@ use test_context::{test_context, TestContext as BlockingTestContext};
 
 fn json_response_error(input: &str) -> crate::types::error::SerdeError {
     let error = serde_json::from_str::<Vec<String>>(input).unwrap_err();
-    crate::types::error::SerdeError::new(input.to_string(), error)
+    openapitor_runtime::SerdeError::new(input.to_string(), error)
 }
 
 fn plain_diagnostic(error: &impl std::fmt::Display) -> String {
@@ -36,7 +36,7 @@ fn test_json_error_context_and_status() {
     assert!(error
         .source()
         .unwrap()
-        .is::<crate::types::error::SerdeError>());
+        .is::<openapitor_runtime::SerdeError>());
     assert!(error.source().unwrap().source().is_none());
 }
 
@@ -52,73 +52,6 @@ fn test_json_error_without_response_body() {
         plain_diagnostic(&error),
         "Serde Error: EOF while parsing a value at line 1 column 0\n",
     );
-}
-
-#[test]
-fn test_json_error_context_settings() {
-    let input = "[\n  \"first\",\n  \"second\",\n  42,\n  \"fourth\"\n]";
-    let mut error = json_response_error(input);
-    error.set_context_lines(0).set_context_characters(3);
-    assert_eq!(error.get_context_lines(), 0);
-    assert_eq!(error.get_context_characters(), 3);
-    assert_eq!(
-        plain_diagnostic(&error),
-        concat!(
-            "\n 4 | 42,\n",
-            "   |   ^ invalid type: integer `42`, expected a string at line 4 column 4\n",
-        ),
-    );
-}
-
-#[test]
-fn test_json_error_long_line_settings() {
-    let input = "[\"abcdefghijklmnopqrstuvwxyz0123456789\", 42, \"after\"]";
-    let mut error = json_response_error(input);
-    error.set_context_characters(3);
-    assert_eq!(
-        plain_diagnostic(&error),
-        concat!(
-            "\n 1 | ..., 42, \"...\n",
-            "   |        ^ invalid type: integer `42`, expected a string at line 1 column 43\n",
-        ),
-    );
-    error.set_contextualize(false);
-    assert!(!error.get_contextualize());
-    assert_eq!(
-        plain_diagnostic(&error),
-        format!(
-            "\n 1 | {input}\n   |                                            ^ invalid type: \
-             integer `42`, expected a string at line 1 column 43\n"
-        ),
-    );
-}
-
-#[test]
-fn test_json_error_preserves_grapheme_clusters() {
-    let input = "[\"abc\", 42, \"e\u{301}\u{1f468}\u{200d}\u{1f469}\u{200d}\u{1f466}xyzmore\"]";
-    let mut error = json_response_error(input);
-    error.set_context_characters(5);
-    assert_eq!(
-        plain_diagnostic(&error),
-        concat!(
-            "\n 1 | ...c\", 42, \"e\u{301}\u{1f468}\u{200d}\u{1f469}\u{200d}\u{1f466}...\n",
-            "   |          ^ invalid type: integer `42`, expected a string at line 1 column 10\n",
-        ),
-    );
-}
-
-#[test]
-fn test_json_error_handles_extreme_context_settings() {
-    let input = "{\n  \"hello\": ]\n}";
-    let source = serde_json::from_str::<serde_json::Value>(input).unwrap_err();
-    let message = source.to_string();
-    let mut error = crate::types::error::SerdeError::new(input.to_string(), source);
-    error.set_context_lines(0).set_context_characters(0);
-    assert!(plain_diagnostic(&error).contains(&format!("^ {message}")));
-    error
-        .set_context_lines(usize::MAX)
-        .set_context_characters(usize::MAX);
-    assert!(plain_diagnostic(&error).contains(&format!("^ {message}")));
 }
 
 #[test]
@@ -510,7 +443,16 @@ fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     };
 
     let mut cmd = std::process::Command::new("cargo");
+    // Test against the workspace runtime before it is published.
+    let runtime_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../openapitor-runtime")
+        .canonicalize()?;
+    let runtime_patch = format!(
+        "patch.crates-io.openapitor-runtime.path={}",
+        serde_json::to_string(&runtime_path)?
+    );
     cmd.args(["test", "--quiet"])
+        .args(["--config", &runtime_patch])
         .current_dir(output)
         // So that we can run fresh and not fail.
         .env("EXPECTORATE", "overwrite");
