@@ -1541,6 +1541,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "openapitor-runtime"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "regex",
+ "serde_json",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "openapiv3"
 version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
