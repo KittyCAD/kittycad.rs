@@ -40,6 +40,14 @@ tag: ## Create a new git tag to prepare to build a release.
 	git tag -sa v$(VERSION) -m "v$(VERSION)"
 	@echo "Run git push origin v$(VERSION) to push your new tag to GitHub and trigger a release."
 
+.PHONY: tag-openapitor-runtime
+tag-openapitor-runtime: ## Create a git tag to release openapitor-runtime independently.
+	@set -e; \
+	package_id=$$(cargo pkgid --offline --locked --manifest-path openapitor-runtime/Cargo.toml); \
+	tag="openapitor-runtime-v$${package_id##*#}"; \
+	git tag -sa "$$tag" -m "$$tag"; \
+	echo "Run git push origin $$tag to push your new tag to GitHub and release openapitor-runtime."
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | sed 's/^[^:]*://g' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
