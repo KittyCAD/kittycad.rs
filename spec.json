@@ -39892,6 +39892,13 @@
             ]
           },
           {
+            "description": "Reuses unchanged cloud project file contents across versions.",
+            "type": "string",
+            "enum": [
+              "project_file_storage_reuse"
+            ]
+          },
+          {
             "description": "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio.",
             "type": "string",
             "enum": [
