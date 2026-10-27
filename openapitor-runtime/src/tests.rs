@@ -493,48 +493,99 @@ fn test_json_error_propagates_formatter_errors() {
 }
 
 #[test]
-#[ignore = "Known bug: an EOF location after the final newline omits the error message"]
 fn test_json_error_retains_message_at_eof_after_newline() {
-    for input in ["\n", "[\n", "[\n\n"] {
+    for input in ["\n", "[\n", "[\n\n", "\r\n", "[\r\n", "[\r\n\r\n"] {
         let source = serde_json::from_str::<Vec<String>>(input).unwrap_err();
         let message = source.to_string();
-        let error = crate::SerdeError::new(input.to_string(), source);
-        let diagnostic = plain_diagnostic(&error);
-        assert!(
-            diagnostic.contains(&message),
-            "input: {input:?}, diagnostic: {diagnostic:?}",
+        let mut error = crate::SerdeError::new(input.to_string(), source);
+        for context_lines in [0, 3, usize::MAX] {
+            for contextualize in [true, false] {
+                error
+                    .set_context_lines(context_lines)
+                    .set_contextualize(contextualize);
+                assert_eq!(
+                    plain_diagnostic(&error),
+                    format!("{message}\n"),
+                    "input: {input:?}, context_lines={context_lines}, \
+                     contextualize={contextualize}",
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn test_json_error_retains_message_without_source_location() {
+    let source = serde_json::from_value::<Vec<String>>(serde_json::json!([42])).unwrap_err();
+    assert_eq!((source.line(), source.column()), (0, 0));
+    let message = source.to_string();
+    let mut error = crate::SerdeError::new("[42]".to_string(), source);
+    for contextualize in [true, false] {
+        error.set_contextualize(contextualize);
+        assert_eq!(plain_diagnostic(&error), format!("{message}\n"));
+    }
+}
+
+#[test]
+fn test_json_error_clipping_keeps_indented_offending_value() {
+    let mut error = json_response_error("[\n        42, \"after\"\n]");
+    error.set_context_lines(0).set_context_characters(1);
+    assert_eq!(
+        plain_diagnostic(&error),
+        concat!(
+            "\n 2 | 42,...\n",
+            "   |   ^ invalid type: integer `42`, expected a string at line 2 column 10\n",
+        ),
+    );
+}
+
+#[test]
+fn test_json_error_clipping_keeps_offending_value_after_unicode() {
+    for (input, column) in [
+        ("[\"\u{e9}\", 42]", 9),
+        ("[\"e\u{301}\", 42]", 10),
+        ("[\"\u{1f468}\u{200d}\u{1f469}\u{200d}\u{1f466}\", 42]", 25),
+    ] {
+        let mut error = json_response_error(input);
+        error.set_context_characters(3);
+        assert_eq!(
+            plain_diagnostic(&error),
+            format!(
+                concat!(
+                    "\n 1 | ..., 42]\n",
+                    "   |        ^ invalid type: integer `42`, expected a string at line 1 column \
+                     {}\n",
+                ),
+                column,
+            ),
+            "input: {input:?}",
         );
     }
 }
 
 #[test]
-#[ignore = "Known bug: line zero from an unlocated serde_json error omits the error message"]
-fn test_json_error_retains_message_without_source_location() {
-    let source = serde_json::from_value::<Vec<String>>(serde_json::json!([42])).unwrap_err();
-    assert_eq!((source.line(), source.column()), (0, 0));
-    let message = source.to_string();
-    let error = crate::SerdeError::new("[42]".to_string(), source);
-    let diagnostic = plain_diagnostic(&error);
-    assert!(diagnostic.contains(&message), "diagnostic: {diagnostic:?}",);
-}
-
-#[test]
-#[ignore = "Known bug: clipping uses the original column after removing indentation"]
-fn test_json_error_clipping_keeps_indented_offending_value() {
-    let mut error = json_response_error("[\n        42, \"after\"\n]");
-    error.set_context_lines(0).set_context_characters(1);
-    let diagnostic = plain_diagnostic(&error);
-    let excerpt = diagnostic.lines().nth(1).unwrap();
-    assert!(excerpt.contains("42"), "diagnostic: {diagnostic:?}");
-}
-
-#[test]
-#[ignore = "Known bug: clipping treats a byte column as a grapheme index"]
-fn test_json_error_clipping_keeps_offending_value_after_unicode() {
-    let input = "[\"\u{1f468}\u{200d}\u{1f469}\u{200d}\u{1f466}\", 42]";
+fn test_json_error_clipping_handles_indentation_and_unicode_together() {
+    let input = "[\n        \"\u{1f468}\u{200d}\u{1f469}\u{200d}\u{1f466}\", 42, \"after\"\n]";
     let mut error = json_response_error(input);
-    error.set_context_characters(3);
-    let diagnostic = plain_diagnostic(&error);
-    let excerpt = diagnostic.lines().nth(1).unwrap();
-    assert!(excerpt.contains("42"), "diagnostic: {diagnostic:?}");
+    error.set_context_lines(0).set_context_characters(3);
+    assert_eq!(
+        plain_diagnostic(&error),
+        concat!(
+            "\n 2 | ..., 42, \"...\n",
+            "   |        ^ invalid type: integer `42`, expected a string at line 2 column 32\n",
+        ),
+    );
+}
+
+#[test]
+fn test_json_error_column_inside_multibyte_character() {
+    let input = "[\u{e9}]";
+    let source = serde_json::from_str::<serde_json::Value>(input).unwrap_err();
+    assert_eq!((source.line(), source.column()), (1, 2));
+    let mut error = crate::SerdeError::new(input.to_string(), source);
+    error.set_context_characters(0);
+    assert_eq!(
+        plain_diagnostic(&error),
+        "\n 1 | ...\u{e9}...\n   |     ^ expected value at line 1 column 2\n",
+    );
 }

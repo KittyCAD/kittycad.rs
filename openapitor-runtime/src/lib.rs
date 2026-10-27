@@ -80,7 +80,7 @@ impl std::fmt::Display for SerdeError {
             .skip(skip)
             .take(take)
             .collect();
-        if lines.is_empty() {
+        if !lines.iter().any(|(index, _)| index + 1 == error_line) {
             return writeln!(f, "{}", self.message.red().bold());
         }
 
@@ -107,15 +107,24 @@ impl std::fmt::Display for SerdeError {
                 continue;
             }
 
+            // serde_json columns count bytes. Clipping and the pointer use graphemes
+            // in the displayed text, after removing the common indentation.
+            let indentation_bytes = line.chars().take(indentation).map(char::len_utf8).sum();
+            let byte_column = error_column.saturating_sub(indentation_bytes);
+            let column = text
+                .grapheme_indices(true)
+                .take_while(|(index, _)| *index < byte_column)
+                .count();
+            let text_length = text.graphemes(true).count();
             let length = self.context_characters.saturating_mul(2).saturating_add(1);
-            let shorten = self.contextualize && text.len() > length;
+            let shorten = self.contextualize && text_length > length;
             let start = if shorten {
-                error_column.saturating_sub(self.context_characters.saturating_add(1))
+                column.saturating_sub(self.context_characters.saturating_add(1))
             } else {
                 0
             };
             let before = start != 0;
-            let after = shorten && start.saturating_add(length) < text.graphemes(true).count();
+            let after = shorten && start.saturating_add(length) < text_length;
             let text = if shorten {
                 text.graphemes(true)
                     .skip(start)
@@ -135,9 +144,8 @@ impl std::fmt::Display for SerdeError {
             }
             writeln!(f)?;
 
-            let column = error_column
+            let column = column
                 .saturating_sub(start)
-                .saturating_sub(indentation)
                 .saturating_add(if before { 3 } else { 0 });
             let pointer = format!("{:>column$}^ {}", "", self.message);
             writeln!(f, " {:>width$}{}{}", "", separator, pointer.red().bold())?;
