@@ -9798,6 +9798,10 @@ pub enum Feature {
     #[serde(rename = "execution_jobs")]
     #[display("execution_jobs")]
     ExecutionJobs,
+    #[doc = "Reuses unchanged cloud project file contents across versions."]
+    #[serde(rename = "project_file_storage_reuse")]
+    #[display("project_file_storage_reuse")]
+    ProjectFileStorageReuse,
     #[doc = "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio."]
     #[serde(rename = "enable_z0006_lint")]
     #[display("enable_z0006_lint")]
