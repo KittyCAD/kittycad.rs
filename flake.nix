@@ -53,6 +53,7 @@
             nightlyRustfmt
             cargo-sort
             cargo-nextest
+            just
             toml-cli
             openssl
             postgresql

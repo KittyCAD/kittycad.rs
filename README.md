@@ -63,9 +63,9 @@ your proxy uses a different endpoint or boot time.
 1. Set the version in `openapitor-runtime/Cargo.toml` and run
    `cargo test -p openapitor-runtime` to test it and update `Cargo.lock`.
 2. Commit and push the changes, and make sure the tests pass on `main`.
-3. Run `make tag-openapitor-runtime` to create a signed tag such as
+3. Run `just tag-runtime` to create a signed tag such as
    `openapitor-runtime-v0.1.0`.
-4. Push the tag using the command printed by `make tag-openapitor-runtime`.
+4. Push the tag using the command printed by `just tag-runtime`.
 5. The release workflow checks that the tag matches the manifest version, runs
    clippy and tests for the runtime, publishes only `openapitor-runtime` to
    crates.io, and creates a GitHub release.
