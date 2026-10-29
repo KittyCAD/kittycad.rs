@@ -9614,10 +9614,6 @@ pub enum Feature {
     #[serde(rename = "execution_jobs")]
     #[display("execution_jobs")]
     ExecutionJobs,
-    #[doc = "Reuses unchanged cloud project file contents across versions."]
-    #[serde(rename = "project_file_storage_reuse")]
-    #[display("project_file_storage_reuse")]
-    ProjectFileStorageReuse,
     #[doc = "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio."]
     #[serde(rename = "enable_z0006_lint")]
     #[display("enable_z0006_lint")]
@@ -21749,6 +21745,8 @@ pub struct ProjectResponse {
     #[doc = "Named library containing the project; null means unassigned."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_id: Option<uuid::Uuid>,
+    #[doc = "Opaque token used to detect conflicting library moves."]
+    pub metadata_revision: String,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
     #[doc = "Stable authenticated thumbnail URL, when one exists."]
@@ -21764,7 +21762,7 @@ pub struct ProjectResponse {
     pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
-    #[doc = "When the project row was last updated."]
+    #[doc = "When the current version was last updated, including preview updates. This is separate from the project row's update timestamp."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -21780,7 +21778,7 @@ impl std::fmt::Display for ProjectResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectResponse {
-    const LENGTH: usize = 16;
+    const LENGTH: usize = 17;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.access).into(),
@@ -21795,6 +21793,7 @@ impl tabled::Tabled for ProjectResponse {
             } else {
                 String::new().into()
             },
+            self.metadata_revision.clone().into(),
             format!("{:?}", self.preview_status).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -21820,6 +21819,7 @@ impl tabled::Tabled for ProjectResponse {
             "files".into(),
             "id".into(),
             "library_id".into(),
+            "metadata_revision".into(),
             "preview_status".into(),
             "preview_url".into(),
             "project_toml_path".into(),
@@ -21984,6 +21984,8 @@ pub struct ProjectSummaryResponse {
     #[doc = "Named library containing the project; null means unassigned."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_id: Option<uuid::Uuid>,
+    #[doc = "Opaque token used to detect conflicting library moves."]
+    pub metadata_revision: String,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
     #[doc = "Stable authenticated thumbnail URL, when one exists."]
@@ -21999,7 +22001,7 @@ pub struct ProjectSummaryResponse {
     pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
-    #[doc = "When the project row was last updated."]
+    #[doc = "When the current version was last updated, including preview updates. This is separate from the project row's update timestamp."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
@@ -22015,7 +22017,7 @@ impl std::fmt::Display for ProjectSummaryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectSummaryResponse {
-    const LENGTH: usize = 15;
+    const LENGTH: usize = 16;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.access).into(),
@@ -22029,6 +22031,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             } else {
                 String::new().into()
             },
+            self.metadata_revision.clone().into(),
             format!("{:?}", self.preview_status).into(),
             if let Some(preview_url) = &self.preview_url {
                 format!("{:?}", preview_url).into()
@@ -22053,6 +22056,7 @@ impl tabled::Tabled for ProjectSummaryResponse {
             "entrypoint_path".into(),
             "id".into(),
             "library_id".into(),
+            "metadata_revision".into(),
             "preview_status".into(),
             "preview_url".into(),
             "project_toml_path".into(),
@@ -29097,6 +29101,47 @@ impl tabled::Tabled for UpdateOrgDatasetSource {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["access_role_arn".into(), "provider".into(), "uri".into()]
+    }
+}
+
+#[doc = "Request payload for moving a project to a library or leaving it unassigned."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateProjectLibraryRequest {
+    #[doc = "Metadata revision returned by the last project read."]
+    pub expected_revision: String,
+    #[doc = "Destination library; null leaves the project unassigned."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub library_id: Option<uuid::Uuid>,
+}
+
+impl std::fmt::Display for UpdateProjectLibraryRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateProjectLibraryRequest {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.expected_revision.clone().into(),
+            if let Some(library_id) = &self.library_id {
+                format!("{:?}", library_id).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["expected_revision".into(), "library_id".into()]
     }
 }
 

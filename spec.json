@@ -27552,6 +27552,218 @@
         "x-billable": false
       }
     },
+    "/user/projects/{id}/library": {
+      "put": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Move a project to a named library or leave it unassigned.",
+        "operationId": "update_project_library",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectLibraryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_project_library",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/user/projects/{id}/organization": {
       "put": {
         "tags": [
@@ -39889,13 +40101,6 @@
             "type": "string",
             "enum": [
               "execution_jobs"
-            ]
-          },
-          {
-            "description": "Reuses unchanged cloud project file contents across versions.",
-            "type": "string",
-            "enum": [
-              "project_file_storage_reuse"
             ]
           },
           {
@@ -58106,6 +58311,10 @@
               }
             ]
           },
+          "metadata_revision": {
+            "description": "Opaque token used to detect conflicting library moves.",
+            "type": "string"
+          },
           "preview_status": {
             "description": "Current preview generation state.",
             "allOf": [
@@ -58149,7 +58358,7 @@
           },
           "updated_at": {
             "title": "DateTime",
-            "description": "When the project row was last updated.",
+            "description": "When the current version was last updated, including preview updates. This is separate from the project row's update timestamp.",
             "type": "string",
             "format": "date-time"
           }
@@ -58162,6 +58371,7 @@
           "entrypoint_path",
           "files",
           "id",
+          "metadata_revision",
           "preview_status",
           "project_toml_path",
           "publication",
@@ -58284,6 +58494,10 @@
               }
             ]
           },
+          "metadata_revision": {
+            "description": "Opaque token used to detect conflicting library moves.",
+            "type": "string"
+          },
           "preview_status": {
             "description": "Current preview generation state.",
             "allOf": [
@@ -58327,7 +58541,7 @@
           },
           "updated_at": {
             "title": "DateTime",
-            "description": "When the project row was last updated.",
+            "description": "When the current version was last updated, including preview updates. This is separate from the project row's update timestamp.",
             "type": "string",
             "format": "date-time"
           }
@@ -58339,6 +58553,7 @@
           "description",
           "entrypoint_path",
           "id",
+          "metadata_revision",
           "preview_status",
           "project_toml_path",
           "publication",
@@ -63621,6 +63836,28 @@
             "type": "string"
           }
         }
+      },
+      "UpdateProjectLibraryRequest": {
+        "description": "Request payload for moving a project to a library or leaving it unassigned.",
+        "type": "object",
+        "properties": {
+          "expected_revision": {
+            "description": "Metadata revision returned by the last project read.",
+            "type": "string"
+          },
+          "library_id": {
+            "nullable": true,
+            "description": "Destination library; null leaves the project unassigned.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "expected_revision"
+        ]
       },
       "UpdateShortlinkRequest": {
         "description": "Request to update a shortlink.",
