@@ -1,5 +1,8 @@
 //! Error methods.
 
+#[doc(inline)]
+pub use openapitor_runtime::SerdeError;
+
 /// Error produced by generated client methods.
 pub enum Error {
     /// The request did not conform to API requirements.
@@ -15,7 +18,7 @@ pub enum Error {
     /// An expected response whose deserialization failed.
     SerdeError {
         /// The error.
-        error: format_serde_error::SerdeError,
+        error: SerdeError,
         /// The response status.
         status: reqwest::StatusCode,
     },
@@ -72,10 +75,7 @@ impl Error {
     }
 
     /// Creates a new error from a response status and a serde error.
-    pub fn from_serde_error(
-        e: format_serde_error::SerdeError,
-        status: reqwest::StatusCode,
-    ) -> Self {
+    pub fn from_serde_error(e: SerdeError, status: reqwest::StatusCode) -> Self {
         Self::SerdeError { error: e, status }
     }
 }
@@ -96,7 +96,7 @@ impl From<reqwest::Error> for Error {
 impl From<serde_json::Error> for Error {
     fn from(e: serde_json::Error) -> Self {
         Self::SerdeError {
-            error: format_serde_error::SerdeError::new(String::new(), e),
+            error: SerdeError::new(String::new(), e),
             status: reqwest::StatusCode::INTERNAL_SERVER_ERROR,
         }
     }

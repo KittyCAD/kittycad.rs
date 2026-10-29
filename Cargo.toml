@@ -1,3 +1,7 @@
 [workspace]
-members = ["kittycad", "openapitor"]
+members = ["kittycad", "openapitor", "openapitor-runtime"]
 resolver = "2"
+
+[patch.crates-io]
+# If you change this, update run_cargo_test() in openapitor/src/tests.rs.
+openapitor-runtime = { path = "openapitor-runtime" }

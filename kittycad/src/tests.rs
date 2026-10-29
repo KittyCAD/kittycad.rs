@@ -6,6 +6,23 @@ use tokio_tungstenite::tungstenite::Message as WsMsg;
 use crate::types::{ModelingCmd, PathSegment, Point3D, WebSocketRequest::ModelingCmdReq};
 
 #[test]
+fn test_serde_error_uses_shared_runtime() {
+    use std::error::Error as _;
+
+    let input = "null";
+    let source = serde_json::from_str::<String>(input).unwrap_err();
+    let error: crate::types::error::SerdeError =
+        openapitor_runtime::SerdeError::new(input.to_string(), source);
+    let error = crate::types::error::Error::from_serde_error(error, reqwest::StatusCode::OK);
+
+    assert_eq!(error.status(), Some(reqwest::StatusCode::OK));
+    assert!(error
+        .source()
+        .unwrap()
+        .is::<openapitor_runtime::SerdeError>());
+}
+
+#[test]
 fn test_mlcopilot_server_message_serde_roundtrip() {
     use pretty_assertions::assert_eq;
     use serde_json::json;

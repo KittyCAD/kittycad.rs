@@ -299,6 +299,8 @@ pub mod phone_number {
 
 pub mod error {
     #![doc = " Error methods."]
+    #[doc(inline)]
+    pub use openapitor_runtime::SerdeError;
     #[doc = " Error produced by generated client methods."]
     pub enum Error {
         #[doc = " The request did not conform to API requirements."]
@@ -308,7 +310,7 @@ pub mod error {
         #[doc = " An expected response whose deserialization failed."]
         SerdeError {
             #[doc = " The error."]
-            error: format_serde_error::SerdeError,
+            error: SerdeError,
             #[doc = " The response status."]
             status: reqwest::StatusCode,
         },
@@ -338,7 +340,7 @@ pub mod error {
 
         #[doc = " Creates a new error from a response status and a serde error."]
         pub fn from_serde_error(
-            e: format_serde_error::SerdeError,
+            e: SerdeError,
             status: reqwest::StatusCode,
         ) -> Self {
             Self::SerdeError { error: e, status }

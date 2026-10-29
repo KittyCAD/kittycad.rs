@@ -1521,7 +1521,7 @@ fn get_function_body(
 
                     // Parse the json response.
                     // Return a human error.
-                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status))
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(crate::types::error::SerdeError::new(text.to_string(), err), status))
                 }
             }
             "application/vnd.github.v3.object" => {
@@ -1531,7 +1531,7 @@ fn get_function_body(
 
                     // Parse the json response.
                     // Return a human error.
-                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status))
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(crate::types::error::SerdeError::new(text.to_string(), err), status))
                 }
             }
             "application/scim+json" => {
@@ -1541,7 +1541,7 @@ fn get_function_body(
 
                     // Parse the json response.
                     // Return a human error.
-                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(format_serde_error::SerdeError::new(text.to_string(), err), status))
+                    serde_json::from_str(&text).map_err(|err| crate::types::error::Error::from_serde_error(crate::types::error::SerdeError::new(text.to_string(), err), status))
                 }
             }
             _ => {

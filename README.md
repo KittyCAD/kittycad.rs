@@ -42,7 +42,7 @@ response body. Override `SMOKE_URL`, `SMOKE_ATTEMPTS`, or `SMOKE_DELAY_MS` if
 your proxy uses a different endpoint or boot time.
 
 
-### Releasing a new version
+### Releasing a new kittycad version
 
 1. Make sure the `VERSION.txt` has the new version you want to release.
 2. Make sure you have run `make generate` and pushed any changes. The release
@@ -53,3 +53,28 @@ your proxy uses a different endpoint or boot time.
 4. Push the tag (the result of `make tag` gives instructions for this)
 5. Everything else is triggered from the tag push. Just make sure all the tests
    pass on the `main` branch before making and pushing a new tag.
+
+### Releasing openapitor-runtime
+
+`openapitor-runtime` is versioned and published independently of `kittycad` and
+`openapitor`. Its version comes from `openapitor-runtime/Cargo.toml`, rather than
+`VERSION.txt`.
+
+1. Set the version in `openapitor-runtime/Cargo.toml` and run
+   `cargo test -p openapitor-runtime` to test it and update `Cargo.lock`.
+2. Commit and push the changes, and make sure the tests pass on `main`.
+3. Run `just tag-runtime` to create a signed tag such as
+   `openapitor-runtime-v0.1.0`.
+4. Push the tag using the command printed by `just tag-runtime`.
+5. The release workflow checks that the tag matches the manifest version, runs
+   clippy and tests for the runtime, publishes only `openapitor-runtime` to
+   crates.io, and creates a GitHub release.
+
+The workflow uses the existing `CARGO_TOKEN` repository secret, which must have
+permission to publish `openapitor-runtime`.
+
+Publish the runtime version before releasing either dependent crate. When
+updating the runtime dependency, update `openapitor/Cargo.toml` and the generated
+manifest template in `openapitor/src/lib.rs`, then run `make generate` to update
+`kittycad/Cargo.toml`. The workspace's `[patch.crates-io]` entry uses the local
+runtime for development; published crates use the dependency from crates.io.

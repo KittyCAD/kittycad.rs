@@ -1,6 +1,77 @@
 use anyhow::Result;
 use test_context::{test_context, TestContext as BlockingTestContext};
 
+fn json_response_error(input: &str) -> crate::types::error::SerdeError {
+    let error = serde_json::from_str::<Vec<String>>(input).unwrap_err();
+    openapitor_runtime::SerdeError::new(input.to_string(), error)
+}
+
+fn plain_diagnostic(error: &impl std::fmt::Display) -> String {
+    regex::Regex::new(r"\x1b\[[0-9;]*m")
+        .unwrap()
+        .replace_all(&error.to_string(), "")
+        .into_owned()
+}
+
+#[test]
+fn test_json_error_context_and_status() {
+    use std::error::Error as _;
+
+    let input = "[\n  \"first\",\n  \"second\",\n  42,\n  \"fourth\"\n]";
+    let error = json_response_error(input);
+    assert!(error.get_contextualize());
+    assert_eq!(error.get_context_lines(), 3);
+    assert_eq!(error.get_context_characters(), 30);
+    // Keep the diagnostic text produced by the previous formatter.
+    let expected = concat!(
+        "\n   | [\n   |   \"first\",\n   |   \"second\",\n 4 |   42,\n",
+        "   |     ^ invalid type: integer `42`, expected a string at line 4 column 4\n",
+        "   |   \"fourth\"\n   | ]\n",
+    );
+    assert_eq!(plain_diagnostic(&error), expected);
+
+    let error = crate::types::error::Error::from_serde_error(error, reqwest::StatusCode::OK);
+    assert_eq!(error.status(), Some(reqwest::StatusCode::OK));
+    assert_eq!(plain_diagnostic(&error), format!("Serde Error: {expected}"));
+    assert!(error
+        .source()
+        .unwrap()
+        .is::<openapitor_runtime::SerdeError>());
+    assert!(error.source().unwrap().source().is_none());
+}
+
+#[test]
+fn test_json_error_without_response_body() {
+    let error = serde_json::from_str::<Vec<String>>("").unwrap_err();
+    let error = crate::types::error::Error::from(error);
+    assert_eq!(
+        error.status(),
+        Some(reqwest::StatusCode::INTERNAL_SERVER_ERROR)
+    );
+    assert_eq!(
+        plain_diagnostic(&error),
+        "Serde Error: EOF while parsing a value at line 1 column 0\n",
+    );
+}
+
+#[test]
+fn test_load_yaml_spec_fixture() {
+    let spec = crate::load_yaml_spec(include_str!("../tests/gusto.v1.yaml")).unwrap();
+    let json = serde_json::to_string(&spec).unwrap();
+    assert_eq!(
+        serde_json::to_value(&spec).unwrap(),
+        serde_json::to_value(crate::load_json_spec(&json).unwrap()).unwrap(),
+    );
+}
+
+#[test]
+fn test_load_yaml_spec_rejects_invalid_input() {
+    for input in ["", "openapi: [", "openapi: 3.0.3\ninfo: {}\npaths: {}"] {
+        let error = crate::load_yaml_spec(input).unwrap_err();
+        assert!(error.downcast_ref::<yaml_serde::Error>().is_some());
+    }
+}
+
 struct TestContext {
     tmp_dir: std::path::PathBuf,
 }
@@ -372,7 +443,18 @@ fn run_cargo_test(opts: &crate::Opts) -> Result<()> {
     };
 
     let mut cmd = std::process::Command::new("cargo");
+    // Temporary clients do not inherit the workspace's [patch.crates-io]. Use
+    // this test-only override to test the local runtime, including before
+    // publication.
+    let runtime_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../openapitor-runtime")
+        .canonicalize()?;
+    let runtime_patch = format!(
+        "patch.crates-io.openapitor-runtime.path={}",
+        serde_json::to_string(&runtime_path)?
+    );
     cmd.args(["test", "--quiet"])
+        .args(["--config", &runtime_patch])
         .current_dir(output)
         // So that we can run fresh and not fail.
         .env("EXPECTORATE", "overwrite");
