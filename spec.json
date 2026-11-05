@@ -203,8 +203,30 @@
           "meta"
         ],
         "summary": "List all active announcements.",
-        "description": "No authentication is required.",
+        "description": "No authentication is required. Results are ordered newest first, with the announcement ID breaking ties.",
         "operationId": "get_announcements",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -277,7 +299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AnnouncementList"
+                  "$ref": "#/components/schemas/AnnouncementResultsPage"
                 }
               }
             }
@@ -289,7 +311,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       }
     },
     "/api-calls/{id}": {
@@ -11006,6 +11031,498 @@
         "x-billable": false
       }
     },
+    "/org/factory/jobs/{job_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Download an exact submitted manufacturing input for a current organization member.",
+        "operationId": "get_org_factory_job_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "Stable job identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "description": "Submitted file identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_org_factory_job_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "Stable job identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "description": "Submitted file identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/org/factory/jobs/{job_id}/versions": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "List an organization's submitted revision history for a current member.",
+        "operationId": "list_org_factory_job_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobVersionResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Submit a complete new revision as a current human member of the owning organization.",
+        "operationId": "create_org_factory_job_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_org_factory_job_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/org/members": {
       "get": {
         "tags": [
@@ -14622,6 +15139,201 @@
         "x-billable": false
       }
     },
+    "/org/projects/search/semantic": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Search current projects shared with the authenticated user's organization.",
+        "description": "Results are ranked by similarity to bounded project metadata: title, description, and a capped list of source filenames. Project source contents are not indexed. Projects become searchable asynchronously after saving or changing organization ownership. Personal projects and obsolete versions are excluded. Pass `library_id` to search one named organization library.",
+        "operationId": "search_org_projects_semantic",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectSemanticSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Array_of_ProjectSemanticSearchMatch",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSemanticSearchMatch"
+                  }
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_projects_semantic_search",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/org/saml/idp": {
       "get": {
         "tags": [
@@ -16249,6 +16961,28 @@
         ],
         "summary": "List the active categories available for project submissions.",
         "operationId": "list_project_categories",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -16320,11 +17054,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectCategoryResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectCategoryResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectCategoryResponseResultsPage"
                 }
               }
             }
@@ -16336,7 +17066,10 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "options": {
         "tags": [
@@ -16843,7 +17576,7 @@
         "tags": [
           "projects"
         ],
-        "summary": "Download a published public project as a tar archive.",
+        "summary": "Download all or selected files from a published public project.",
         "operationId": "download_public_project",
         "parameters": [
           {
@@ -16862,6 +17595,20 @@
             "schema": {
               "$ref": "#/components/schemas/ProjectArchiveFormat"
             }
+          },
+          {
+            "in": "query",
+            "name": "file_ids",
+            "description": "Optional comma-separated file IDs from this download's version. Omit to download every file. An empty or malformed list returns HTTP 400 with `error_code: InvalidProjectFileIds`. Any ID outside this version returns HTTP 400 with `error_code: InvalidProjectFileSelection` and a `missing_file_ids` array listing the requested IDs absent from this version. The entire selection fails: requesting ten IDs with one missing returns HTTP 400 without an archive. Missing projects or versions still return HTTP 404. Repeated IDs are included once. Selecting one file still returns the requested archive format.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1
+            },
+            "explode": false
           }
         ],
         "responses": {
@@ -16870,6 +17617,16 @@
             "content": {
               "*/*": {
                 "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid download parameters. InvalidProjectFileSelection includes missing_file_ids.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDownloadErrorResponse"
+                }
               }
             }
           }
@@ -17219,7 +17976,8 @@
           "hidden",
           "projects"
         ],
-        "summary": "Download a project using a share link.",
+        "summary": "Download all or selected files using a share link.",
+        "description": "File IDs must belong to the version pinned by this link. Manifest downloads retain the same public-data sanitization when selected individually.",
         "operationId": "download_shared_project",
         "parameters": [
           {
@@ -17238,6 +17996,20 @@
             "schema": {
               "$ref": "#/components/schemas/ProjectArchiveFormat"
             }
+          },
+          {
+            "in": "query",
+            "name": "file_ids",
+            "description": "Optional comma-separated file IDs from this download's version. Omit to download every file. An empty or malformed list returns HTTP 400 with `error_code: InvalidProjectFileIds`. Any ID outside this version returns HTTP 400 with `error_code: InvalidProjectFileSelection` and a `missing_file_ids` array listing the requested IDs absent from this version. The entire selection fails: requesting ten IDs with one missing returns HTTP 400 without an archive. Missing projects or versions still return HTTP 404. Repeated IDs are included once. Selecting one file still returns the requested archive format.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1
+            },
+            "explode": false
           }
         ],
         "responses": {
@@ -17246,6 +18018,16 @@
             "content": {
               "*/*": {
                 "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid download parameters. InvalidProjectFileSelection includes missing_file_ids.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDownloadErrorResponse"
+                }
               }
             }
           }
@@ -22377,6 +23159,498 @@
         "x-billable": false
       }
     },
+    "/user/factory/jobs/{job_id}/files/{file_id}": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Download an exact submitted manufacturing input of a personal Factory job.",
+        "operationId": "get_user_factory_job_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "Stable job identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "description": "Submitted file identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "",
+            "content": {
+              "*/*": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_get_user_factory_job_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "Stable job identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "file_id",
+            "description": "Submitted file identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/factory/jobs/{job_id}/versions": {
+      "get": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "List a personal Factory job's submitted revision history, newest first by default.",
+        "operationId": "list_user_factory_job_versions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryCustomerJobVersionResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "factory"
+        ],
+        "summary": "Submit a complete new revision of a personal Factory job.",
+        "operationId": "create_user_factory_job_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FactoryJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_create_user_factory_job_version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "description": "The requested job's identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/user/factory/materials": {
       "get": {
         "tags": [
@@ -25953,6 +27227,7 @@
           "projects"
         ],
         "summary": "List personal libraries and libraries belonging to the active organization.",
+        "description": "Returns an object with `items` and `next_page`, ordered by library ID. Request the next page with `?page_token=<next_page>` until `next_page` is null. Keep the same authenticated user and active organization for every page; changing that context requires starting a new list request.\n\nEach library has a stable `id`, a display `name`, either `user_id` or `org_id`, an opaque `revision`, and `can_manage`. Use the ID to track a library across renames. `can_manage` allows renaming/deleting the library, not editing all of its projects. Organization members can discover libraries; only organization admins can manage them. Project permissions remain unchanged.\n\nProjects with `library_id: null` have no named library. They do not appear as a library record here. Use `GET /user/projects?scope=personal&unassigned=true` for the default personal group, or `scope=organization&unassigned=true` for the active organization's unassigned projects.\n\nEach library includes its creation source: `zds`, `factory_portal`, or `org_dataset`. Libraries created before source tracking are returned as `zds`. Clients can filter the results by source; API permissions remain unchanged.",
         "operationId": "list_project_libraries",
         "parameters": [
           {
@@ -26070,6 +27345,7 @@
           "projects"
         ],
         "summary": "Create a personal library or a library owned by the active organization.",
+        "description": "Send JSON with a name and explicit ownership scope:\n\n```json { \"name\": \"Designs\", \"scope\": \"personal\" } ```\n\nUse `scope: \"organization\"` to create a library for the request's active organization; this requires organization-admin access. There is no organization ID in this body. Personal scope always uses the authenticated user.\n\nNames are trimmed, must contain 1–255 characters, and are unique ignoring case within each user or organization. Display capitalization is preserved. Duplicate names return HTTP 409. The HTTP 201 response contains the library ID, ownership, revision, and `can_manage`. Creating a library does not move existing projects; select its ID when creating a project, or move an existing project with `PUT /user/projects/{id}/library`.\n\nInclude `source` to identify the application that created the library:\n\n```json { \"name\": \"Factory designs\", \"scope\": \"personal\", \"source\": \"factory_portal\" } ```\n\nAccepted sources are `zds`, `factory_portal`, and `org_dataset`. Omitting source defaults to `zds`. Null and unsupported values return HTTP 400.\n\nSource is returned in library responses and cannot be changed after creation. Clients use it to decide how to display libraries; it does not change API permissions. No API source filter is provided at the moment.",
         "operationId": "create_project_library",
         "requestBody": {
           "content": {
@@ -26260,6 +27536,7 @@
           "projects"
         ],
         "summary": "Delete an empty cloud project library.",
+        "description": "Supply the library's last-read `revision` as the required `expected_revision` query parameter. URL-encode this value. Only the personal owner or an admin of the active organization can delete the library. Libraries managed by an organization dataset cannot be deleted independently; those requests return HTTP 409.\n\nMove or unassign all projects first. A nonempty library or stale revision returns HTTP 409. Success returns HTTP 204 without deleting projects or history. Library revisions are separate from project `revision` and `metadata_revision`.",
         "operationId": "delete_project_library",
         "parameters": [
           {
@@ -26462,6 +27739,7 @@
           "projects"
         ],
         "summary": "Rename a library owned by the user or their active organization.",
+        "description": "Send JSON containing `name` and `expected_revision`, using the library's `revision` from the last library list response. The personal owner or an admin of the active organization can rename the library. Names follow the same validation and uniqueness rules as library creation.\n\nHTTP 200 returns the updated library and revision. A stale revision or duplicate name returns HTTP 409; refresh the library list before deciding whether to retry. Renaming keeps the library ID, ownership, and project assignments unchanged.\n\nRenaming doesn't change the library's source.",
         "operationId": "rename_project_library",
         "parameters": [
           {
@@ -26577,6 +27855,7 @@
           "projects"
         ],
         "summary": "List projects in a cloud library, newest first.",
+        "description": "Returns project summaries in `items`, with `next_page` for continuation. Pass `?page_token=<next_page>` on the same library endpoint until `next_page` is null. Keep the same authenticated user and active organization for every page. Results are ordered by creation time descending, then project ID ascending.\n\nEach summary includes `library_id`, content `revision`, `metadata_revision`, and the caller's project `access` capabilities. Access to a library does not grant additional project permissions.\n\nProjects can move or disappear while pages load. Even an empty page can have a continuation token; stop only when `next_page` is null.\n\nWhen loading several libraries, a project may appear in library A's results, then move to library B before B is loaded. Combining those results can show the same project twice. Use the project ID to show it once, and fetch its latest details to confirm which library it belongs to. A missing list entry may also mean the project moved; fetch its details before treating it as deleted, and preserve unsynced local edits.",
         "operationId": "list_library_projects",
         "parameters": [
           {
@@ -26802,8 +28081,29 @@
           "projects"
         ],
         "summary": "List the authenticated user's projects.",
+        "description": "Returns a page, including personal projects and projects accessible through the request's active organization. Optional `scope=personal` or `scope=organization` narrows ownership; `unassigned=true` includes only projects whose `library_id` is null. Combine them, for example: `GET /user/projects?scope=personal&unassigned=true`. Omitting both filters keeps returning all accessible projects, including projects in named libraries.\n\nUnassigned is a grouping within the existing ownership scope, not a stored default library. Use `GET /user/project-libraries/{id}/projects` for a named library's paginated project list. Filters do not grant additional access.",
         "operationId": "list_projects",
         "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
           {
             "in": "query",
             "name": "scope",
@@ -26893,11 +28193,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Array_of_ProjectSummaryResponse",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProjectSummaryResponse"
-                  }
+                  "$ref": "#/components/schemas/ProjectSummaryResponseResultsPage"
                 }
               }
             }
@@ -26909,13 +28205,17 @@
             "$ref": "#/components/responses/Error"
           }
         },
-        "x-billable": false
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
       },
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "Create a draft project for the authenticated user.",
+        "summary": "Create a project for the authenticated user.",
+        "description": "Send multipart data with a JSON `body` part and file parts whose filenames are relative project paths. Include an optional `library_id` in the JSON to create the project in a named library:\n\n```json { \"title\": \"Bracket\", \"entrypoint_path\": \"main.kcl\", \"library_id\": \"<LIBRARY_ID>\" } ```\n\nA personal library creates a personal project. An accessible library belonging to the active organization creates an organization project with the caller as its creator; creating the project does not require library-management rights. Omitting `library_id` or passing null creates an unassigned personal project, even when the request has an active organization.\n\nThe HTTP 201 response includes `id`, `library_id`, content `revision`, and `metadata_revision`. Later saves preserve membership, even if they include a library field. Use `PUT /user/projects/{id}/library` to move or unassign an existing project instead of uploading its files again.",
         "operationId": "create_project",
         "requestBody": {
           "content": {
@@ -27210,6 +28510,7 @@
           "projects"
         ],
         "summary": "Replace one of the authenticated user's projects.",
+        "description": "Content saves use the project's content `revision` as `expected_revision` and preserve its current library assignment. Omitting `library_id`, setting it to null, or supplying another library ID here does not move the project. Use `PUT /user/projects/{id}/library` with `metadata_revision` for library changes.",
         "operationId": "update_project",
         "parameters": [
           {
@@ -27518,7 +28819,8 @@
         "tags": [
           "projects"
         ],
-        "summary": "Download one of the authenticated user's projects as a tar archive.",
+        "summary": "Download all or selected files from the current version of a project.",
+        "description": "Use `file_ids=<UUID>,<UUID>` to select files from the current version. This endpoint resolves the project's current version at request time, so file IDs from before a save may no longer belong to it. To download those files, use `/user/projects/{id}/versions/{version_id}/download` with `version_id` set to the `summary.revision` returned alongside that file list. A single selected file still uses the requested tar or zip archive format.",
         "operationId": "download_project",
         "parameters": [
           {
@@ -27537,6 +28839,20 @@
             "schema": {
               "$ref": "#/components/schemas/ProjectArchiveFormat"
             }
+          },
+          {
+            "in": "query",
+            "name": "file_ids",
+            "description": "Optional comma-separated file IDs from this download's version. Omit to download every file. An empty or malformed list returns HTTP 400 with `error_code: InvalidProjectFileIds`. Any ID outside this version returns HTTP 400 with `error_code: InvalidProjectFileSelection` and a `missing_file_ids` array listing the requested IDs absent from this version. The entire selection fails: requesting ten IDs with one missing returns HTTP 400 without an archive. Missing projects or versions still return HTTP 404. Repeated IDs are included once. Selecting one file still returns the requested archive format.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1
+            },
+            "explode": false
           }
         ],
         "responses": {
@@ -27545,6 +28861,16 @@
             "content": {
               "*/*": {
                 "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid download parameters. InvalidProjectFileSelection includes missing_file_ids.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDownloadErrorResponse"
+                }
               }
             }
           }
@@ -27558,6 +28884,7 @@
           "projects"
         ],
         "summary": "Move a project to a named library or leave it unassigned.",
+        "description": "Read the project first, then send JSON using its `metadata_revision` as the required `expected_revision`. Do not use its content `revision` or a library's revision for this operation.\n\n```json { \"library_id\": \"<DESTINATION_LIBRARY_ID>\", \"expected_revision\": \"<METADATA_REVISION>\" } ```\n\nSave the JSON as `move-project.json`, with values from actual responses:\n\n```sh curl --fail-with-body \\   --request PUT \"${API_BASE_URL}/user/projects/${PROJECT_ID}/library\" \\   --header \"Authorization: Bearer ${API_TOKEN}\" \\   --header 'Content-Type: application/json' \\   --data-binary @move-project.json ```\n\nUse `library_id: null` to unassign the project. The destination must match the project's current ownership: the same user for a personal project, or the same organization for an organization project. Existing project write permission is required; managing the destination library does not grant it. To change ownership first, use `/user/projects/{id}/organization`.\n\nHTTP 200 returns the project with its library assignment and a new `metadata_revision`. A move preserves its ID, files, current content `revision`, version history, publication, and share links; it creates no content version. Ordinary saves preserve membership and cannot be used to move a project.\n\nA stale revision or a destination with different ownership returns HTTP 409. If another save, move, or ownership change conflicts with the move, fetch the latest project before deciding whether to retry. Missing or inaccessible projects/libraries fail their normal existence and permission checks.\n\nIf the connection drops or the request times out, the API may have completed the move even though the client did not receive a response. Fetch the project to check its current library. If library_id matches the requested destination, no further move is needed. Otherwise review its latest state before retrying with its new `metadata_revision`. No idempotency key is used for this operation.",
         "operationId": "update_project_library",
         "parameters": [
           {
@@ -27769,8 +29096,8 @@
         "tags": [
           "projects"
         ],
-        "summary": "Move one of the authenticated user's projects into their active organization library.",
-        "description": "This changes only the project's ownership scope. The project ID, current revision, files, and version history remain unchanged so cloud bindings stay valid across the move.",
+        "summary": "Transfer one of the authenticated user's projects to their active organization.",
+        "description": "This changes only the project's ownership scope. The project ID, current revision, files, and version history remain unchanged so cloud bindings stay valid across the move.\n\nAn actual ownership change clears `library_id` and changes `metadata_revision`. The project becomes unassigned in the organization. To place it in a named organization library, use `PUT /user/projects/{id}/library` afterwards with the returned metadata revision. An already organization-owned project in the same organization is unchanged by this request.",
         "operationId": "update_project_organization",
         "parameters": [
           {
@@ -27873,8 +29200,8 @@
         "tags": [
           "projects"
         ],
-        "summary": "Move an organization project back to its creator's personal library.",
-        "description": "Organization administrators may perform this move to revoke organization access. The project ID, current revision, files, and version history remain unchanged.",
+        "summary": "Transfer an organization project back to its creator's personal ownership.",
+        "description": "Organization administrators may perform this move to revoke organization access. The project ID, current revision, files, and version history remain unchanged.\n\nThe ownership change clears `library_id` and changes `metadata_revision`, leaving the project unassigned under its creator. Success returns HTTP 204. Fetch the project again before assigning it to a personal named library.",
         "operationId": "delete_project_organization",
         "parameters": [
           {
@@ -29511,7 +30838,8 @@
         "tags": [
           "projects"
         ],
-        "summary": "Download the files saved in one project version.",
+        "summary": "Download all or selected files saved in one project version.",
+        "description": "Select files with `file_ids=<UUID>,<UUID>`. IDs must belong to this version; omitted files are excluded, including the manifest unless explicitly selected. The response is a tar or zip archive even when selecting one file.",
         "operationId": "download_project_version",
         "parameters": [
           {
@@ -29539,6 +30867,20 @@
             "schema": {
               "$ref": "#/components/schemas/ProjectArchiveFormat"
             }
+          },
+          {
+            "in": "query",
+            "name": "file_ids",
+            "description": "Optional comma-separated file IDs from this download's version. Omit to download every file. An empty or malformed list returns HTTP 400 with `error_code: InvalidProjectFileIds`. Any ID outside this version returns HTTP 400 with `error_code: InvalidProjectFileSelection` and a `missing_file_ids` array listing the requested IDs absent from this version. The entire selection fails: requesting ten IDs with one missing returns HTTP 400 without an archive. Missing projects or versions still return HTTP 404. Repeated IDs are included once. Selecting one file still returns the requested archive format.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "minItems": 1
+            },
+            "explode": false
           }
         ],
         "responses": {
@@ -29547,6 +30889,16 @@
             "content": {
               "*/*": {
                 "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid download parameters. InvalidProjectFileSelection includes missing_file_ids.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDownloadErrorResponse"
+                }
               }
             }
           }
@@ -34003,20 +35355,25 @@
           "updated_at"
         ]
       },
-      "AnnouncementList": {
-        "description": "Response containing active announcements.",
+      "AnnouncementResultsPage": {
+        "description": "A single page of results",
         "type": "object",
         "properties": {
-          "announcements": {
-            "description": "The list of active announcements.",
+          "items": {
+            "description": "list of items on this page of results",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Announcement"
             }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
           }
         },
         "required": [
-          "announcements"
+          "items"
         ]
       },
       "ApiCallStatus": {
@@ -37235,6 +38592,15 @@
                 "$ref": "#/components/schemas/ProjectLibraryScope"
               }
             ]
+          },
+          "source": {
+            "description": "Application creating the library. Defaults to zds when omitted.",
+            "default": "zds",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectLibrarySource"
+              }
+            ]
           }
         },
         "required": [
@@ -39879,6 +41245,24 @@
           "job"
         ]
       },
+      "FactoryCustomerJobFile": {
+        "description": "Minimized submitted-file metadata, without Project identifiers or storage locations.",
+        "type": "object",
+        "properties": {
+          "download_url": {
+            "description": "Authenticated Factory download URL.",
+            "type": "string"
+          },
+          "file_name": {
+            "description": "Submitted file's display name.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "download_url",
+          "file_name"
+        ]
+      },
       "FactoryCustomerJobSummary": {
         "description": "Customer-visible summary of a manufacturing job.",
         "type": "object",
@@ -39946,7 +41330,7 @@
         ]
       },
       "FactoryCustomerJobVersion": {
-        "description": "Customer-visible snapshot of the current job version. File names are display metadata; no private storage URI or download capability is exposed.",
+        "description": "Customer-visible submitted snapshot with authenticated Factory download links.",
         "type": "object",
         "properties": {
           "created_at": {
@@ -39962,8 +41346,15 @@
               "type": "string"
             }
           },
+          "files": {
+            "description": "Submitted input names and authenticated download links.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FactoryCustomerJobFile"
+            }
+          },
           "id": {
-            "description": "Identifier of the current version.",
+            "description": "Identifier of this Factory revision.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Uuid"
@@ -39977,8 +41368,30 @@
         "required": [
           "created_at",
           "file_names",
+          "files",
           "id",
           "specs"
+        ]
+      },
+      "FactoryCustomerJobVersionResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FactoryCustomerJobVersion"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "FactoryJobResponse": {
@@ -39987,7 +41400,7 @@
         "properties": {
           "current_version_id": {
             "nullable": true,
-            "description": "The current (first) version id of the job.",
+            "description": "The newly submitted Factory version id of the job.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/Uuid"
@@ -40003,7 +41416,7 @@
             ]
           },
           "status": {
-            "description": "The initial workflow status (`new`).",
+            "description": "The workflow status after submission (`new` for creation, `quoting` for a revision).",
             "type": "string"
           }
         },
@@ -40118,6 +41531,20 @@
             ]
           },
           {
+            "description": "Enables the authenticated hosted MCP proxy.",
+            "type": "string",
+            "enum": [
+              "hosted_mcp"
+            ]
+          },
+          {
+            "description": "Store org dataset conversions in organization-shared cloud project libraries.",
+            "type": "string",
+            "enum": [
+              "org_dataset_cloud_projects"
+            ]
+          },
+          {
             "description": "KCL CEK machine executor.",
             "type": "string",
             "enum": [
@@ -40192,20 +41619,6 @@
             "type": "string",
             "enum": [
               "drawings"
-            ]
-          },
-          {
-            "description": "Enables modeling dialogs in Zoo Design Studio.",
-            "type": "string",
-            "enum": [
-              "modeling_dialogs"
-            ]
-          },
-          {
-            "description": "Enables the named views user interface in Zoo Design Studio.",
-            "type": "string",
-            "enum": [
-              "named_views_ui"
             ]
           },
           {
@@ -42504,6 +43917,33 @@
           "completions"
         ]
       },
+      "KclFile": {
+        "description": "A file in a KCL project.",
+        "type": "object",
+        "properties": {
+          "contents": {
+            "description": "Raw file contents. KCL source is UTF-8; imported assets may be binary.",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint8",
+              "minimum": 0
+            }
+          },
+          "path": {
+            "description": "Where is the file, relative to the project directory?",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SafeFilepath"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contents",
+          "path"
+        ]
+      },
       "KclMigrationApplication": {
         "description": "A revision-fenced acknowledgement from the client that owns the project files.",
         "type": "object",
@@ -43241,6 +44681,31 @@
           "code"
         ]
       },
+      "KclProject": {
+        "description": "A KCL project.",
+        "type": "object",
+        "properties": {
+          "entrypoint": {
+            "description": "Which file is the entrypoint? This is the first KCL file to be executed, the root of the KCL module tree.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SafeFilepath"
+              }
+            ]
+          },
+          "files": {
+            "description": "All files in the project.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KclFile"
+            }
+          }
+        },
+        "required": [
+          "entrypoint",
+          "files"
+        ]
+      },
       "KclProjectFileRole": {
         "description": "Logical role of a file stored under a KCL project.",
         "oneOf": [
@@ -43263,6 +44728,32 @@
             "type": "string",
             "enum": [
               "preview_image"
+            ]
+          }
+        ]
+      },
+      "KclProjectLibrarySource": {
+        "description": "Application that created a cloud project library.",
+        "oneOf": [
+          {
+            "description": "Created through Zoo Design Studio. Also the default.",
+            "type": "string",
+            "enum": [
+              "zds"
+            ]
+          },
+          {
+            "description": "Created through Factory Portal.",
+            "type": "string",
+            "enum": [
+              "factory_portal"
+            ]
+          },
+          {
+            "description": "Created by organization dataset conversion automation.",
+            "type": "string",
+            "enum": [
+              "org_dataset"
             ]
           }
         ]
@@ -44107,6 +45598,70 @@
             ]
           },
           {
+            "description": "Explicitly request a sponsored migration in this conversation. This action does not grant execution or bypass API eligibility checks. Progress and the final answer use the ordinary Copilot messages.",
+            "type": "object",
+            "properties": {
+              "request": {
+                "description": "Complete isolated input. API binds it to the active conversation; a supplied conversation ID must match that conversation.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/KclMigrationRequest"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "migrate_kcl"
+                ]
+              }
+            },
+            "required": [
+              "request",
+              "type"
+            ]
+          },
+          {
+            "description": "Report Apply/Undo/Redo without creating or charging for a chat turn.",
+            "type": "object",
+            "properties": {
+              "expected_revision": {
+                "description": "Last acknowledged revision. Retrying the same change is idempotent.",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              },
+              "operation_id": {
+                "description": "Migration request ID, independent of the connection and prompt IDs.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Uuid"
+                  }
+                ]
+              },
+              "status": {
+                "description": "Client-reported project state.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/KclMigrationApplicationStatus"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "kcl_migration_application"
+                ]
+              }
+            },
+            "required": [
+              "expected_revision",
+              "operation_id",
+              "status",
+              "type"
+            ]
+          },
+          {
             "description": "Request persisted attachments from conversation history over the active websocket.",
             "type": "object",
             "properties": {
@@ -44654,6 +46209,67 @@
             },
             "required": [
               "access_denied"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "API-owned migration state. Candidate files are released only after API validates and stores the worker result. Replaying conversation history must not apply these files again.",
+            "type": "object",
+            "properties": {
+              "kcl_migration_operation": {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "description": "Durable migration outcome and the source snapshot it was based on.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/KclMigrationOperation"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "operation"
+                ]
+              }
+            },
+            "required": [
+              "kcl_migration_operation"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Acknowledge the client's reported Apply/Undo/Redo state.",
+            "type": "object",
+            "properties": {
+              "kcl_migration_application": {
+                "type": "object",
+                "properties": {
+                  "application": {
+                    "description": "Accepted state and revision for subsequent acknowledgements.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/KclMigrationApplication"
+                      }
+                    ]
+                  },
+                  "operation_id": {
+                    "description": "Migration request ID.",
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/Uuid"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "application",
+                  "operation_id"
+                ]
+              }
+            },
+            "required": [
+              "kcl_migration_application"
             ],
             "additionalProperties": false
           },
@@ -47080,6 +48696,15 @@
                   }
                 ]
               },
+              "kcl_source": {
+                "nullable": true,
+                "description": "KCL source to embed in formats that support source metadata.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/KclProject"
+                  }
+                ]
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -47110,6 +48735,15 @@
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/OutputFormat3d"
+                  }
+                ]
+              },
+              "kcl_source": {
+                "nullable": true,
+                "description": "KCL source to embed in formats that support source metadata.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/KclProject"
                   }
                 ]
               },
@@ -51525,6 +53159,67 @@
       "MovePathPen": {
         "description": "The response from the `MovePathPen` endpoint.",
         "type": "object"
+      },
+      "NamedView": {
+        "description": "Options for exporting glTF 2.0.",
+        "type": "object",
+        "properties": {
+          "baseline": {
+            "description": "Baseline visibility.\n\nDetermines whether entities are visible or by default.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ]
+          },
+          "except_ids": {
+            "description": "Exceptions to the baseline visibility.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelingCmdId"
+            }
+          },
+          "projection": {
+            "description": "Projection kind.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Projection"
+              }
+            ]
+          },
+          "target": {
+            "description": "Target point.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "up": {
+            "description": "Up direction.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          },
+          "vantage": {
+            "description": "Vantage point.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Point3d"
+              }
+            ]
+          }
+        },
+        "required": [
+          "baseline",
+          "except_ids",
+          "projection",
+          "target",
+          "up",
+          "vantage"
+        ]
       },
       "NewAnnotation": {
         "description": "The response from the `NewAnnotation` endpoint.",
@@ -56690,6 +58385,7 @@
               },
               "presentation": {
                 "description": "Specifies how the JSON will be presented.",
+                "default": "pretty",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/GltfPresentation"
@@ -56698,6 +58394,7 @@
               },
               "storage": {
                 "description": "Specifies which kind of glTF 2.0 will be exported.",
+                "default": "embedded",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/GltfStorage"
@@ -56709,11 +58406,16 @@
                 "enum": [
                   "gltf"
                 ]
+              },
+              "views": {
+                "description": "Named views in the scene.",
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/NamedView"
+                }
               }
             },
             "required": [
-              "presentation",
-              "storage",
               "type"
             ]
           },
@@ -56861,6 +58563,13 @@
                     "$ref": "#/components/schemas/UnitLength"
                   }
                 ]
+              },
+              "views": {
+                "description": "Named views in the scene.",
+                "type": "object",
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/NamedView"
+                }
               }
             },
             "required": [
@@ -57791,15 +59500,15 @@
         "properties": {
           "x": {
             "type": "number",
-            "format": "float"
+            "format": "double"
           },
           "y": {
             "type": "number",
-            "format": "float"
+            "format": "double"
           },
           "z": {
             "type": "number",
-            "format": "float"
+            "format": "double"
           }
         },
         "required": [
@@ -58010,6 +59719,53 @@
           "sort_order"
         ]
       },
+      "ProjectCategoryResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProjectCategoryResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ProjectDownloadErrorResponse": {
+        "description": "Error returned when project download query parameters are invalid.",
+        "type": "object",
+        "properties": {
+          "error_code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "missing_file_ids": {
+            "description": "Requested IDs absent from the resolved project version. Present for `InvalidProjectFileSelection`, with duplicate IDs listed once.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "request_id"
+        ]
+      },
       "ProjectEntityToPlane": {
         "description": "The response from the `ProjectEntityToPlane` command.",
         "type": "object",
@@ -58132,6 +59888,14 @@
             "description": "Opaque revision token required when renaming or deleting the library.",
             "type": "string"
           },
+          "source": {
+            "description": "Application that created the library. Cannot be changed after creation.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/KclProjectLibrarySource"
+              }
+            ]
+          },
           "updated_at": {
             "title": "DateTime",
             "description": "When the library was last updated.",
@@ -58154,6 +59918,7 @@
           "id",
           "name",
           "revision",
+          "source",
           "updated_at"
         ]
       },
@@ -58312,7 +60077,7 @@
             ]
           },
           "metadata_revision": {
-            "description": "Opaque token used to detect conflicting library moves.",
+            "description": "Opaque token for library moves. Send as expected_revision to the library endpoint. Read a fresh value after a save, move, or ownership change; do not parse it.",
             "type": "string"
           },
           "preview_status": {
@@ -58349,7 +60114,7 @@
             ]
           },
           "revision": {
-            "description": "Opaque revision token for optimistic project mutations.",
+            "description": "Current content version's revision. Use as expected_revision for content saves. Library moves do not change this value.",
             "type": "string"
           },
           "title": {
@@ -58379,6 +60144,77 @@
           "revision",
           "title",
           "updated_at"
+        ]
+      },
+      "ProjectSemanticSearchMatch": {
+        "description": "One matching current project, rather than one match for every source file.",
+        "type": "object",
+        "properties": {
+          "description": {
+            "description": "Bounded project description.",
+            "type": "string"
+          },
+          "project_id": {
+            "description": "Project in the caller's current organization library.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "similarity": {
+            "description": "Cosine similarity to the embedded query.",
+            "type": "number",
+            "format": "double"
+          },
+          "title": {
+            "description": "Bounded project title.",
+            "type": "string"
+          },
+          "version_id": {
+            "description": "Current version represented by this match.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          }
+        },
+        "required": [
+          "description",
+          "project_id",
+          "similarity",
+          "title",
+          "version_id"
+        ]
+      },
+      "ProjectSemanticSearchRequest": {
+        "description": "Natural-language search within the caller's current organization library.",
+        "type": "object",
+        "properties": {
+          "library_id": {
+            "nullable": true,
+            "description": "Restrict results to this library in the authenticated organization.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "limit": {
+            "nullable": true,
+            "description": "Maximum matching projects; defaults to 10 and must be between 1 and 100.",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "q": {
+            "description": "Search text, limited to 2,048 characters after trimming whitespace.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "q"
         ]
       },
       "ProjectShareLinkResponse": {
@@ -58495,7 +60331,7 @@
             ]
           },
           "metadata_revision": {
-            "description": "Opaque token used to detect conflicting library moves.",
+            "description": "Opaque token for library moves. Send as expected_revision to the library endpoint. Read a fresh value after a save, move, or ownership change; do not parse it.",
             "type": "string"
           },
           "preview_status": {
@@ -58532,7 +60368,7 @@
             ]
           },
           "revision": {
-            "description": "Opaque revision token for optimistic project mutations.",
+            "description": "Current content version's revision. Use as expected_revision for content saves. Library moves do not change this value.",
             "type": "string"
           },
           "title": {
@@ -58753,6 +60589,41 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "Projection": {
+        "description": "Data item selection.",
+        "oneOf": [
+          {
+            "description": "Orthographic (parallel) projection.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "orthographic"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "description": "Perspective projection.",
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "perspective"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          }
         ]
       },
       "PublicEmailMarketingConsentRequest": {
@@ -59556,6 +61427,10 @@
           "sdp",
           "type"
         ]
+      },
+      "SafeFilepath": {
+        "description": "Filepath which is guaranteed to be relative and not contain parent directory jumps like '..'",
+        "type": "string"
       },
       "SalesInquiryType": {
         "description": "The type of sales inquiry for website sales forms.",
@@ -64301,6 +66176,25 @@
           "settings"
         ]
       },
+      "Visibility": {
+        "description": "Identifies the visibility of entities.",
+        "oneOf": [
+          {
+            "description": "The entity is visible.",
+            "type": "string",
+            "enum": [
+              "show"
+            ]
+          },
+          {
+            "description": "The entity is hidden.",
+            "type": "string",
+            "enum": [
+              "hide"
+            ]
+          }
+        ]
+      },
       "Volume": {
         "description": "The volume response.",
         "type": "object",
@@ -65054,7 +66948,7 @@
             ]
           },
           {
-            "description": "The Text-to-CAD UI.",
+            "description": "Zookeeper callbacks to the API.",
             "type": "string",
             "enum": [
               "text_to_cad"
