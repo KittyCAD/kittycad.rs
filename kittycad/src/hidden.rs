@@ -275,16 +275,11 @@ impl Hidden {
         }
     }
 
-    #[doc = "Download a project using a share link.\n\n**Parameters:**\n\n- `format: \
-             Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to \
-             `tar`.\n- `key: &'astr`: Share-link key. (required)\n\n```rust,no_run\nasync fn \
-             example_hidden_download_shared_project() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    client\n        .hidden()\n        \
-             .download_shared_project(Some(kittycad::types::ProjectArchiveFormat::Zip), \
-             \"some-string\")\n        .await?;\n    Ok(())\n}\n```"]
+    #[doc = "Download all or selected files using a share link.\n\nFile IDs must belong to the version pinned by this link. Manifest downloads retain the same public-data sanitization when selected individually.\n\n**Parameters:**\n\n- `file_ids: Option<Vec<uuid::Uuid>>`: Optional comma-separated file IDs from this download's version. Omit to download every file. An empty or malformed list returns HTTP 400 with `error_code: InvalidProjectFileIds`. Any ID outside this version returns HTTP 400 with `error_code: InvalidProjectFileSelection` and a `missing_file_ids` array listing the requested IDs absent from this version. The entire selection fails: requesting ten IDs with one missing returns HTTP 400 without an archive. Missing projects or versions still return HTTP 404. Repeated IDs are included once. Selecting one file still returns the requested archive format.\n- `format: Option<crate::types::ProjectArchiveFormat>`: Archive format to return. Defaults to `tar`.\n- `key: &'astr`: Share-link key. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_hidden_download_shared_project() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .hidden()\n        .download_shared_project(\n            Some(vec![uuid::Uuid::from_str(\n                \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n            )?]),\n            Some(kittycad::types::ProjectArchiveFormat::Zip),\n            \"some-string\",\n        )\n        .await?;\n    Ok(())\n}\n```"]
     #[tracing::instrument]
     pub async fn download_shared_project<'a>(
         &'a self,
+        file_ids: Option<Vec<uuid::Uuid>>,
         format: Option<crate::types::ProjectArchiveFormat>,
         key: &'a str,
     ) -> Result<(), crate::types::error::Error> {
@@ -298,6 +293,10 @@ impl Hidden {
         );
         req = req.bearer_auth(&self.client.token);
         let mut query_params = vec![];
+        if let Some(p) = file_ids {
+            query_params.push(("file_ids", itertools::join(p, ",")));
+        }
+
         if let Some(p) = format {
             query_params.push(("format", format!("{}", p)));
         }
