@@ -1906,16 +1906,19 @@ impl tabled::Tabled for Announcement {
     }
 }
 
-#[doc = "Response containing active announcements."]
+#[doc = "A single page of results"]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
-pub struct AnnouncementList {
-    #[doc = "The list of active announcements."]
-    pub announcements: Vec<Announcement>,
+pub struct AnnouncementResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<Announcement>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
 }
 
-impl std::fmt::Display for AnnouncementList {
+impl std::fmt::Display for AnnouncementResultsPage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
@@ -1925,15 +1928,62 @@ impl std::fmt::Display for AnnouncementList {
     }
 }
 
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for AnnouncementResultsPage {
+    type Item = Announcement;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
 #[cfg(feature = "tabled")]
-impl tabled::Tabled for AnnouncementList {
-    const LENGTH: usize = 1;
+impl tabled::Tabled for AnnouncementResultsPage {
+    const LENGTH: usize = 2;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![format!("{:?}", self.announcements).into()]
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["announcements".into()]
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -5466,6 +5516,9 @@ pub struct CreateProjectLibraryRequest {
     pub name: String,
     #[doc = "Whether the library belongs to the user or their active organization."]
     pub scope: ProjectLibraryScope,
+    #[doc = "Application creating the library. Defaults to zds when omitted."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source: Option<KclProjectLibrarySource>,
 }
 
 impl std::fmt::Display for CreateProjectLibraryRequest {
@@ -5480,13 +5533,21 @@ impl std::fmt::Display for CreateProjectLibraryRequest {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for CreateProjectLibraryRequest {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
-        vec![self.name.clone().into(), format!("{:?}", self.scope).into()]
+        vec![
+            self.name.clone().into(),
+            format!("{:?}", self.scope).into(),
+            if let Some(source) = &self.source {
+                format!("{:?}", source).into()
+            } else {
+                String::new().into()
+            },
+        ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["name".into(), "scope".into()]
+        vec!["name".into(), "scope".into(), "source".into()]
     }
 }
 
@@ -9457,6 +9518,42 @@ impl tabled::Tabled for FactoryCustomerJobDetail {
     }
 }
 
+#[doc = "Minimized submitted-file metadata, without Project identifiers or storage locations."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobFile {
+    #[doc = "Authenticated Factory download URL."]
+    pub download_url: String,
+    #[doc = "Submitted file's display name."]
+    pub file_name: String,
+}
+
+impl std::fmt::Display for FactoryCustomerJobFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobFile {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.download_url.clone().into(),
+            self.file_name.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["download_url".into(), "file_name".into()]
+    }
+}
+
 #[doc = "Customer-visible summary of a manufacturing job."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9594,8 +9691,7 @@ impl tabled::Tabled for FactoryCustomerJobSummaryResultsPage {
     }
 }
 
-#[doc = "Customer-visible snapshot of the current job version. File names are display metadata; no \
-         private storage URI or download capability is exposed."]
+#[doc = "Customer-visible submitted snapshot with authenticated Factory download links."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -9604,7 +9700,9 @@ pub struct FactoryCustomerJobVersion {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Names of files attached to this version, without storage locations."]
     pub file_names: Vec<String>,
-    #[doc = "Identifier of the current version."]
+    #[doc = "Submitted input names and authenticated download links."]
+    pub files: Vec<FactoryCustomerJobFile>,
+    #[doc = "Identifier of this Factory revision."]
     pub id: uuid::Uuid,
     #[doc = "Customer-visible fields from the version's intake payload."]
     pub specs: serde_json::Value,
@@ -9622,11 +9720,12 @@ impl std::fmt::Display for FactoryCustomerJobVersion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FactoryCustomerJobVersion {
-    const LENGTH: usize = 4;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.file_names).into(),
+            format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
             format!("{:?}", self.specs).into(),
         ]
@@ -9636,9 +9735,91 @@ impl tabled::Tabled for FactoryCustomerJobVersion {
         vec![
             "created_at".into(),
             "file_names".into(),
+            "files".into(),
             "id".into(),
             "specs".into(),
         ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerJobVersionResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<FactoryCustomerJobVersion>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for FactoryCustomerJobVersionResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for FactoryCustomerJobVersionResultsPage {
+    type Item = FactoryCustomerJobVersion;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerJobVersionResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -9649,12 +9830,12 @@ impl tabled::Tabled for FactoryCustomerJobVersion {
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 pub struct FactoryJobResponse {
-    #[doc = "The current (first) version id of the job."]
+    #[doc = "The newly submitted Factory version id of the job."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current_version_id: Option<uuid::Uuid>,
     #[doc = "The stable, customer-facing job id."]
     pub id: uuid::Uuid,
-    #[doc = "The initial workflow status (`new`)."]
+    #[doc = "The workflow status after submission (`new` for creation, `quoting` for a revision)."]
     pub status: String,
 }
 
@@ -9805,6 +9986,14 @@ pub enum Feature {
     #[serde(rename = "factory_portal")]
     #[display("factory_portal")]
     FactoryPortal,
+    #[doc = "Enables the authenticated hosted MCP proxy."]
+    #[serde(rename = "hosted_mcp")]
+    #[display("hosted_mcp")]
+    HostedMcp,
+    #[doc = "Store org dataset conversions in organization-shared cloud project libraries."]
+    #[serde(rename = "org_dataset_cloud_projects")]
+    #[display("org_dataset_cloud_projects")]
+    OrgDatasetCloudProjects,
     #[doc = "KCL CEK machine executor."]
     #[serde(rename = "kcl_cek_executor")]
     #[display("kcl_cek_executor")]
@@ -9851,14 +10040,6 @@ pub enum Feature {
     #[serde(rename = "drawings")]
     #[display("drawings")]
     Drawings,
-    #[doc = "Enables modeling dialogs in Zoo Design Studio."]
-    #[serde(rename = "modeling_dialogs")]
-    #[display("modeling_dialogs")]
-    ModelingDialogs,
-    #[doc = "Enables the named views user interface in Zoo Design Studio."]
-    #[serde(rename = "named_views_ui")]
-    #[display("named_views_ui")]
-    NamedViewsUi,
     #[doc = "Enables the Scene browser and model tree UI in Zoo Design Studio."]
     #[serde(rename = "scene_browser")]
     #[display("scene_browser")]
@@ -12462,6 +12643,46 @@ impl tabled::Tabled for KclCodeCompletionResponse {
     }
 }
 
+#[doc = "A file in a KCL project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclFile {
+    #[doc = "Raw file contents. KCL source is UTF-8; imported assets may be binary."]
+    #[serde(
+        serialize_with = "serde_bytes::serialize",
+        deserialize_with = "serde_bytes::deserialize"
+    )]
+    pub contents: Vec<u8>,
+    #[doc = "Where is the file, relative to the project directory?"]
+    pub path: String,
+}
+
+impl std::fmt::Display for KclFile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclFile {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.contents).into(),
+            self.path.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["contents".into(), "path".into()]
+    }
+}
+
 #[doc = "A revision-fenced acknowledgement from the client that owns the project files."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -13055,6 +13276,43 @@ impl tabled::Tabled for KclModel {
     }
 }
 
+#[doc = "A KCL project."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct KclProject {
+    #[doc = "Which file is the entrypoint? This is the first KCL file to be executed, the root of \
+             the KCL module tree."]
+    pub entrypoint: String,
+    #[doc = "All files in the project."]
+    pub files: Vec<KclFile>,
+}
+
+impl std::fmt::Display for KclProject {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for KclProject {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.entrypoint.clone().into(),
+            format!("{:?}", self.files).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["entrypoint".into(), "files".into()]
+    }
+}
+
 #[doc = "Logical role of a file stored under a KCL project."]
 #[derive(
     serde :: Serialize,
@@ -13082,6 +13340,35 @@ pub enum KclProjectFileRole {
     #[serde(rename = "preview_image")]
     #[display("preview_image")]
     PreviewImage,
+}
+
+#[doc = "Application that created a cloud project library."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum KclProjectLibrarySource {
+    #[doc = "Created through Zoo Design Studio. Also the default."]
+    #[serde(rename = "zds")]
+    #[display("zds")]
+    Zds,
+    #[doc = "Created through Factory Portal."]
+    #[serde(rename = "factory_portal")]
+    #[display("factory_portal")]
+    FactoryPortal,
+    #[doc = "Created by organization dataset conversion automation."]
+    #[serde(rename = "org_dataset")]
+    #[display("org_dataset")]
+    OrgDataset,
 }
 
 #[doc = "Preview generation status for a KCL project."]
@@ -13926,6 +14213,25 @@ pub enum MlCopilotClientMessage {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         source_ranges: Option<Vec<SourceRangePrompt>>,
     },
+    #[doc = "Explicitly request a sponsored migration in this conversation. This action does not \
+             grant execution or bypass API eligibility checks. Progress and the final answer use \
+             the ordinary Copilot messages."]
+    #[serde(rename = "migrate_kcl")]
+    MigrateKcl {
+        #[doc = "Complete isolated input. API binds it to the active conversation; a supplied \
+                 conversation ID must match that conversation."]
+        request: KclMigrationRequest,
+    },
+    #[doc = "Report Apply/Undo/Redo without creating or charging for a chat turn."]
+    #[serde(rename = "kcl_migration_application")]
+    KclMigrationApplication {
+        #[doc = "Last acknowledged revision. Retrying the same change is idempotent."]
+        expected_revision: u32,
+        #[doc = "Migration request ID, independent of the connection and prompt IDs."]
+        operation_id: uuid::Uuid,
+        #[doc = "Client-reported project state."]
+        status: KclMigrationApplicationStatus,
+    },
     #[doc = "Request persisted attachments from conversation history over the active websocket."]
     #[serde(rename = "fetch_attachments")]
     FetchAttachments {
@@ -14329,6 +14635,22 @@ pub enum MlCopilotServerMessage {
         detail: String,
         #[doc = "Whether reconnecting without an external account change can help."]
         retryable: bool,
+    },
+    #[doc = "API-owned migration state. Candidate files are released only after API validates and \
+             stores the worker result. Replaying conversation history must not apply these files \
+             again."]
+    #[serde(rename = "kcl_migration_operation")]
+    KclMigrationOperation {
+        #[doc = "Durable migration outcome and the source snapshot it was based on."]
+        operation: KclMigrationOperation,
+    },
+    #[doc = "Acknowledge the client's reported Apply/Undo/Redo state."]
+    #[serde(rename = "kcl_migration_application")]
+    KclMigrationApplication {
+        #[doc = "Accepted state and revision for subsequent acknowledgements."]
+        application: KclMigrationApplication,
+        #[doc = "Migration request ID."]
+        operation_id: uuid::Uuid,
     },
     #[doc = "Log / banner text."]
     #[serde(rename = "info")]
@@ -15539,6 +15861,9 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat3D,
+        #[doc = "KCL source to embed in formats that support source metadata."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_source: Option<KclProject>,
     },
     #[doc = "Export the scene to a file.\n\nThe response is a MsgPack-encoded message in a \
              WebSocket binary frame."]
@@ -15549,6 +15874,9 @@ pub enum ModelingCmd {
         entity_ids: Vec<uuid::Uuid>,
         #[doc = "The file format to export to."]
         format: OutputFormat3D,
+        #[doc = "KCL source to embed in formats that support source metadata."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        kcl_source: Option<KclProject>,
     },
     #[doc = "What is this entity's parent?"]
     #[serde(rename = "entity_get_parent_id")]
@@ -17108,6 +17436,61 @@ impl tabled::Tabled for MovePathPen {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec![]
+    }
+}
+
+#[doc = "Options for exporting glTF 2.0."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct NamedView {
+    #[doc = "Baseline visibility.\n\nDetermines whether entities are visible or by default."]
+    pub baseline: Visibility,
+    #[doc = "Exceptions to the baseline visibility."]
+    pub except_ids: Vec<uuid::Uuid>,
+    #[doc = "Projection kind."]
+    pub projection: Projection,
+    #[doc = "Target point."]
+    pub target: Point3D,
+    #[doc = "Up direction."]
+    pub up: Point3D,
+    #[doc = "Vantage point."]
+    pub vantage: Point3D,
+}
+
+impl std::fmt::Display for NamedView {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for NamedView {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.baseline).into(),
+            format!("{:?}", self.except_ids).into(),
+            format!("{:?}", self.projection).into(),
+            format!("{:?}", self.target).into(),
+            format!("{:?}", self.up).into(),
+            format!("{:?}", self.vantage).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "baseline".into(),
+            "except_ids".into(),
+            "projection".into(),
+            "target".into(),
+            "up".into(),
+            "vantage".into(),
+        ]
     }
 }
 
@@ -20573,9 +20956,14 @@ pub enum OutputFormat3D {
         #[serde(default)]
         include_uuids: bool,
         #[doc = "Specifies how the JSON will be presented."]
-        presentation: GltfPresentation,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        presentation: Option<GltfPresentation>,
         #[doc = "Specifies which kind of glTF 2.0 will be exported."]
-        storage: GltfStorage,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        storage: Option<GltfStorage>,
+        #[doc = "Named views in the scene."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        views: Option<std::collections::HashMap<String, NamedView>>,
     },
     #[doc = "Wavefront OBJ format."]
     #[serde(rename = "obj")]
@@ -20618,6 +21006,9 @@ pub enum OutputFormat3D {
         #[doc = "Export length unit.\n\nDefaults to meters."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
         units: Option<UnitLength>,
+        #[doc = "Named views in the scene."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        views: Option<std::collections::HashMap<String, NamedView>>,
     },
     #[doc = "*ST**ereo**L**ithography format."]
     #[serde(rename = "stl")]
@@ -22011,6 +22402,142 @@ impl tabled::Tabled for ProjectCategoryResponse {
     }
 }
 
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectCategoryResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<ProjectCategoryResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for ProjectCategoryResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for ProjectCategoryResponseResultsPage {
+    type Item = ProjectCategoryResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectCategoryResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Error returned when project download query parameters are invalid."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectDownloadErrorResponse {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub error_code: Option<String>,
+    pub message: String,
+    #[doc = "Requested IDs absent from the resolved project version. Present for \
+             `InvalidProjectFileSelection`, with duplicate IDs listed once."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub missing_file_ids: Option<Vec<uuid::Uuid>>,
+    pub request_id: String,
+}
+
+impl std::fmt::Display for ProjectDownloadErrorResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectDownloadErrorResponse {
+    const LENGTH: usize = 4;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(error_code) = &self.error_code {
+                format!("{:?}", error_code).into()
+            } else {
+                String::new().into()
+            },
+            self.message.clone().into(),
+            if let Some(missing_file_ids) = &self.missing_file_ids {
+                format!("{:?}", missing_file_ids).into()
+            } else {
+                String::new().into()
+            },
+            self.request_id.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "error_code".into(),
+            "message".into(),
+            "missing_file_ids".into(),
+            "request_id".into(),
+        ]
+    }
+}
+
 #[doc = "The response from the `ProjectEntityToPlane` command."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -22132,6 +22659,8 @@ pub struct ProjectLibraryResponse {
     pub org_id: Option<uuid::Uuid>,
     #[doc = "Opaque revision token required when renaming or deleting the library."]
     pub revision: String,
+    #[doc = "Application that created the library. Cannot be changed after creation."]
+    pub source: KclProjectLibrarySource,
     #[doc = "When the library was last updated."]
     pub updated_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Personal owner; null for an organization library."]
@@ -22151,7 +22680,7 @@ impl std::fmt::Display for ProjectLibraryResponse {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for ProjectLibraryResponse {
-    const LENGTH: usize = 8;
+    const LENGTH: usize = 9;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.can_manage).into(),
@@ -22164,6 +22693,7 @@ impl tabled::Tabled for ProjectLibraryResponse {
                 String::new().into()
             },
             self.revision.clone().into(),
+            format!("{:?}", self.source).into(),
             format!("{:?}", self.updated_at).into(),
             if let Some(user_id) = &self.user_id {
                 format!("{:?}", user_id).into()
@@ -22181,6 +22711,7 @@ impl tabled::Tabled for ProjectLibraryResponse {
             "name".into(),
             "org_id".into(),
             "revision".into(),
+            "source".into(),
             "updated_at".into(),
             "user_id".into(),
         ]
@@ -22417,7 +22948,8 @@ pub struct ProjectResponse {
     #[doc = "Named library containing the project; null means unassigned."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_id: Option<uuid::Uuid>,
-    #[doc = "Opaque token used to detect conflicting library moves."]
+    #[doc = "Opaque token for library moves. Send as expected_revision to the library endpoint. \
+             Read a fresh value after a save, move, or ownership change; do not parse it."]
     pub metadata_revision: String,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
@@ -22430,7 +22962,8 @@ pub struct ProjectResponse {
     pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
-    #[doc = "Opaque revision token for optimistic project mutations."]
+    #[doc = "Current content version's revision. Use as expected_revision for content saves. \
+             Library moves do not change this value."]
     pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
@@ -22502,6 +23035,106 @@ impl tabled::Tabled for ProjectResponse {
             "title".into(),
             "updated_at".into(),
         ]
+    }
+}
+
+#[doc = "One matching current project, rather than one match for every source file."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectSemanticSearchMatch {
+    #[doc = "Bounded project description."]
+    pub description: String,
+    #[doc = "Project in the caller's current organization library."]
+    pub project_id: uuid::Uuid,
+    #[doc = "Cosine similarity to the embedded query."]
+    pub similarity: f64,
+    #[doc = "Bounded project title."]
+    pub title: String,
+    #[doc = "Current version represented by this match."]
+    pub version_id: uuid::Uuid,
+}
+
+impl std::fmt::Display for ProjectSemanticSearchMatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectSemanticSearchMatch {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.description.clone().into(),
+            format!("{:?}", self.project_id).into(),
+            format!("{:?}", self.similarity).into(),
+            self.title.clone().into(),
+            format!("{:?}", self.version_id).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "description".into(),
+            "project_id".into(),
+            "similarity".into(),
+            "title".into(),
+            "version_id".into(),
+        ]
+    }
+}
+
+#[doc = "Natural-language search within the caller's current organization library."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct ProjectSemanticSearchRequest {
+    #[doc = "Restrict results to this library in the authenticated organization."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub library_id: Option<uuid::Uuid>,
+    #[doc = "Maximum matching projects; defaults to 10 and must be between 1 and 100."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<u32>,
+    #[doc = "Search text, limited to 2,048 characters after trimming whitespace."]
+    pub q: String,
+}
+
+impl std::fmt::Display for ProjectSemanticSearchRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for ProjectSemanticSearchRequest {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(library_id) = &self.library_id {
+                format!("{:?}", library_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(limit) = &self.limit {
+                format!("{:?}", limit).into()
+            } else {
+                String::new().into()
+            },
+            self.q.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["library_id".into(), "limit".into(), "q".into()]
     }
 }
 
@@ -22657,7 +23290,8 @@ pub struct ProjectSummaryResponse {
     #[doc = "Named library containing the project; null means unassigned."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub library_id: Option<uuid::Uuid>,
-    #[doc = "Opaque token used to detect conflicting library moves."]
+    #[doc = "Opaque token for library moves. Send as expected_revision to the library endpoint. \
+             Read a fresh value after a save, move, or ownership change; do not parse it."]
     pub metadata_revision: String,
     #[doc = "Current preview generation state."]
     pub preview_status: KclProjectPreviewStatus,
@@ -22670,7 +23304,8 @@ pub struct ProjectSummaryResponse {
     pub publication: ProjectPublicationInfoResponse,
     #[doc = "Current publication workflow state."]
     pub publication_status: KclProjectPublicationStatus,
-    #[doc = "Opaque revision token for optimistic project mutations."]
+    #[doc = "Current content version's revision. Use as expected_revision for content saves. \
+             Library moves do not change this value."]
     pub revision: String,
     #[doc = "User-facing project title."]
     pub title: String,
@@ -23056,6 +23691,21 @@ impl tabled::Tabled for ProjectVersionSummaryResponseResultsPage {
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
     }
+}
+
+#[doc = "Data item selection."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+#[serde(tag = "type")]
+pub enum Projection {
+    #[doc = "Orthographic (parallel) projection."]
+    #[serde(rename = "orthographic")]
+    Orthographic {},
+    #[doc = "Perspective projection."]
+    #[serde(rename = "perspective")]
+    Perspective {},
 }
 
 #[doc = "The data for subscribing a user to the newsletter."]
@@ -30573,6 +31223,31 @@ impl tabled::Tabled for ViewIsometric {
     }
 }
 
+#[doc = "Identifies the visibility of entities."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum Visibility {
+    #[doc = "The entity is visible."]
+    #[serde(rename = "show")]
+    #[display("show")]
+    Show,
+    #[doc = "The entity is hidden."]
+    #[serde(rename = "hide")]
+    #[display("hide")]
+    Hide,
+}
+
 #[doc = "The volume response."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -31476,7 +32151,7 @@ pub enum ZooTool {
     #[serde(rename = "modeling_app")]
     #[display("modeling_app")]
     ModelingApp,
-    #[doc = "The Text-to-CAD UI."]
+    #[doc = "Zookeeper callbacks to the API."]
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
     TextToCad,
