@@ -586,16 +586,19 @@ impl TypeSpace {
             return self.render_enum(name, &enum_schema, data, enum_docs);
         }
 
+        let tag_result = get_one_of_tag(one_ofs, &self.spec)?;
+
         // Check if we only have objects with 1 item (regardless of that property's type).
         // Some schemas wrap content inside a single-key object whose value may be a $ref or
         // non-object type (e.g., `ReasoningMessage`). Treat those as nested-object enums so
         // variants render as `Variant(Type)` or `Variant { field: Type }`.
         let mut is_one_of_nested_object = true;
+        let mut nested_property_names = std::collections::BTreeSet::new();
         for one_of in one_ofs {
             let schema = one_of.get_schema_from_reference(&self.spec, true)?;
             match &schema.schema_kind {
                 SchemaKind::Type(openapiv3::Type::Object(o)) if o.properties.len() == 1 => {
-                    // okay, keep checking next
+                    nested_property_names.extend(o.properties.keys().cloned());
                 }
                 _ => {
                     is_one_of_nested_object = false;
@@ -604,7 +607,10 @@ impl TypeSpace {
             }
         }
 
-        if is_one_of_nested_object {
+        // A shared singleton tag is internally tagged, even without payload
+        // fields. Treating it as an outer wrapper would emit duplicate variants.
+        if is_one_of_nested_object && (nested_property_names.len() != 1 || tag_result.tag.is_none())
+        {
             return self.render_one_of_nested_object(name, one_ofs, data);
         }
 
@@ -614,8 +620,6 @@ impl TypeSpace {
             // Return the one_of type.
             return self.render_schema(name, first);
         }
-
-        let tag_result = get_one_of_tag(one_ofs, &self.spec)?;
 
         let mut serde_options = Vec::new();
         // Add our tag if we have one.
@@ -2699,6 +2703,46 @@ mod tests {
         expectorate::assert_contents(
             "tests/types/kittycad.async-api-call-output.rs.gen",
             &crate::types::get_text_fmt(&type_space.rendered).unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_schema_parsing_tag_only_variants() {
+        let schema = serde_json::from_str::<openapiv3::Schema>(r#"{
+            "oneOf": [
+                {"type":"object","properties":{"type":{"type":"string","enum":["orthographic"]}},"required":["type"]},
+                {"type":"object","properties":{"type":{"type":"string","enum":["perspective"]}},"required":["type"]}
+            ]
+        }"#).unwrap();
+        let mut type_space = crate::types::TypeSpace {
+            types: Default::default(),
+            spec: Default::default(),
+            rendered: quote!(),
+            opts: Default::default(),
+        };
+        type_space.render_schema("Projection", &schema).unwrap();
+        let expected = quote! {
+            #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, schemars::JsonSchema)]
+            #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+            #[serde(tag = "type")]
+            pub enum Projection {
+                #[serde(rename = "orthographic")]
+                Orthographic {},
+                #[serde(rename = "perspective")]
+                Perspective {},
+            }
+        };
+        assert_eq!(type_space.rendered.to_string(), expected.to_string());
+        let example = crate::types::example::generate_example_rust_from_schema(
+            &type_space,
+            "Projection",
+            &schema,
+            true,
+        )
+        .unwrap();
+        assert_eq!(
+            example.to_string(),
+            quote!(Projection::Orthographic {}).to_string()
         );
     }
 
