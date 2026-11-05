@@ -162,6 +162,7 @@ async fn create_async_file_conversion(client: &crate::Client) -> crate::types::F
             created: None,
             presentation: None,
             units: None,
+            views: None,
         },
         src_format: crate::types::InputFormat3D::Obj {
             coords: kittycad_coord_system(),
