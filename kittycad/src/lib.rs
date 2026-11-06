@@ -64,6 +64,9 @@
 #![allow(clippy::too_many_arguments)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+/// Saved delivery addresses and immutable address revisions.
+#[cfg(feature = "requests")]
+pub mod addresses;
 /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
 ///
 /// FROM: <https://zoo.dev/docs/api/api-calls>
@@ -427,6 +430,11 @@ impl Client {
         }
 
         Ok(RequestBuilder(req))
+    }
+
+    /// Saved delivery addresses and immutable address revisions.
+    pub fn addresses(&self) -> addresses::Addresses {
+        addresses::Addresses::new(self.clone())
     }
 
     /// API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.
