@@ -627,6 +627,60 @@ impl tabled::Tabled for AddOrgMember {
     }
 }
 
+#[doc = "Delivery contact fields shared by saved addresses and one-off destinations."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddressContact {
+    #[doc = "Company name, or an empty string when absent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company: Option<String>,
+    #[doc = "Delivery contact phone, or an empty string when absent."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+    #[doc = "Individual or department receiving the delivery."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub recipient: Option<String>,
+}
+
+impl std::fmt::Display for AddressContact {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddressContact {
+    const LENGTH: usize = 3;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(company) = &self.company {
+                format!("{:?}", company).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(phone) = &self.phone {
+                format!("{:?}", phone).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(recipient) = &self.recipient {
+                format!("{:?}", recipient).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["company".into(), "phone".into(), "recipient".into()]
+    }
+}
+
 #[doc = "Address details."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -704,6 +758,219 @@ impl tabled::Tabled for AddressDetails {
             "street_2".into(),
             "zip".into(),
         ]
+    }
+}
+
+#[doc = "Postal fields as stored, including incomplete historical billing addresses."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddressPostalResponse {
+    #[doc = "City or locality."]
+    pub city: String,
+    #[doc = "Two-letter country code, or an uncorrected historical value."]
+    pub country: String,
+    #[doc = "State, province, or region when applicable."]
+    pub state: String,
+    #[doc = "First street line."]
+    #[serde(rename = "street1")]
+    pub street_1: String,
+    #[doc = "Optional second street line, represented by an empty string when absent."]
+    #[serde(rename = "street2")]
+    pub street_2: String,
+    #[doc = "Postal code when applicable."]
+    pub zip: String,
+}
+
+impl std::fmt::Display for AddressPostalResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddressPostalResponse {
+    const LENGTH: usize = 6;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.city.clone().into(),
+            self.country.clone().into(),
+            self.state.clone().into(),
+            self.street_1.clone().into(),
+            self.street_2.clone().into(),
+            self.zip.clone().into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "city".into(),
+            "country".into(),
+            "state".into(),
+            "street_1".into(),
+            "street_2".into(),
+            "zip".into(),
+        ]
+    }
+}
+
+#[doc = "One address-book card and its current immutable contents."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddressResponse {
+    #[doc = "Whether this caller can edit/archive the card through these endpoints."]
+    pub can_manage: bool,
+    #[doc = "Recipient, company, and phone attached to this revision."]
+    pub contact: AddressContact,
+    #[doc = "When the card was created."]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Stable address-book identifier. Edits preserve this ID."]
+    pub id: uuid::Uuid,
+    #[doc = "Billing edits use the existing payment endpoints to update the provider."]
+    pub is_billing: bool,
+    #[doc = "Whether this card is the owner's selected shipping default."]
+    pub is_default_shipping: bool,
+    #[doc = "False for a one-off destination omitted from address-book listings."]
+    pub is_saved: bool,
+    #[doc = "Customer-visible label for this address-book card."]
+    pub label: String,
+    #[doc = "Current postal destination."]
+    pub postal: AddressPostalResponse,
+    #[doc = "Immutable postal/contact revision. Orders must pin this ID."]
+    pub revision_id: uuid::Uuid,
+    #[doc = "When the card was most recently edited."]
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl std::fmt::Display for AddressResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddressResponse {
+    const LENGTH: usize = 11;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.can_manage).into(),
+            format!("{:?}", self.contact).into(),
+            format!("{:?}", self.created_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_billing).into(),
+            format!("{:?}", self.is_default_shipping).into(),
+            format!("{:?}", self.is_saved).into(),
+            self.label.clone().into(),
+            format!("{:?}", self.postal).into(),
+            format!("{:?}", self.revision_id).into(),
+            format!("{:?}", self.updated_at).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "can_manage".into(),
+            "contact".into(),
+            "created_at".into(),
+            "id".into(),
+            "is_billing".into(),
+            "is_default_shipping".into(),
+            "is_saved".into(),
+            "label".into(),
+            "postal".into(),
+            "revision_id".into(),
+            "updated_at".into(),
+        ]
+    }
+}
+
+#[doc = "A single page of results"]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddressResponseResultsPage {
+    #[doc = "list of items on this page of results"]
+    pub items: Vec<AddressResponse>,
+    #[doc = "token used to fetch the next page of results (if any)"]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_page: Option<String>,
+}
+
+impl std::fmt::Display for AddressResponseResultsPage {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "requests")]
+impl crate::types::paginate::Pagination for AddressResponseResultsPage {
+    type Item = AddressResponse;
+    fn has_more_pages(&self) -> bool {
+        self.next_page.is_some()
+    }
+
+    fn next_page_token(&self) -> Option<String> {
+        self.next_page.clone()
+    }
+
+    fn next_page(
+        &self,
+        req: reqwest::Request,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        self.next_page_with_param(req, "next_page")
+    }
+
+    fn next_page_with_param(
+        &self,
+        req: reqwest::Request,
+        page_param: &str,
+    ) -> anyhow::Result<reqwest::Request, crate::types::error::Error> {
+        let mut req = req.try_clone().ok_or_else(|| {
+            crate::types::error::Error::InvalidRequest(format!(
+                "failed to clone request: {:?}",
+                req
+            ))
+        })?;
+        req.url_mut()
+            .query_pairs_mut()
+            .append_pair(page_param, self.next_page.as_deref().unwrap_or(""));
+        Ok(req)
+    }
+
+    fn items(&self) -> Vec<Self::Item> {
+        self.items.clone()
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddressResponseResultsPage {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.items).into(),
+            if let Some(next_page) = &self.next_page {
+                format!("{:?}", next_page).into()
+            } else {
+                String::new().into()
+            },
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["items".into(), "next_page".into()]
     }
 }
 
@@ -1598,6 +1865,19 @@ pub enum AnnotationMbdLeaderPosition {
     #[doc = "Geometric Center of the entity (such as on the center axis for a cylinder)"]
     #[serde(rename = "centroid")]
     Centroid {},
+    #[doc = "Used in dimension measurements for the to_entity_leader_pos field. Determines the \
+             position using the previous \"from\" position stepped back (projected) onto the \
+             planar entity (via planar projection or vector dot product)"]
+    #[serde(rename = "step_from")]
+    StepFrom {},
+    #[doc = "Used in dimension measurements for the to_entity_leader_pos field. Automatically \
+             determines which type of leader position to use. If the entity is planar and this is \
+             a to_entity_leader_pos dimension field, then StepFrom is used. If the entity is \
+             circular or cylindrical, Centroid is used. If the entity is a linear edge \
+             NormalizedPos { 0.5, N/A } is used If no other cases apply, then NormalizedPos { \
+             0.5, 0.5 } is used"]
+    #[serde(rename = "auto")]
+    Auto {},
 }
 
 #[doc = "Options for annotations"]
@@ -5316,6 +5596,64 @@ impl tabled::Tabled for Coupon {
     }
 }
 
+#[doc = "Create a saved card or an owned one-off destination. Billing is unchanged."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct CreateAddressRequest {
+    #[doc = "Delivery contact. Recipient is required; company and phone may be empty."]
+    pub contact: AddressContact,
+    #[doc = "Select this saved card as the shipping default without changing billing."]
+    #[serde(default)]
+    pub is_default_shipping: bool,
+    #[doc = "Defaults to true. Set false for an order-only destination."]
+    #[serde(default)]
+    pub is_saved: bool,
+    #[doc = "Customer-visible label, such as Home or Workshop."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+    #[doc = "Postal destination. Accepts zip or postal_code."]
+    pub postal: AddressDetails,
+}
+
+impl std::fmt::Display for CreateAddressRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for CreateAddressRequest {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.contact).into(),
+            format!("{:?}", self.is_default_shipping).into(),
+            format!("{:?}", self.is_saved).into(),
+            if let Some(label) = &self.label {
+                format!("{:?}", label).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.postal).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "contact".into(),
+            "is_default_shipping".into(),
+            "is_saved".into(),
+            "label".into(),
+            "postal".into(),
+        ]
+    }
+}
+
 #[doc = "Body for creating a custom ML model."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -8225,13 +8563,19 @@ impl tabled::Tabled for EntityMirrorAcrossEdge {
     }
 }
 
-#[doc = "An edge/vertex can be defined by the faces that it is connected to."]
+#[doc = "A reference identifying a selectable scene entity."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 #[serde(tag = "type")]
 pub enum EntityReference {
+    #[doc = "A uuid referencing an annotation."]
+    #[serde(rename = "annotation")]
+    Annotation {
+        #[doc = "Id of the annotation object being referenced."]
+        annotation_id: uuid::Uuid,
+    },
     #[doc = "A uuid referencing a plane."]
     #[serde(rename = "plane")]
     Plane {
@@ -8424,6 +8768,9 @@ pub enum EntityType {
     #[serde(rename = "patterngroup")]
     #[display("patterngroup")]
     Patterngroup,
+    #[serde(rename = "annotation")]
+    #[display("annotation")]
+    Annotation,
 }
 
 #[doc = "Error information from a response."]
@@ -10044,6 +10391,10 @@ pub enum Feature {
     #[serde(rename = "scene_browser")]
     #[display("scene_browser")]
     SceneBrowser,
+    #[doc = "Enables the refactored project shell in Zoo Design Studio."]
+    #[serde(rename = "zds_project_shell_refactor")]
+    #[display("zds_project_shell_refactor")]
+    ZdsProjectShellRefactor,
     #[doc = "Enables plugins in Zoo Design Studio."]
     #[serde(rename = "plugins")]
     #[display("plugins")]
@@ -30193,6 +30544,57 @@ impl tabled::Tabled for UnitVolumeConversion {
             "status".into(),
             "updated_at".into(),
             "user_id".into(),
+        ]
+    }
+}
+
+#[doc = "Replace a delivery card without changing revisions already used by orders."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct UpdateAddressRequest {
+    #[doc = "Replacement recipient, company, and phone."]
+    pub contact: AddressContact,
+    #[doc = "revision_id returned when the card was loaded. Stale edits return 409."]
+    pub expected_revision: uuid::Uuid,
+    #[doc = "Select or clear this card as the default shipping destination."]
+    pub is_default_shipping: bool,
+    #[doc = "Replacement card label."]
+    pub label: String,
+    #[doc = "Replacement postal destination."]
+    pub postal: AddressDetails,
+}
+
+impl std::fmt::Display for UpdateAddressRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for UpdateAddressRequest {
+    const LENGTH: usize = 5;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.contact).into(),
+            format!("{:?}", self.expected_revision).into(),
+            format!("{:?}", self.is_default_shipping).into(),
+            self.label.clone().into(),
+            format!("{:?}", self.postal).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "contact".into(),
+            "expected_revision".into(),
+            "is_default_shipping".into(),
+            "label".into(),
+            "postal".into(),
         ]
     }
 }
