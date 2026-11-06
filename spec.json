@@ -7559,6 +7559,738 @@
         "x-billable": false
       }
     },
+    "/org/addresses": {
+      "get": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "List saved addresses belonging to your active organization.",
+        "description": "Current members can read delivery destinations; only admins see billing cards or manage the book. One-off and archived destinations are omitted.",
+        "operationId": "list_org_addresses",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponseResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Create a saved or one-off destination belonging to your organization.",
+        "description": "Admins can save cards or select shipping defaults. Other current members can create one-off destinations with is_saved=false without modifying the book.",
+        "operationId": "create_org_address",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_addresses",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/org/addresses/{id}": {
+      "get": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Get an address from your active organization's address book.",
+        "description": "Requires current membership. Billing cards require organization-admin access.",
+        "operationId": "get_org_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "put": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Replace an organization delivery address and its shipping-default selection.",
+        "description": "Requires organization-admin access and the current revision_id as expected_revision. Previously pinned order contents remain unchanged.",
+        "operationId": "update_org_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "delete": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Remove an organization delivery address from future selection.",
+        "description": "Requires organization-admin access and the current expected_revision. Previously pinned revisions remain available until organization erasure.",
+        "operationId": "delete_org_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expected_revision",
+            "description": "revision_id returned when the card was loaded.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_org_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/org/api-calls": {
       "get": {
         "tags": [
@@ -20030,6 +20762,737 @@
         "x-billable": false
       }
     },
+    "/user/addresses": {
+      "get": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "List your saved addresses, including the current billing address.",
+        "description": "One-off and archived cards are omitted. Billing cards may contain incomplete historical details and use the payment endpoints for edits. Follow next_page with page_token to read the next page. Results are ordered by stable card ID.",
+        "operationId": "list_user_addresses",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponseResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Create a personal delivery address.",
+        "description": "Set is_saved=false for a one-off destination. It remains owned and erasable while staying out of the picker. Creating a delivery address never changes billing.",
+        "operationId": "create_user_address",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_user_addresses",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/user/addresses/{id}": {
+      "get": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Get a personal address and its current immutable revision.",
+        "operationId": "get_user_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "put": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Replace a personal delivery address and its shipping-default selection.",
+        "description": "expected_revision must match the current revision_id. Edits create immutable revisions, preserving any revision already selected by an order. Billing cards must be updated through the payment endpoints.",
+        "operationId": "update_user_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "delete": {
+        "tags": [
+          "addresses"
+        ],
+        "summary": "Remove a personal address from future selection.",
+        "description": "Requires its current expected_revision. Revisions pinned by orders remain available until account erasure. An active billing address cannot be removed.",
+        "operationId": "delete_user_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "expected_revision",
+            "description": "revision_id returned when the card was loaded.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful deletion",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "OPTIONS endpoint.",
+        "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
+        "operationId": "options_user_address",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/user/api-calls": {
       "get": {
         "tags": [
@@ -22771,7 +24234,7 @@
           "hidden"
         ],
         "summary": "Submit a part for manufacturing. Requires a signed-in Zoo account.",
-        "description": "The request is `multipart/form-data`: - one JSON part named `body` (`FactoryIntakeForm`) whose `fields` object holds   intake data (material, finish, quantity, notes, …). Material and finish   are required customer-visible catalog names; all other fields are stored   verbatim so they can be added or renamed without an API change. - one or more file parts (any part name). At least one file is required.\n\nThe submitter's identity (email, name, user id) comes from the authenticated account, not the form.\n\nFetch `GET /user/factory/materials` and `GET /user/factory/finishes`, then send the returned exact `material` and `finish` names. The server rejects missing, non-string, unknown, deleted, and internal-only choices with these stable field-specific `error_code` values: - `factory_material_input_missing` - `factory_material_input_invalid_type` - `factory_material_not_found` - `factory_material_not_customer_visible` - `factory_finish_input_missing` - `factory_finish_input_invalid_type` - `factory_finish_not_found` - `factory_finish_not_customer_visible` - `quantity`: a positive integer.\n\nExample `body` part: ```json { \"fields\": { \"material\": \"6061 Aluminum\", \"finish\": \"Anodized\", \"quantity\": 10, \"notes\": \"deburr all edges\" } } ```\n\nExample request (curl): ``` curl -X POST https://api.zoo.dev/user/factory/jobs \\   -H \"Authorization: Bearer $ZOO_API_TOKEN\" \\   -F 'body={\"fields\":{\"material\":\"6061 Aluminum\",\"finish\":\"Anodized\",\"quantity\":10}};type=application/json' \\   -F 'file=@bracket.step' ```\n\nReturns `201` with the created job (`FactoryJobResponse`).",
+        "description": "The request is `multipart/form-data`: - one JSON part named `body` (`FactoryIntakeForm`) whose `fields` object holds   intake data (material, finish, quantity, notes, …). Material and finish   are required customer-visible catalog names; all other fields are stored   verbatim so they can be added or renamed without an API change.   The same JSON part requires `shipping_address_revision_id` and `is_expedited`.   First create a delivery address through `/user/addresses` or `/org/addresses`   for the job's owner, then submit its `revision_id`, not its stable card `id`.   All delivery fields except company and street2 are required for Factory.   `is_expedited` is required and accepts booleans or the exact strings \"true\"/\"false\".   The job pins that revision without changing billing or following later address-book edits. - one or more file parts (any part name). At least one file is required.\n\nThe submitter's identity (email, name, user id) comes from the authenticated account, not the form.\n\nFetch `GET /user/factory/materials` and `GET /user/factory/finishes`, then send the returned exact `material` and `finish` names. The server rejects missing, non-string, unknown, deleted, and internal-only choices with these stable field-specific `error_code` values: - `factory_material_input_missing` - `factory_material_input_invalid_type` - `factory_material_not_found` - `factory_material_not_customer_visible` - `factory_finish_input_missing` - `factory_finish_input_invalid_type` - `factory_finish_not_found` - `factory_finish_not_customer_visible` - `quantity`: a positive integer.\n\nExample `body` part: ```json { \"fields\": { \"material\": \"6061 Aluminum\", \"finish\": \"Anodized\", \"quantity\": 10 }, \"shipping_address_revision_id\": \"00000000-0000-4000-8000-000000000001\", \"is_expedited\": false } ```\n\nExample request (curl): ``` curl -X POST https://api.zoo.dev/user/factory/jobs \\   -H \"Authorization: Bearer $ZOO_API_TOKEN\" \\   -F 'body={\"fields\":{\"material\":\"6061 Aluminum\",\"finish\":\"Anodized\",\"quantity\":10},\"shipping_address_revision_id\":\"00000000-0000-4000-8000-000000000001\",\"is_expedited\":false};type=application/json' \\   -F 'file=@bracket.step' ```\n\nReturns `201` with the created job (`FactoryJobResponse`).",
         "operationId": "create_user_factory_job",
         "requestBody": {
           "content": {
@@ -34432,6 +35895,27 @@
           "role"
         ]
       },
+      "AddressContact": {
+        "description": "Delivery contact fields shared by saved addresses and one-off destinations.",
+        "type": "object",
+        "properties": {
+          "company": {
+            "description": "Company name, or an empty string when absent.",
+            "default": "",
+            "type": "string"
+          },
+          "phone": {
+            "description": "Delivery contact phone, or an empty string when absent.",
+            "default": "",
+            "type": "string"
+          },
+          "recipient": {
+            "description": "Individual or department receiving the delivery.",
+            "default": "",
+            "type": "string"
+          }
+        }
+      },
       "AddressDetails": {
         "description": "Address details.",
         "type": "object",
@@ -34467,6 +35951,148 @@
         },
         "required": [
           "country"
+        ]
+      },
+      "AddressPostalResponse": {
+        "description": "Postal fields as stored, including incomplete historical billing addresses.",
+        "type": "object",
+        "properties": {
+          "city": {
+            "description": "City or locality.",
+            "type": "string"
+          },
+          "country": {
+            "description": "Two-letter country code, or an uncorrected historical value.",
+            "type": "string"
+          },
+          "state": {
+            "description": "State, province, or region when applicable.",
+            "type": "string"
+          },
+          "street1": {
+            "description": "First street line.",
+            "type": "string"
+          },
+          "street2": {
+            "description": "Optional second street line, represented by an empty string when absent.",
+            "type": "string"
+          },
+          "zip": {
+            "description": "Postal code when applicable.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "city",
+          "country",
+          "state",
+          "street1",
+          "street2",
+          "zip"
+        ]
+      },
+      "AddressResponse": {
+        "description": "One address-book card and its current immutable contents.",
+        "type": "object",
+        "properties": {
+          "can_manage": {
+            "description": "Whether this caller can edit/archive the card through these endpoints.",
+            "type": "boolean"
+          },
+          "contact": {
+            "description": "Recipient, company, and phone attached to this revision.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressContact"
+              }
+            ]
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "When the card was created.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "Stable address-book identifier. Edits preserve this ID.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "is_billing": {
+            "description": "Billing edits use the existing payment endpoints to update the provider.",
+            "type": "boolean"
+          },
+          "is_default_shipping": {
+            "description": "Whether this card is the owner's selected shipping default.",
+            "type": "boolean"
+          },
+          "is_saved": {
+            "description": "False for a one-off destination omitted from address-book listings.",
+            "type": "boolean"
+          },
+          "label": {
+            "description": "Customer-visible label for this address-book card.",
+            "type": "string"
+          },
+          "postal": {
+            "description": "Current postal destination.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressPostalResponse"
+              }
+            ]
+          },
+          "revision_id": {
+            "description": "Immutable postal/contact revision. Orders must pin this ID.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "When the card was most recently edited.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "can_manage",
+          "contact",
+          "created_at",
+          "id",
+          "is_billing",
+          "is_default_shipping",
+          "is_saved",
+          "label",
+          "postal",
+          "revision_id",
+          "updated_at"
+        ]
+      },
+      "AddressResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "AdjacencyInfo": {
@@ -35148,6 +36774,32 @@
             },
             "required": [
               "centroid"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Used in dimension measurements for the to_entity_leader_pos field. Determines the position using the previous \"from\" position stepped back (projected) onto the planar entity (via planar projection or vector dot product)",
+            "type": "object",
+            "properties": {
+              "step_from": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "step_from"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "Used in dimension measurements for the to_entity_leader_pos field. Automatically determines which type of leader position to use. If the entity is planar and this is a to_entity_leader_pos dimension field, then StepFrom is used. If the entity is circular or cylindrical, Centroid is used. If the entity is a linear edge NormalizedPos { 0.5, N/A } is used If no other cases apply, then NormalizedPos { 0.5, 0.5 } is used",
+            "type": "object",
+            "properties": {
+              "auto": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "auto"
             ],
             "additionalProperties": false
           }
@@ -38465,6 +40117,48 @@
           }
         }
       },
+      "CreateAddressRequest": {
+        "description": "Create a saved card or an owned one-off destination. Billing is unchanged.",
+        "type": "object",
+        "properties": {
+          "contact": {
+            "description": "Delivery contact. Recipient is required; company and phone may be empty.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressContact"
+              }
+            ]
+          },
+          "is_default_shipping": {
+            "description": "Select this saved card as the shipping default without changing billing.",
+            "default": false,
+            "type": "boolean"
+          },
+          "is_saved": {
+            "description": "Defaults to true. Set false for an order-only destination.",
+            "default": true,
+            "type": "boolean"
+          },
+          "label": {
+            "description": "Customer-visible label, such as Home or Workshop.",
+            "default": "",
+            "type": "string"
+          },
+          "postal": {
+            "description": "Postal destination. Accepts zip or postal_code.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressDetails"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contact",
+          "postal"
+        ],
+        "additionalProperties": false
+      },
       "CreateCustomModel": {
         "description": "Body for creating a custom ML model.",
         "type": "object",
@@ -40139,8 +41833,29 @@
         }
       },
       "EntityReference": {
-        "description": "An edge/vertex can be defined by the faces that it is connected to.",
+        "description": "A reference identifying a selectable scene entity.",
         "oneOf": [
+          {
+            "description": "A uuid referencing an annotation.",
+            "type": "object",
+            "properties": {
+              "annotation_id": {
+                "description": "Id of the annotation object being referenced.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "annotation"
+                ]
+              }
+            },
+            "required": [
+              "annotation_id",
+              "type"
+            ]
+          },
           {
             "description": "A uuid referencing a plane.",
             "type": "object",
@@ -40488,7 +42203,8 @@
           "plane",
           "vertex",
           "region",
-          "patterngroup"
+          "patterngroup",
+          "annotation"
         ]
       },
       "Error": {
@@ -41626,6 +43342,13 @@
             "type": "string",
             "enum": [
               "scene_browser"
+            ]
+          },
+          {
+            "description": "Enables the refactored project shell in Zoo Design Studio.",
+            "type": "string",
+            "enum": [
+              "zds_project_shell_refactor"
             ]
           },
           {
@@ -65583,6 +67306,52 @@
           "user_id"
         ]
       },
+      "UpdateAddressRequest": {
+        "description": "Replace a delivery card without changing revisions already used by orders.",
+        "type": "object",
+        "properties": {
+          "contact": {
+            "description": "Replacement recipient, company, and phone.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressContact"
+              }
+            ]
+          },
+          "expected_revision": {
+            "description": "revision_id returned when the card was loaded. Stale edits return 409.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "is_default_shipping": {
+            "description": "Select or clear this card as the default shipping destination.",
+            "type": "boolean"
+          },
+          "label": {
+            "description": "Replacement card label.",
+            "type": "string"
+          },
+          "postal": {
+            "description": "Replacement postal destination.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AddressDetails"
+              }
+            ]
+          }
+        },
+        "required": [
+          "contact",
+          "expected_revision",
+          "is_default_shipping",
+          "label",
+          "postal"
+        ],
+        "additionalProperties": false
+      },
       "UpdateAnnotation": {
         "description": "The response from the `UpdateAnnotation` endpoint.",
         "type": "object"
@@ -67412,6 +69181,10 @@
     }
   },
   "tags": [
+    {
+      "name": "addresses",
+      "description": "Saved delivery addresses and immutable address revisions."
+    },
     {
       "name": "api-calls",
       "description": "API calls that have been performed by users can be queried by the API. This is helpful for debugging as well as billing.",
