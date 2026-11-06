@@ -30462,7 +30462,7 @@
         ],
         "summary": "OPTIONS endpoint.",
         "description": "This is necessary for some preflight requests, specifically POST, PUT, and DELETE.",
-        "operationId": "options_project_library",
+        "operationId": "options_project_library_assignment",
         "parameters": [
           {
             "in": "path",
