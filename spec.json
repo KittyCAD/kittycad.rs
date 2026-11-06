@@ -42955,6 +42955,15 @@
                 "$ref": "#/components/schemas/FactoryCustomerJobSummary"
               }
             ]
+          },
+          "quote": {
+            "nullable": true,
+            "description": "The active published quote, excluding all internal costing and worksheet notes.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FactoryCustomerQuote"
+              }
+            ]
           }
         },
         "required": [
@@ -43108,6 +43117,81 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "FactoryCustomerQuote": {
+        "description": "Customer prices only. Internal costs and worksheet notes never enter this type.",
+        "type": "object",
+        "properties": {
+          "delivery_estimate": {
+            "description": "Broad production and shipping guidance, not a promised arrival date.",
+            "type": "string"
+          },
+          "estimated_delivery_business_days": {
+            "nullable": true,
+            "description": "Production plus shipping business days from invoicing; null if either is unknown.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "expires_at": {
+            "title": "DateTime",
+            "description": "Seven calendar days after the latest send. Expired offers remain readable.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "is_expedited": {
+            "type": "boolean"
+          },
+          "job_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "part_quantity": {
+            "nullable": true,
+            "description": "Positive quantity from the quoted revision; null when historical input is unusable.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "price_per_part_cents": {
+            "nullable": true,
+            "description": "Approximate USD cents per part, rounded half-up for display only. Subtotal is authoritative.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "published_at": {
+            "title": "DateTime",
+            "description": "Most recent explicit send, including resends of this same offer.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "shipping_cents": {
+            "description": "Customer shipping charge in USD cents: zero for standard shipping, or the expedited upgrade.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "subtotal_cents": {
+            "description": "Part selling subtotal in USD cents, excluding shipping upgrades and tax.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_before_tax_cents": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "delivery_estimate",
+          "expires_at",
+          "id",
+          "is_expedited",
+          "job_version_id",
+          "published_at",
+          "shipping_cents",
+          "subtotal_cents",
+          "total_before_tax_cents"
         ]
       },
       "FactoryJobResponse": {

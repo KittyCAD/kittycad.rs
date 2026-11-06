@@ -9834,6 +9834,9 @@ pub struct FactoryCustomerJobDetail {
     pub current_version: Option<FactoryCustomerJobVersion>,
     #[doc = "The same summary returned by the customer job list."]
     pub job: FactoryCustomerJobSummary,
+    #[doc = "The active published quote, excluding all internal costing and worksheet notes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub quote: Option<FactoryCustomerQuote>,
 }
 
 impl std::fmt::Display for FactoryCustomerJobDetail {
@@ -9848,7 +9851,7 @@ impl std::fmt::Display for FactoryCustomerJobDetail {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FactoryCustomerJobDetail {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(current_version) = &self.current_version {
@@ -9857,11 +9860,16 @@ impl tabled::Tabled for FactoryCustomerJobDetail {
                 String::new().into()
             },
             format!("{:?}", self.job).into(),
+            if let Some(quote) = &self.quote {
+                format!("{:?}", quote).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["current_version".into(), "job".into()]
+        vec!["current_version".into(), "job".into(), "quote".into()]
     }
 }
 
@@ -10167,6 +10175,100 @@ impl tabled::Tabled for FactoryCustomerJobVersionResultsPage {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["items".into(), "next_page".into()]
+    }
+}
+
+#[doc = "Customer prices only. Internal costs and worksheet notes never enter this type."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerQuote {
+    #[doc = "Broad production and shipping guidance, not a promised arrival date."]
+    pub delivery_estimate: String,
+    #[doc = "Production plus shipping business days from invoicing; null if either is unknown."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub estimated_delivery_business_days: Option<i64>,
+    #[doc = "Seven calendar days after the latest send. Expired offers remain readable."]
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "A UUID usually v4 or v7"]
+    pub id: uuid::Uuid,
+    pub is_expedited: bool,
+    #[doc = "A UUID usually v4 or v7"]
+    pub job_version_id: uuid::Uuid,
+    #[doc = "Positive quantity from the quoted revision; null when historical input is unusable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub part_quantity: Option<u64>,
+    #[doc = "Approximate USD cents per part, rounded half-up for display only. Subtotal is \
+             authoritative."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub price_per_part_cents: Option<i64>,
+    #[doc = "Most recent explicit send, including resends of this same offer."]
+    pub published_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Customer shipping charge in USD cents: zero for standard shipping, or the expedited \
+             upgrade."]
+    pub shipping_cents: i64,
+    #[doc = "Part selling subtotal in USD cents, excluding shipping upgrades and tax."]
+    pub subtotal_cents: i64,
+    pub total_before_tax_cents: i64,
+}
+
+impl std::fmt::Display for FactoryCustomerQuote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerQuote {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.delivery_estimate.clone().into(),
+            if let Some(estimated_delivery_business_days) = &self.estimated_delivery_business_days {
+                format!("{:?}", estimated_delivery_business_days).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.expires_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_expedited).into(),
+            format!("{:?}", self.job_version_id).into(),
+            if let Some(part_quantity) = &self.part_quantity {
+                format!("{:?}", part_quantity).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(price_per_part_cents) = &self.price_per_part_cents {
+                format!("{:?}", price_per_part_cents).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.published_at).into(),
+            format!("{:?}", self.shipping_cents).into(),
+            format!("{:?}", self.subtotal_cents).into(),
+            format!("{:?}", self.total_before_tax_cents).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "delivery_estimate".into(),
+            "estimated_delivery_business_days".into(),
+            "expires_at".into(),
+            "id".into(),
+            "is_expedited".into(),
+            "job_version_id".into(),
+            "part_quantity".into(),
+            "price_per_part_cents".into(),
+            "published_at".into(),
+            "shipping_cents".into(),
+            "subtotal_cents".into(),
+            "total_before_tax_cents".into(),
+        ]
     }
 }
 
