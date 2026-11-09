@@ -11713,6 +11713,43 @@ pub enum GlobalAxis {
     Z,
 }
 
+#[doc = "Additional data that can be included in a glTF 2.0 export."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum GltfExportExtra {
+    #[doc = "Sketch geometry and metadata."]
+    #[serde(rename = "sketches")]
+    #[display("sketches")]
+    Sketches,
+    #[doc = "Sketch regions and their resolver metadata."]
+    #[serde(rename = "regions")]
+    #[display("regions")]
+    Regions,
+    #[doc = "Original imported files."]
+    #[serde(rename = "imported_files")]
+    #[display("imported_files")]
+    ImportedFiles,
+    #[doc = "Model-based definition (MBD) annotations."]
+    #[serde(rename = "mbd")]
+    #[display("mbd")]
+    Mbd,
+    #[doc = "UUIDs and source UUIDs on boundary-representation solids, edges, faces, and surfaces."]
+    #[serde(rename = "geometry_uuids")]
+    #[display("geometry_uuids")]
+    GeometryUuids,
+}
+
 #[doc = "Describes the presentation style of the glTF JSON."]
 #[derive(
     serde :: Serialize,
@@ -21592,8 +21629,13 @@ pub enum OutputFormat3D {
              prefer ASCII output, you can set that option for the export."]
     #[serde(rename = "gltf")]
     Gltf {
-        #[doc = "Include engine UUIDs in glTF extras. Defaults to false."]
+        #[doc = "Additional data to include in the exported glTF. Defaults to an empty set."]
         #[serde(default)]
+        extras: Vec<GltfExportExtra>,
+        #[doc = "Include geometry UUIDs. Setting this to true is equivalent to adding \
+                 `geometry_uuids` to `extras`."]
+        #[serde(default)]
+        #[deprecated]
         include_uuids: bool,
         #[doc = "Specifies how the JSON will be presented."]
         #[serde(default, skip_serializing_if = "Option::is_none")]
