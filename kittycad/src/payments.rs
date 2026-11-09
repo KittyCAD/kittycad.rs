@@ -540,7 +540,7 @@ impl Payments {
     }
 
     #[doc = "List payment methods for your org.\n\nThis endpoint requires authentication by an org \
-             admin. It lists payment methods for the authenticated user's org, with the valid \
+             member. It lists payment methods for the authenticated user's org, with the valid \
              default card first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of \
              items returned by a single call\n- `page_token: Option<String>`: Token returned by \
              previous call to retrieve the subsequent page\n\n```rust,no_run\nuse \
@@ -593,7 +593,7 @@ impl Payments {
     }
 
     #[doc = "List payment methods for your org.\n\nThis endpoint requires authentication by an org \
-             admin. It lists payment methods for the authenticated user's org, with the valid \
+             member. It lists payment methods for the authenticated user's org, with the valid \
              default card first.\n\n**Parameters:**\n\n- `limit: Option<u32>`: Maximum number of \
              items returned by a single call\n- `page_token: Option<String>`: Token returned by \
              previous call to retrieve the subsequent page\n\n```rust,no_run\nuse \

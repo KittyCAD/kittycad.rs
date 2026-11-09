@@ -9648,6 +9648,9 @@ pub struct FactoryCustomerJobDetail {
     pub current_version: Option<FactoryCustomerJobVersion>,
     #[doc = "The same summary returned by the customer job list."]
     pub job: FactoryCustomerJobSummary,
+    #[doc = "The active published quote, excluding all internal costing and worksheet notes."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub quote: Option<FactoryCustomerQuote>,
 }
 
 impl std::fmt::Display for FactoryCustomerJobDetail {
@@ -9662,7 +9665,7 @@ impl std::fmt::Display for FactoryCustomerJobDetail {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FactoryCustomerJobDetail {
-    const LENGTH: usize = 2;
+    const LENGTH: usize = 3;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(current_version) = &self.current_version {
@@ -9671,11 +9674,16 @@ impl tabled::Tabled for FactoryCustomerJobDetail {
                 String::new().into()
             },
             format!("{:?}", self.job).into(),
+            if let Some(quote) = &self.quote {
+                format!("{:?}", quote).into()
+            } else {
+                String::new().into()
+            },
         ]
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["current_version".into(), "job".into()]
+        vec!["current_version".into(), "job".into(), "quote".into()]
     }
 }
 
@@ -9865,6 +9873,12 @@ pub struct FactoryCustomerJobVersion {
     pub files: Vec<FactoryCustomerJobFile>,
     #[doc = "Identifier of this Factory revision."]
     pub id: uuid::Uuid,
+    #[doc = "Preview state of the pinned Project snapshot, if it still exists."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preview_status: Option<KclProjectPreviewStatus>,
+    #[doc = "Authenticated Factory thumbnail URL when the pinned preview is ready."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub preview_url: Option<String>,
     #[doc = "Customer-visible fields from the version's intake payload."]
     pub specs: serde_json::Value,
 }
@@ -9881,13 +9895,23 @@ impl std::fmt::Display for FactoryCustomerJobVersion {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FactoryCustomerJobVersion {
-    const LENGTH: usize = 5;
+    const LENGTH: usize = 7;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             format!("{:?}", self.created_at).into(),
             format!("{:?}", self.file_names).into(),
             format!("{:?}", self.files).into(),
             format!("{:?}", self.id).into(),
+            if let Some(preview_status) = &self.preview_status {
+                format!("{:?}", preview_status).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(preview_url) = &self.preview_url {
+                format!("{:?}", preview_url).into()
+            } else {
+                String::new().into()
+            },
             format!("{:?}", self.specs).into(),
         ]
     }
@@ -9898,6 +9922,8 @@ impl tabled::Tabled for FactoryCustomerJobVersion {
             "file_names".into(),
             "files".into(),
             "id".into(),
+            "preview_status".into(),
+            "preview_url".into(),
             "specs".into(),
         ]
     }
@@ -9984,6 +10010,98 @@ impl tabled::Tabled for FactoryCustomerJobVersionResultsPage {
     }
 }
 
+#[doc = "Customer prices only. Internal costs and worksheet notes never enter this type."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryCustomerQuote {
+    #[doc = "Broad production and shipping guidance, not a promised arrival date."]
+    pub delivery_estimate: String,
+    #[doc = "Production plus shipping business days from invoicing; null if either is unknown."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub estimated_delivery_business_days: Option<i64>,
+    #[doc = "Seven calendar days after the latest send. Expired offers remain readable."]
+    pub expires_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "A UUID usually v4 or v7"]
+    pub id: uuid::Uuid,
+    pub is_expedited: bool,
+    #[doc = "A UUID usually v4 or v7"]
+    pub job_version_id: uuid::Uuid,
+    #[doc = "Positive quantity from the quoted revision; null when historical input is unusable."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub part_quantity: Option<u64>,
+    #[doc = "Approximate USD cents per part, rounded half-up for display only. Subtotal is authoritative."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub price_per_part_cents: Option<i64>,
+    #[doc = "Most recent explicit send, including resends of this same offer."]
+    pub published_at: chrono::DateTime<chrono::Utc>,
+    #[doc = "Customer shipping charge in USD cents: zero for standard shipping, or the expedited upgrade."]
+    pub shipping_cents: i64,
+    #[doc = "Part selling subtotal in USD cents, excluding shipping upgrades and tax."]
+    pub subtotal_cents: i64,
+    pub total_before_tax_cents: i64,
+}
+
+impl std::fmt::Display for FactoryCustomerQuote {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryCustomerQuote {
+    const LENGTH: usize = 12;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            self.delivery_estimate.clone().into(),
+            if let Some(estimated_delivery_business_days) = &self.estimated_delivery_business_days {
+                format!("{:?}", estimated_delivery_business_days).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.expires_at).into(),
+            format!("{:?}", self.id).into(),
+            format!("{:?}", self.is_expedited).into(),
+            format!("{:?}", self.job_version_id).into(),
+            if let Some(part_quantity) = &self.part_quantity {
+                format!("{:?}", part_quantity).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(price_per_part_cents) = &self.price_per_part_cents {
+                format!("{:?}", price_per_part_cents).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.published_at).into(),
+            format!("{:?}", self.shipping_cents).into(),
+            format!("{:?}", self.subtotal_cents).into(),
+            format!("{:?}", self.total_before_tax_cents).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "delivery_estimate".into(),
+            "estimated_delivery_business_days".into(),
+            "expires_at".into(),
+            "id".into(),
+            "is_expedited".into(),
+            "job_version_id".into(),
+            "part_quantity".into(),
+            "price_per_part_cents".into(),
+            "published_at".into(),
+            "shipping_cents".into(),
+            "subtotal_cents".into(),
+            "total_before_tax_cents".into(),
+        ]
+    }
+}
+
 #[doc = "Response returned when a Factory job is created. Only customer-facing ids are exposed: the job id (the customer's reference) and its current version id. The internal Help Desk thread id is deliberately NOT returned (internal-only per the ERD)."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10025,6 +10143,113 @@ impl tabled::Tabled for FactoryJobResponse {
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
         vec!["current_version_id".into(), "id".into(), "status".into()]
+    }
+}
+
+#[doc = "A paid invoice and the manufacturing job it releases for production."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryQuoteAcceptance {
+    #[doc = "The ordinary paid billing invoice, including its hosted page and PDF links."]
+    pub invoice: Invoice,
+    #[doc = "The job after confirmed payment, preserving later manufacturing states on replay."]
+    pub job: FactoryCustomerJobSummary,
+}
+
+impl std::fmt::Display for FactoryQuoteAcceptance {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryQuoteAcceptance {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.invoice).into(),
+            format!("{:?}", self.job).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["invoice".into(), "job".into()]
+    }
+}
+
+#[doc = "Current checkout amounts in USD cents, before accepting or collecting payment."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryQuotePreview {
+    #[doc = "Signed Stripe invoice balance applied separately from Zoo usage credits."]
+    pub account_balance_adjustment_cents: i64,
+    #[doc = "Cash remaining after balance adjustments."]
+    pub amount_due_cents: i64,
+    #[doc = "Zoo usage credits currently available to the customer."]
+    pub available_credits_cents: i64,
+    #[doc = "Zoo usage credits applied to this purchase."]
+    pub credits_applied_cents: i64,
+    #[doc = "Currency of all checkout amounts."]
+    pub currency: String,
+    #[doc = "The published offer these amounts describe."]
+    pub quote_id: uuid::Uuid,
+    #[doc = "Delivery charge before tax."]
+    pub shipping_cents: i64,
+    #[doc = "Manufacturing price before shipping and tax."]
+    pub subtotal_cents: i64,
+    #[doc = "Tax calculated by Stripe."]
+    pub tax_cents: i64,
+    #[doc = "Manufacturing, shipping, and tax combined."]
+    pub total_cents: i64,
+}
+
+impl std::fmt::Display for FactoryQuotePreview {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryQuotePreview {
+    const LENGTH: usize = 10;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.account_balance_adjustment_cents).into(),
+            format!("{:?}", self.amount_due_cents).into(),
+            format!("{:?}", self.available_credits_cents).into(),
+            format!("{:?}", self.credits_applied_cents).into(),
+            self.currency.clone().into(),
+            format!("{:?}", self.quote_id).into(),
+            format!("{:?}", self.shipping_cents).into(),
+            format!("{:?}", self.subtotal_cents).into(),
+            format!("{:?}", self.tax_cents).into(),
+            format!("{:?}", self.total_cents).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            "account_balance_adjustment_cents".into(),
+            "amount_due_cents".into(),
+            "available_credits_cents".into(),
+            "credits_applied_cents".into(),
+            "currency".into(),
+            "quote_id".into(),
+            "shipping_cents".into(),
+            "subtotal_cents".into(),
+            "tax_cents".into(),
+            "total_cents".into(),
+        ]
     }
 }
 
@@ -10152,6 +10377,10 @@ pub enum Feature {
     #[serde(rename = "org_dataset_cloud_projects")]
     #[display("org_dataset_cloud_projects")]
     OrgDatasetCloudProjects,
+    #[doc = "Ingest documents and images in org datasets using cloud projects."]
+    #[serde(rename = "org_dataset_reference_files")]
+    #[display("org_dataset_reference_files")]
+    OrgDatasetReferenceFiles,
     #[doc = "KCL CEK machine executor."]
     #[serde(rename = "kcl_cek_executor")]
     #[display("kcl_cek_executor")]
@@ -13423,7 +13652,7 @@ pub enum KclProjectFileRole {
     #[serde(rename = "project_toml")]
     #[display("project_toml")]
     ProjectToml,
-    #[doc = "A project source file such as `.kcl`."]
+    #[doc = "A project source or reference file, such as KCL, a PDF, or a spreadsheet."]
     #[serde(rename = "project_file")]
     #[display("project_file")]
     ProjectFile,
@@ -13489,6 +13718,10 @@ pub enum KclProjectPreviewStatus {
     #[serde(rename = "failed")]
     #[display("failed")]
     Failed,
+    #[doc = "This project contains a reference file and needs no geometry preview."]
+    #[serde(rename = "not_applicable")]
+    #[display("not_applicable")]
+    NotApplicable,
 }
 
 #[doc = "Publication workflow state for a KCL project."]
@@ -19281,6 +19514,15 @@ pub struct OrgDatasetFileConversionDetails {
     pub output: Option<String>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "The single cloud project containing this conversion's generated versions."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<uuid::Uuid>,
+    #[doc = "The immutable project version containing the raw KCL output."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_raw_version_id: Option<uuid::Uuid>,
+    #[doc = "The immutable project version containing the salon or manual-override KCL output."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_salon_version_id: Option<uuid::Uuid>,
     #[doc = "Plain-text contents of the raw KCL artifact, when available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_output: Option<String>,
@@ -19321,7 +19563,7 @@ impl std::fmt::Display for OrgDatasetFileConversionDetails {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionDetails {
-    const LENGTH: usize = 25;
+    const LENGTH: usize = 28;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -19363,6 +19605,21 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
                 String::new().into()
             },
             format!("{:?}", self.phase).into(),
+            if let Some(project_id) = &self.project_id {
+                format!("{:?}", project_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_raw_version_id) = &self.project_raw_version_id {
+                format!("{:?}", project_raw_version_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_salon_version_id) = &self.project_salon_version_id {
+                format!("{:?}", project_salon_version_id).into()
+            } else {
+                String::new().into()
+            },
             if let Some(raw_kcl_output) = &self.raw_kcl_output {
                 format!("{:?}", raw_kcl_output).into()
             } else {
@@ -19417,6 +19674,9 @@ impl tabled::Tabled for OrgDatasetFileConversionDetails {
             "original_snapshot_images".into(),
             "output".into(),
             "phase".into(),
+            "project_id".into(),
+            "project_raw_version_id".into(),
+            "project_salon_version_id".into(),
             "raw_kcl_output".into(),
             "raw_kcl_similarity_score".into(),
             "raw_kcl_snapshot_images".into(),
@@ -19586,6 +19846,15 @@ pub struct OrgDatasetFileConversionSummary {
     pub metadata: Option<serde_json::Value>,
     #[doc = "Current step in the conversion pipeline."]
     pub phase: OrgDatasetFileConversionPhase,
+    #[doc = "The single cloud project containing this conversion's generated versions."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_id: Option<uuid::Uuid>,
+    #[doc = "The immutable project version containing the raw KCL output."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_raw_version_id: Option<uuid::Uuid>,
+    #[doc = "The immutable project version containing the salon or manual-override KCL output."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub project_salon_version_id: Option<uuid::Uuid>,
     #[doc = "Score from `0.0` to `1.0` that quantifies how closely the raw KCL model matches the original model."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub raw_kcl_similarity_score: Option<f64>,
@@ -19616,7 +19885,7 @@ impl std::fmt::Display for OrgDatasetFileConversionSummary {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for OrgDatasetFileConversionSummary {
-    const LENGTH: usize = 18;
+    const LENGTH: usize = 21;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(completed_at) = &self.completed_at {
@@ -19647,6 +19916,21 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
                 String::new().into()
             },
             format!("{:?}", self.phase).into(),
+            if let Some(project_id) = &self.project_id {
+                format!("{:?}", project_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_raw_version_id) = &self.project_raw_version_id {
+                format!("{:?}", project_raw_version_id).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(project_salon_version_id) = &self.project_salon_version_id {
+                format!("{:?}", project_salon_version_id).into()
+            } else {
+                String::new().into()
+            },
             if let Some(raw_kcl_similarity_score) = &self.raw_kcl_similarity_score {
                 format!("{:?}", raw_kcl_similarity_score).into()
             } else {
@@ -19686,6 +19970,9 @@ impl tabled::Tabled for OrgDatasetFileConversionSummary {
             "manual_kcl_override_updated_at".into(),
             "metadata".into(),
             "phase".into(),
+            "project_id".into(),
+            "project_raw_version_id".into(),
+            "project_salon_version_id".into(),
             "raw_kcl_similarity_score".into(),
             "salon_kcl_similarity_score".into(),
             "started_at".into(),
@@ -23130,7 +23417,7 @@ pub struct ProjectVersionDetailResponse {
     pub created_at: chrono::DateTime<chrono::Utc>,
     #[doc = "Description saved with this version."]
     pub description: String,
-    #[doc = "Relative path to this version's KCL entrypoint."]
+    #[doc = "Relative path to this version's entrypoint file."]
     pub entrypoint_path: String,
     #[doc = "Files stored for this version."]
     pub files: Vec<ProjectFileResponse>,
