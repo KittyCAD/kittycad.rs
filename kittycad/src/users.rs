@@ -105,6 +105,31 @@ impl Users {
         }
     }
 
+    #[doc = "Remove the profile photo and prevent future sign-ins from importing it \
+             again.\n\nCommunity profile synchronization is best effort.\n\n```rust,no_run\nasync \
+             fn example_users_remove_avatar() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    client.users().remove_avatar().await?;\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn remove_avatar<'a>(&'a self) -> Result<(), crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::DELETE,
+            format!("{}/{}", self.client.base_url, "user/avatar"),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            Ok(())
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Gets authenticated CAD user info form data for the current \
              user.\n\n```rust,no_run\nasync fn example_users_get_cad_info_form() -> \
              anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \

@@ -207,6 +207,48 @@ impl Factory {
         }
     }
 
+    #[doc = "Cancel your organization's Factory job before payment starts. Requires organization \
+             membership.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The requested job's \
+             identifier. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_cancel_org_job() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        \
+             .cancel_org_job(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn cancel_org_job<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+    ) -> Result<crate::types::FactoryCustomerJobSummary, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/factory/jobs/{job_id}/cancel".replace("{job_id}", &format!("{}", job_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    crate::types::error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Download an exact submitted manufacturing input for a current organization \
              member.\n\n**Parameters:**\n\n- `file_id: uuid::Uuid`: Submitted file identifier. \
              (required)\n- `job_id: uuid::Uuid`: Stable job identifier. \
@@ -247,20 +289,83 @@ impl Factory {
         }
     }
 
+    #[doc = "Get your organization's published Factory quote and current checkout amounts. \
+             Requires organization membership.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The \
+             manufacturing job being purchased. (required)\n- `payment_attempt_id: uuid::Uuid`: \
+             Identity reused by the corresponding acceptance and its transport retries. \
+             (required)\n- `quote_id: uuid::Uuid`: The exact published quote accepted by the \
+             customer. (required)\n- `use_credits: Option<bool>`: Include available Zoo usage \
+             credits in the checkout estimate.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_get_org_quote() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryQuoteDetail = client\n        .factory()\n        \
+             .get_org_quote(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_org_quote<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+        payment_attempt_id: uuid::Uuid,
+        quote_id: uuid::Uuid,
+        use_credits: Option<bool>,
+    ) -> Result<crate::types::FactoryQuoteDetail, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "org/factory/jobs/{job_id}/quotes/{quote_id}"
+                    .replace("{job_id}", &format!("{}", job_id))
+                    .replace("{quote_id}", &format!("{}", quote_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![("payment_attempt_id", format!("{}", payment_attempt_id))];
+        if let Some(p) = use_credits {
+            query_params.push(("use_credits", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    crate::types::error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Accept your organization's current Factory quote and charge its default card. \
              Requires organization membership.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The \
              manufacturing job being purchased. (required)\n- `max_amount_due_cents: Option<i64>`: \
              Maximum cash payment confirmed by the customer from the checkout preview. If the \
-             amount increases, refresh the preview before retrying acceptance.\n- `quote_id: \
-             uuid::Uuid`: The exact published quote accepted by the customer. (required)\n- \
-             `use_credits: Option<bool>`: Apply available Zoo usage credits to this purchase \
-             before charging the default card.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
-             example_factory_accept_org_quote() -> anyhow::Result<()> {\n    let client = \
-             kittycad::Client::new_from_env();\n    let result: \
+             amount increases, refresh the preview before retrying acceptance.\n- \
+             `payment_attempt_id: uuid::Uuid`: Generate once for an explicit acceptance and reuse \
+             for every transport retry. A new attempt after a confirmed decline requires a new \
+             UUID. (required)\n- `quote_id: uuid::Uuid`: The exact published quote accepted by the \
+             customer. (required)\n- `use_credits: Option<bool>`: Apply available Zoo usage \
+             credits to this purchase before charging the default card.\n\n```rust,no_run\nuse \
+             std::str::FromStr;\nasync fn example_factory_accept_org_quote() -> anyhow::Result<()> \
+             {\n    let client = kittycad::Client::new_from_env();\n    let result: \
              kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        \
              .accept_org_quote(\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 \
              as i64),\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
              Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
              Ok(())\n}\n```"]
@@ -269,6 +374,7 @@ impl Factory {
         &'a self,
         job_id: uuid::Uuid,
         max_amount_due_cents: Option<i64>,
+        payment_attempt_id: uuid::Uuid,
         quote_id: uuid::Uuid,
         use_credits: Option<bool>,
     ) -> Result<crate::types::FactoryQuoteAcceptance, crate::types::error::Error> {
@@ -283,7 +389,7 @@ impl Factory {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
+        let mut query_params = vec![("payment_attempt_id", format!("{}", payment_attempt_id))];
         if let Some(p) = max_amount_due_cents {
             query_params.push(("max_amount_due_cents", format!("{}", p)));
         }
@@ -312,43 +418,24 @@ impl Factory {
         }
     }
 
-    #[doc = "Preview your organization's Factory quote without accepting it or charging a card. \
-             Requires organization membership.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The \
-             manufacturing job being purchased. (required)\n- `quote_id: uuid::Uuid`: The exact \
-             published quote accepted by the customer. (required)\n- `use_credits: Option<bool>`: \
-             Include available Zoo usage credits in the checkout estimate.\n\n```rust,no_run\nuse \
-             std::str::FromStr;\nasync fn example_factory_preview_org_quote() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::FactoryQuotePreview = client\n        .factory()\n        \
-             .preview_org_quote(\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
+    #[doc = "Decline your organization's current Factory quote and close the job. Requires organization membership.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n- `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn example_factory_decline_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        .decline_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn preview_org_quote<'a>(
+    pub async fn decline_org_quote<'a>(
         &'a self,
         job_id: uuid::Uuid,
         quote_id: uuid::Uuid,
-        use_credits: Option<bool>,
-    ) -> Result<crate::types::FactoryQuotePreview, crate::types::error::Error> {
+    ) -> Result<crate::types::FactoryCustomerJobSummary, crate::types::error::Error> {
         let mut req = self.client.client.request(
-            http::Method::GET,
+            http::Method::POST,
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "org/factory/jobs/{job_id}/quotes/{quote_id}/preview"
+                "org/factory/jobs/{job_id}/quotes/{quote_id}/decline"
                     .replace("{job_id}", &format!("{}", job_id))
                     .replace("{quote_id}", &format!("{}", quote_id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = use_credits {
-            query_params.push(("use_credits", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {
@@ -942,6 +1029,48 @@ impl Factory {
         }
     }
 
+    #[doc = "Cancel your Factory job before payment starts, even if no quote \
+             exists.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The requested job's identifier. \
+             (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_cancel_user_job() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        \
+             .cancel_user_job(uuid::Uuid::from_str(\n            \
+             \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    \
+             println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn cancel_user_job<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+    ) -> Result<crate::types::FactoryCustomerJobSummary, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::POST,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/factory/jobs/{job_id}/cancel".replace("{job_id}", &format!("{}", job_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    crate::types::error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Download an exact submitted manufacturing input of a personal Factory \
              job.\n\n**Parameters:**\n\n- `file_id: uuid::Uuid`: Submitted file identifier. \
              (required)\n- `job_id: uuid::Uuid`: Stable job identifier. \
@@ -982,20 +1111,84 @@ impl Factory {
         }
     }
 
+    #[doc = "Get your published Factory quote with its current shipping, tax, credits, and \
+             checkout total.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The manufacturing job \
+             being purchased. (required)\n- `payment_attempt_id: uuid::Uuid`: Identity reused by \
+             the corresponding acceptance and its transport retries. (required)\n- `quote_id: \
+             uuid::Uuid`: The exact published quote accepted by the customer. (required)\n- \
+             `use_credits: Option<bool>`: Include available Zoo usage credits in the checkout \
+             estimate.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_get_user_quote() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryQuoteDetail = client\n        .factory()\n        \
+             .get_user_quote(\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
+             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
+             Ok(())\n}\n```"]
+    #[tracing::instrument]
+    pub async fn get_user_quote<'a>(
+        &'a self,
+        job_id: uuid::Uuid,
+        payment_attempt_id: uuid::Uuid,
+        quote_id: uuid::Uuid,
+        use_credits: Option<bool>,
+    ) -> Result<crate::types::FactoryQuoteDetail, crate::types::error::Error> {
+        let mut req = self.client.client.request(
+            http::Method::GET,
+            format!(
+                "{}/{}",
+                self.client.base_url,
+                "user/factory/jobs/{job_id}/quotes/{quote_id}"
+                    .replace("{job_id}", &format!("{}", job_id))
+                    .replace("{quote_id}", &format!("{}", quote_id))
+            ),
+        );
+        req = req.bearer_auth(&self.client.token);
+        let mut query_params = vec![("payment_attempt_id", format!("{}", payment_attempt_id))];
+        if let Some(p) = use_credits {
+            query_params.push(("use_credits", format!("{}", p)));
+        }
+
+        req = req.query(&query_params);
+        let resp = req.send().await?;
+        let status = resp.status();
+        if status.is_success() {
+            let text = resp.text().await.unwrap_or_default();
+            serde_json::from_str(&text).map_err(|err| {
+                crate::types::error::Error::from_serde_error(
+                    crate::types::error::SerdeError::new(text.to_string(), err),
+                    status,
+                )
+            })
+        } else {
+            let text = resp.text().await.unwrap_or_default();
+            Err(crate::types::error::Error::Server {
+                body: text.to_string(),
+                status,
+            })
+        }
+    }
+
     #[doc = "Accept your current Factory quote and immediately charge your default card. \
              Production starts only after successful payment.\n\n**Parameters:**\n\n- `job_id: \
              uuid::Uuid`: The manufacturing job being purchased. (required)\n- \
              `max_amount_due_cents: Option<i64>`: Maximum cash payment confirmed by the customer \
              from the checkout preview. If the amount increases, refresh the preview before \
-             retrying acceptance.\n- `quote_id: uuid::Uuid`: The exact published quote accepted by \
-             the customer. (required)\n- `use_credits: Option<bool>`: Apply available Zoo usage \
-             credits to this purchase before charging the default card.\n\n```rust,no_run\nuse \
-             std::str::FromStr;\nasync fn example_factory_accept_user_quote() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        \
+             retrying acceptance.\n- `payment_attempt_id: uuid::Uuid`: Generate once for an \
+             explicit acceptance and reuse for every transport retry. A new attempt after a \
+             confirmed decline requires a new UUID. (required)\n- `quote_id: uuid::Uuid`: The \
+             exact published quote accepted by the customer. (required)\n- `use_credits: \
+             Option<bool>`: Apply available Zoo usage credits to this purchase before charging the \
+             default card.\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_accept_user_quote() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        \
              .accept_user_quote(\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 \
              as i64),\n            \
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
              Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
              Ok(())\n}\n```"]
@@ -1004,6 +1197,7 @@ impl Factory {
         &'a self,
         job_id: uuid::Uuid,
         max_amount_due_cents: Option<i64>,
+        payment_attempt_id: uuid::Uuid,
         quote_id: uuid::Uuid,
         use_credits: Option<bool>,
     ) -> Result<crate::types::FactoryQuoteAcceptance, crate::types::error::Error> {
@@ -1018,7 +1212,7 @@ impl Factory {
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
+        let mut query_params = vec![("payment_attempt_id", format!("{}", payment_attempt_id))];
         if let Some(p) = max_amount_due_cents {
             query_params.push(("max_amount_due_cents", format!("{}", p)));
         }
@@ -1047,43 +1241,34 @@ impl Factory {
         }
     }
 
-    #[doc = "Preview your Factory quote's shipping, tax, credits, and total without accepting it \
-             or charging a card.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The manufacturing \
-             job being purchased. (required)\n- `quote_id: uuid::Uuid`: The exact published quote \
-             accepted by the customer. (required)\n- `use_credits: Option<bool>`: Include \
-             available Zoo usage credits in the checkout estimate.\n\n```rust,no_run\nuse \
-             std::str::FromStr;\nasync fn example_factory_preview_user_quote() -> \
-             anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let \
-             result: kittycad::types::FactoryQuotePreview = client\n        .factory()\n        \
-             .preview_user_quote(\n            \
+    #[doc = "Decline your current Factory quote and close the job. No payment is \
+             created.\n\n**Parameters:**\n\n- `job_id: uuid::Uuid`: The manufacturing job being \
+             purchased. (required)\n- `quote_id: uuid::Uuid`: The exact published quote accepted \
+             by the customer. (required)\n\n```rust,no_run\nuse std::str::FromStr;\nasync fn \
+             example_factory_decline_user_quote() -> anyhow::Result<()> {\n    let client = \
+             kittycad::Client::new_from_env();\n    let result: \
+             kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        \
+             .decline_user_quote(\n            \
              uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            \
-             Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    \
-             Ok(())\n}\n```"]
+             uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        \
+             .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n```"]
     #[tracing::instrument]
-    pub async fn preview_user_quote<'a>(
+    pub async fn decline_user_quote<'a>(
         &'a self,
         job_id: uuid::Uuid,
         quote_id: uuid::Uuid,
-        use_credits: Option<bool>,
-    ) -> Result<crate::types::FactoryQuotePreview, crate::types::error::Error> {
+    ) -> Result<crate::types::FactoryCustomerJobSummary, crate::types::error::Error> {
         let mut req = self.client.client.request(
-            http::Method::GET,
+            http::Method::POST,
             format!(
                 "{}/{}",
                 self.client.base_url,
-                "user/factory/jobs/{job_id}/quotes/{quote_id}/preview"
+                "user/factory/jobs/{job_id}/quotes/{quote_id}/decline"
                     .replace("{job_id}", &format!("{}", job_id))
                     .replace("{quote_id}", &format!("{}", quote_id))
             ),
         );
         req = req.bearer_auth(&self.client.token);
-        let mut query_params = vec![];
-        if let Some(p) = use_credits {
-            query_params.push(("use_credits", format!("{}", p)));
-        }
-
-        req = req.query(&query_params);
         let resp = req.send().await?;
         let status = resp.status();
         if status.is_success() {

@@ -587,7 +587,7 @@
     "op": "add",
     "path": "/paths/~1org~1datasets~1{id}~1uploads/post/x-rust",
     "value": {
-      "example": "/// Upload source files into a Zoo-managed dataset.\n/// \n/// This endpoint accepts `multipart/form-data` where each file part becomes a source object in the dataset. Exact `<proprietary CAD filename>.json` converter dumps are also accepted and associated with their original CAD file. When both `org_dataset_cloud_projects` and `org_dataset_reference_files` are enabled for the organization, PDFs, Word/Excel documents and images are accepted as reference files. Paths are normalized and must be relative.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_upload_dataset_files() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UploadOrgDatasetFilesResponse = client\n        .orgs()\n        .upload_dataset_files(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Upload source files into a Zoo-managed dataset.\n/// \n/// This endpoint accepts `multipart/form-data` where each file part becomes a source object in the dataset. Exact `<proprietary CAD filename>.json` converter dumps are also accepted and associated with their original CAD file. When both `org_dataset_cloud_projects` and `org_dataset_reference_files` are enabled for the organization, PDFs, Word/Excel documents, Markdown and images are accepted as reference files. Paths are normalized and must be relative.\n/// \n/// **Parameters:**\n/// \n/// - `id: uuid::Uuid`: The identifier. (required)\nuse std::str::FromStr;\nasync fn example_orgs_upload_dataset_files() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::UploadOrgDatasetFilesResponse = client\n        .orgs()\n        .upload_dataset_files(\n            vec![kittycad::types::multipart::Attachment {\n                name: \"thing\".to_string(),\n                filepath: Some(\"myfile.json\".into()),\n                content_type: Some(\"application/json\".to_string()),\n                data: std::fs::read(\"myfile.json\").unwrap(),\n            }],\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/orgs/struct.Orgs.html#method.upload_dataset_files"
     }
   },
@@ -609,6 +609,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1factory~1jobs~1{job_id}~1cancel/post/x-rust",
+    "value": {
+      "example": "/// Cancel your organization's Factory job before payment starts. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The requested job's identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_cancel_org_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        .cancel_org_job(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.cancel_org_job"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1factory~1jobs~1{job_id}~1files~1{file_id}/get/x-rust",
     "value": {
       "example": "/// Download an exact submitted manufacturing input for a current organization member.\n/// \n/// **Parameters:**\n/// \n/// - `file_id: uuid::Uuid`: Submitted file identifier. (required)\n/// - `job_id: uuid::Uuid`: Stable job identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_get_org_job_file() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .factory()\n        .get_org_job_file(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
@@ -617,18 +625,26 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1org~1factory~1jobs~1{job_id}~1quotes~1{quote_id}/get/x-rust",
+    "value": {
+      "example": "/// Get your organization's published Factory quote and current checkout amounts. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `payment_attempt_id: uuid::Uuid`: Identity reused by the corresponding acceptance and its transport retries. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Include available Zoo usage credits in the checkout estimate.\nuse std::str::FromStr;\nasync fn example_factory_get_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteDetail = client\n        .factory()\n        .get_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_org_quote"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1org~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1accept/post/x-rust",
     "value": {
-      "example": "/// Accept your organization's current Factory quote and charge its default card. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `max_amount_due_cents: Option<i64>`: Maximum cash payment confirmed by the customer from the checkout preview. If the amount increases, refresh the preview before retrying acceptance.\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Apply available Zoo usage credits to this purchase before charging the default card.\nuse std::str::FromStr;\nasync fn example_factory_accept_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        .accept_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as i64),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Accept your organization's current Factory quote and charge its default card. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `max_amount_due_cents: Option<i64>`: Maximum cash payment confirmed by the customer from the checkout preview. If the amount increases, refresh the preview before retrying acceptance.\n/// - `payment_attempt_id: uuid::Uuid`: Generate once for an explicit acceptance and reuse for every transport retry. A new attempt after a confirmed decline requires a new UUID. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Apply available Zoo usage credits to this purchase before charging the default card.\nuse std::str::FromStr;\nasync fn example_factory_accept_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        .accept_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as i64),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.accept_org_quote"
     }
   },
   {
     "op": "add",
-    "path": "/paths/~1org~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1preview/get/x-rust",
+    "path": "/paths/~1org~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1decline/post/x-rust",
     "value": {
-      "example": "/// Preview your organization's Factory quote without accepting it or charging a card. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Include available Zoo usage credits in the checkout estimate.\nuse std::str::FromStr;\nasync fn example_factory_preview_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuotePreview = client\n        .factory()\n        .preview_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.preview_org_quote"
+      "example": "/// Decline your organization's current Factory quote and close the job. Requires organization membership.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\nuse std::str::FromStr;\nasync fn example_factory_decline_org_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        .decline_org_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.decline_org_quote"
     }
   },
   {
@@ -1249,6 +1265,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1avatar/delete/x-rust",
+    "value": {
+      "example": "/// Remove the profile photo and prevent future sign-ins from importing it again.\n/// \n/// Community profile synchronization is best effort.\nasync fn example_users_remove_avatar() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client.users().remove_avatar().await?;\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/users/struct.Users.html#method.remove_avatar"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1billing~1usage-collection-threshold/delete/x-rust",
     "value": {
       "example": "/// Restore the default for your personal aggregate-usage collection threshold.\n/// \n/// **Parameters:**\n/// \n/// - `expected_version: i64`: Version returned by the read that this mutation is based on. (required)\nasync fn example_payments_reset_user_usage_collection_threshold() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::AggregateUsageCollectionThresholdView = client\n        .payments()\n        .reset_user_usage_collection_threshold(4 as i64)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
@@ -1361,6 +1385,14 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1factory~1jobs~1{job_id}~1cancel/post/x-rust",
+    "value": {
+      "example": "/// Cancel your Factory job before payment starts, even if no quote exists.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The requested job's identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_cancel_user_job() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        .cancel_user_job(uuid::Uuid::from_str(\n            \"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\",\n        )?)\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.cancel_user_job"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1factory~1jobs~1{job_id}~1files~1{file_id}/get/x-rust",
     "value": {
       "example": "/// Download an exact submitted manufacturing input of a personal Factory job.\n/// \n/// **Parameters:**\n/// \n/// - `file_id: uuid::Uuid`: Submitted file identifier. (required)\n/// - `job_id: uuid::Uuid`: Stable job identifier. (required)\nuse std::str::FromStr;\nasync fn example_factory_get_user_job_file() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    client\n        .factory()\n        .get_user_job_file(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    Ok(())\n}\n",
@@ -1369,18 +1401,26 @@
   },
   {
     "op": "add",
+    "path": "/paths/~1user~1factory~1jobs~1{job_id}~1quotes~1{quote_id}/get/x-rust",
+    "value": {
+      "example": "/// Get your published Factory quote with its current shipping, tax, credits, and checkout total.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `payment_attempt_id: uuid::Uuid`: Identity reused by the corresponding acceptance and its transport retries. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Include available Zoo usage credits in the checkout estimate.\nuse std::str::FromStr;\nasync fn example_factory_get_user_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteDetail = client\n        .factory()\n        .get_user_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.get_user_quote"
+    }
+  },
+  {
+    "op": "add",
     "path": "/paths/~1user~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1accept/post/x-rust",
     "value": {
-      "example": "/// Accept your current Factory quote and immediately charge your default card. Production starts only after successful payment.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `max_amount_due_cents: Option<i64>`: Maximum cash payment confirmed by the customer from the checkout preview. If the amount increases, refresh the preview before retrying acceptance.\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Apply available Zoo usage credits to this purchase before charging the default card.\nuse std::str::FromStr;\nasync fn example_factory_accept_user_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        .accept_user_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as i64),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "example": "/// Accept your current Factory quote and immediately charge your default card. Production starts only after successful payment.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `max_amount_due_cents: Option<i64>`: Maximum cash payment confirmed by the customer from the checkout preview. If the amount increases, refresh the preview before retrying acceptance.\n/// - `payment_attempt_id: uuid::Uuid`: Generate once for an explicit acceptance and reuse for every transport retry. A new attempt after a confirmed decline requires a new UUID. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Apply available Zoo usage credits to this purchase before charging the default card.\nuse std::str::FromStr;\nasync fn example_factory_accept_user_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuoteAcceptance = client\n        .factory()\n        .accept_user_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(4 as i64),\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
       "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.accept_user_quote"
     }
   },
   {
     "op": "add",
-    "path": "/paths/~1user~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1preview/get/x-rust",
+    "path": "/paths/~1user~1factory~1jobs~1{job_id}~1quotes~1{quote_id}~1decline/post/x-rust",
     "value": {
-      "example": "/// Preview your Factory quote's shipping, tax, credits, and total without accepting it or charging a card.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\n/// - `use_credits: Option<bool>`: Include available Zoo usage credits in the checkout estimate.\nuse std::str::FromStr;\nasync fn example_factory_preview_user_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryQuotePreview = client\n        .factory()\n        .preview_user_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            Some(true),\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
-      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.preview_user_quote"
+      "example": "/// Decline your current Factory quote and close the job. No payment is created.\n/// \n/// **Parameters:**\n/// \n/// - `job_id: uuid::Uuid`: The manufacturing job being purchased. (required)\n/// - `quote_id: uuid::Uuid`: The exact published quote accepted by the customer. (required)\nuse std::str::FromStr;\nasync fn example_factory_decline_user_quote() -> anyhow::Result<()> {\n    let client = kittycad::Client::new_from_env();\n    let result: kittycad::types::FactoryCustomerJobSummary = client\n        .factory()\n        .decline_user_quote(\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n            uuid::Uuid::from_str(\"d9797f8d-9ad6-4e08-90d7-2ec17e13471c\")?,\n        )\n        .await?;\n    println!(\"{:?}\", result);\n    Ok(())\n}\n",
+      "libDocsLink": "https://docs.rs/kittycad/latest/kittycad/factory/struct.Factory.html#method.decline_user_quote"
     }
   },
   {
