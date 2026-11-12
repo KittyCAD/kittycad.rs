@@ -681,6 +681,46 @@ impl tabled::Tabled for AddressContact {
     }
 }
 
+#[doc = "Address contents. Ownership, saved-address labels, and shipping speed are separate."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct AddressContent {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contact: Option<AddressContact>,
+    #[doc = "Address details."]
+    pub postal: AddressDetails,
+}
+
+impl std::fmt::Display for AddressContent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for AddressContent {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            if let Some(contact) = &self.contact {
+                format!("{:?}", contact).into()
+            } else {
+                String::new().into()
+            },
+            format!("{:?}", self.postal).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["contact".into(), "postal".into()]
+    }
+}
+
 #[doc = "Address details."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -9832,11 +9872,16 @@ pub struct FactoryCustomerJobDetail {
     #[doc = "The current version, if the job has one."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current_version: Option<FactoryCustomerJobVersion>,
+    #[doc = "Whether the job requests expedited shipping."]
+    pub is_expedited: bool,
     #[doc = "The same summary returned by the customer job list."]
     pub job: FactoryCustomerJobSummary,
     #[doc = "The active published quote, excluding all internal costing and worksheet notes."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub quote: Option<FactoryCustomerQuote>,
+    #[doc = "Pinned delivery address, if it remains available to the job's owner."]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub shipping_info: Option<AddressContent>,
 }
 
 impl std::fmt::Display for FactoryCustomerJobDetail {
@@ -9851,7 +9896,7 @@ impl std::fmt::Display for FactoryCustomerJobDetail {
 
 #[cfg(feature = "tabled")]
 impl tabled::Tabled for FactoryCustomerJobDetail {
-    const LENGTH: usize = 3;
+    const LENGTH: usize = 5;
     fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
         vec![
             if let Some(current_version) = &self.current_version {
@@ -9859,9 +9904,15 @@ impl tabled::Tabled for FactoryCustomerJobDetail {
             } else {
                 String::new().into()
             },
+            format!("{:?}", self.is_expedited).into(),
             format!("{:?}", self.job).into(),
             if let Some(quote) = &self.quote {
                 format!("{:?}", quote).into()
+            } else {
+                String::new().into()
+            },
+            if let Some(shipping_info) = &self.shipping_info {
+                format!("{:?}", shipping_info).into()
             } else {
                 String::new().into()
             },
@@ -9869,7 +9920,13 @@ impl tabled::Tabled for FactoryCustomerJobDetail {
     }
 
     fn headers() -> Vec<std::borrow::Cow<'static, str>> {
-        vec!["current_version".into(), "job".into(), "quote".into()]
+        vec![
+            "current_version".into(),
+            "is_expedited".into(),
+            "job".into(),
+            "quote".into(),
+            "shipping_info".into(),
+        ]
     }
 }
 
@@ -10372,6 +10429,42 @@ impl tabled::Tabled for FactoryQuoteAcceptance {
     }
 }
 
+#[doc = "A published customer offer and its current checkout amounts."]
+#[derive(
+    serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
+)]
+pub struct FactoryQuoteDetail {
+    #[doc = "Shipping, tax, credits, and cash due for the selected payment attempt."]
+    pub pricing: FactoryQuotePreview,
+    #[doc = "The customer-visible offer, excluding internal costs and worksheet notes."]
+    pub quote: FactoryCustomerQuote,
+}
+
+impl std::fmt::Display for FactoryQuoteDetail {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string_pretty(self).map_err(|_| std::fmt::Error)?
+        )
+    }
+}
+
+#[cfg(feature = "tabled")]
+impl tabled::Tabled for FactoryQuoteDetail {
+    const LENGTH: usize = 2;
+    fn fields(&self) -> Vec<std::borrow::Cow<'static, str>> {
+        vec![
+            format!("{:?}", self.pricing).into(),
+            format!("{:?}", self.quote).into(),
+        ]
+    }
+
+    fn headers() -> Vec<std::borrow::Cow<'static, str>> {
+        vec!["pricing".into(), "quote".into()]
+    }
+}
+
 #[doc = "Current checkout amounts in USD cents, before accepting or collecting payment."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
@@ -10650,6 +10743,10 @@ pub enum Feature {
     #[serde(rename = "zookeeper_client_commands")]
     #[display("zookeeper_client_commands")]
     ZookeeperClientCommands,
+    #[doc = "Enables the Pydantic AI runtime for supported Zookeeper turns."]
+    #[serde(rename = "zookeeper_pydantic_ai")]
+    #[display("zookeeper_pydantic_ai")]
+    ZookeeperPydanticAi,
     #[doc = "Enables sponsored, time-limited KCL project migration."]
     #[serde(rename = "zookeeper_kcl_migration")]
     #[display("zookeeper_kcl_migration")]
@@ -14923,6 +15020,16 @@ pub enum MlCopilotClientMessage {
         #[doc = "Current execution state."]
         status: MlCopilotClientCommandStatus,
     },
+    #[doc = "Request an older history page on an opted-in paginated connection. Page delivery is \
+             not enabled yet; API returns `ReplayPageError`."]
+    #[serde(rename = "fetch_replay_page")]
+    FetchReplayPage {
+        #[doc = "Opaque, connection-scoped token returned by the previous page. It is not an \
+                 attachment reference or a persisted message coordinate."]
+        cursor: uuid::Uuid,
+        #[doc = "Client identifier echoed in the page response or error."]
+        request_id: String,
+    },
 }
 
 #[doc = "A file that can be transferred between the client and server."]
@@ -15204,6 +15311,40 @@ pub enum MlCopilotReplayAttachmentMode {
     #[serde(rename = "metadata_only")]
     #[display("metadata_only")]
     MetadataOnly,
+}
+
+#[doc = "Machine-readable failures for paginated client history, independent of generation."]
+#[derive(
+    serde :: Serialize,
+    serde :: Deserialize,
+    PartialEq,
+    Hash,
+    Debug,
+    Clone,
+    schemars :: JsonSchema,
+    parse_display :: FromStr,
+    parse_display :: Display,
+)]
+#[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
+#[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
+pub enum MlCopilotReplayPageErrorCode {
+    #[doc = "Pagination replay is not enabled yet."]
+    #[serde(rename = "unavailable")]
+    #[display("unavailable")]
+    Unavailable,
+    #[doc = "The connection query does not satisfy pagination requirements."]
+    #[serde(rename = "invalid_request")]
+    #[display("invalid_request")]
+    InvalidRequest,
+    #[doc = "The continuation expired, belongs to another connection, or its boundary no longer \
+             exists. The client must start a new replay instead of retrying it."]
+    #[serde(rename = "invalid_cursor")]
+    #[display("invalid_cursor")]
+    InvalidCursor,
+    #[doc = "A transient page load failure; the same request may be retried."]
+    #[serde(rename = "load_failed")]
+    #[display("load_failed")]
+    LoadFailed,
 }
 
 #[doc = "The types of messages that can be sent by the server to the client."]
@@ -15593,6 +15734,32 @@ pub enum MlCopilotServerMessage {
         prompt_id: uuid::Uuid,
         #[doc = "Sequence number of the persisted message row."]
         seq: i32,
+    },
+    #[doc = "A metadata-only history page. Not persisted or forwarded to the backend. Page \
+             delivery is not enabled yet. Existing clients keep receiving `Replay`."]
+    #[serde(rename = "replay_page")]
+    ReplayPage {
+        #[doc = "Conversation whose history this page belongs to."]
+        conversation_id: uuid::Uuid,
+        #[doc = "Canonical message bytes in chronological order, as in `Replay`."]
+        messages: Vec<Vec<u8>>,
+        #[doc = "Connection-scoped token for older history; absent when history is exhausted."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        next_cursor: Option<uuid::Uuid>,
+        #[doc = "Absent for the initial page; otherwise echoes `FetchReplayPage.request_id`."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        request_id: Option<String>,
+    },
+    #[doc = "Page-specific failure. Does not indicate a generation failure."]
+    #[serde(rename = "replay_page_error")]
+    ReplayPageError {
+        #[doc = "Machine-readable reason and retry behavior."]
+        code: MlCopilotReplayPageErrorCode,
+        #[doc = "Client readable error detail, without persisted message contents."]
+        detail: String,
+        #[doc = "Absent for connection-query errors; otherwise echoes the failed request."]
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        request_id: Option<String>,
     },
 }
 
@@ -31334,8 +31501,9 @@ pub struct UpdateUser {
     #[doc = "The user's GitHub handle."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub github: Option<String>,
-    #[doc = "The image URL for the user. NOTE: If the user uses an OAuth2 provider, this will be \
-             overwritten by the provider's image URL when the user logs in next."]
+    #[doc = "The image URL for the user. A non-empty URL replaces the photo. An empty URL leaves \
+             it unchanged. Use DELETE /user/avatar to remove the photo and prevent provider \
+             imports."]
     pub image: String,
     #[doc = "If the user is now onboarded."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -32880,11 +33048,11 @@ impl tabled::Tabled for ZooProductSubscriptionsUserRequest {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum ZooTool {
-    #[doc = "The modeling app."]
+    #[doc = "Design Studio and verified Zookeeper callbacks."]
     #[serde(rename = "modeling_app")]
     #[display("modeling_app")]
     ModelingApp,
-    #[doc = "Zookeeper callbacks to the API."]
+    #[doc = "Legacy Text-to-CAD entitlement, retained for existing plan records."]
     #[serde(rename = "text_to_cad")]
     #[display("text_to_cad")]
     TextToCad,

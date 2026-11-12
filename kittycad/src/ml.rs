@@ -699,7 +699,9 @@ impl Ml {
              Replay for the specified conversation and continue.\n- `replay_attachment_mode: \
              Option<crate::types::MlCopilotReplayAttachmentMode>`: Controls whether replayed \
              attachment payloads are sent in full or replaced with metadata that can be used with \
-             `FetchAttachments`."]
+             `FetchAttachments`.\n- `replay_pagination: Option<bool>`: Opt into paginated replay. \
+             Requires `replay=true`, a conversation, and `replay_attachment_mode=metadata_only`. \
+             Currently returns an explicit unavailable error; page delivery is not enabled yet."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn copilot_ws<'a>(
@@ -708,6 +710,7 @@ impl Ml {
         pr: Option<u64>,
         replay: Option<bool>,
         replay_attachment_mode: Option<crate::types::MlCopilotReplayAttachmentMode>,
+        replay_pagination: Option<bool>,
     ) -> Result<(reqwest::Upgraded, http::HeaderMap), crate::types::error::Error> {
         let mut req = self.client.client_http1_only.request(
             http::Method::GET,
@@ -729,6 +732,10 @@ impl Ml {
 
         if let Some(p) = replay_attachment_mode {
             query_params.push(("replay_attachment_mode", format!("{}", p)));
+        }
+
+        if let Some(p) = replay_pagination {
+            query_params.push(("replay_pagination", format!("{}", p)));
         }
 
         req = req.query(&query_params);
