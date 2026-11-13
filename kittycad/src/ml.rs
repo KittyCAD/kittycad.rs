@@ -701,7 +701,8 @@ impl Ml {
              attachment payloads are sent in full or replaced with metadata that can be used with \
              `FetchAttachments`.\n- `replay_pagination: Option<bool>`: Opt into paginated replay. \
              Requires `replay=true`, a conversation, and `replay_attachment_mode=metadata_only`. \
-             Currently returns an explicit unavailable error; page delivery is not enabled yet."]
+             Receives a first `ReplayPage` followed by older pages requested with \
+             `FetchReplayPage`."]
     #[tracing::instrument]
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn copilot_ws<'a>(

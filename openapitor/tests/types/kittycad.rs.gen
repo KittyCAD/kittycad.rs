@@ -14732,7 +14732,7 @@ pub enum MlCopilotClientMessage {
         #[doc = "Current execution state."]
         status: MlCopilotClientCommandStatus,
     },
-    #[doc = "Request an older history page on an opted-in paginated connection. Page delivery is not enabled yet; API returns `ReplayPageError`."]
+    #[doc = "Request an older history page on an opted-in paginated connection. Cursors are single-use after a successful page; retry failed loads with the same cursor."]
     #[serde(rename = "fetch_replay_page")]
     FetchReplayPage {
         #[doc = "Opaque, connection-scoped token returned by the previous page. It is not an attachment reference or a persisted message coordinate."]
@@ -15032,7 +15032,7 @@ pub enum MlCopilotReplayAttachmentMode {
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 #[cfg_attr(feature = "tabled", derive(tabled::Tabled))]
 pub enum MlCopilotReplayPageErrorCode {
-    #[doc = "Pagination replay is not enabled yet."]
+    #[doc = "Pagination is not available on this connection."]
     #[serde(rename = "unavailable")]
     #[display("unavailable")]
     Unavailable,
@@ -15372,7 +15372,7 @@ pub enum MlCopilotServerMessage {
         #[doc = "Sequence number of the persisted message row."]
         seq: i32,
     },
-    #[doc = "A metadata-only history page. Not persisted or forwarded to the backend. Page delivery is not enabled yet. Existing clients keep receiving `Replay`."]
+    #[doc = "A metadata-only history page. Not persisted or forwarded to the backend. Pages use MessagePack, as does legacy `Replay`. Only opted-in connections receive pages."]
     #[serde(rename = "replay_page")]
     ReplayPage {
         #[doc = "Conversation whose history this page belongs to."]
