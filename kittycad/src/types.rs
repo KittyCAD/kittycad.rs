@@ -13597,9 +13597,9 @@ pub struct KclMigrationOperation {
     pub deadline: chrono::DateTime<chrono::Utc>,
     #[doc = "Same idempotency key supplied by the initiating client."]
     pub id: uuid::Uuid,
-    #[doc = "Source revision, retained for conflict detection when applying the result."]
+    #[doc = "Original project revision captured for this attempt."]
     pub project_snapshot: MlCopilotProjectSnapshotMetadata,
-    #[doc = "Terminal result, if available. The review itself has no execution deadline."]
+    #[doc = "Terminal result, if available."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub result: Option<KclMigrationResult>,
     #[doc = "Current state."]
@@ -13664,7 +13664,7 @@ pub struct KclMigrationRequest {
     pub current_files: std::collections::HashMap<String, Vec<u8>>,
     #[doc = "Project-relative KCL file to execute."]
     pub entrypoint: String,
-    #[doc = "Revision against which the user will review and apply the candidate."]
+    #[doc = "Original project revision captured when the migration starts."]
     pub project_snapshot: MlCopilotProjectSnapshotMetadata,
     #[doc = "Client-generated idempotency key. Reuse it when retrying delivery."]
     pub request_id: uuid::Uuid,
@@ -13714,7 +13714,7 @@ impl tabled::Tabled for KclMigrationRequest {
     }
 }
 
-#[doc = "A worker's terminal candidate, held separately from ordinary project edits."]
+#[doc = "A migration's terminal outcome and validation evidence."]
 #[derive(
     serde :: Serialize, serde :: Deserialize, PartialEq, Debug, Clone, schemars :: JsonSchema,
 )]
@@ -13726,7 +13726,8 @@ pub struct KclMigrationResult {
     pub conversion_not_started: bool,
     #[doc = "User-facing outcome or failure explanation."]
     pub detail: String,
-    #[doc = "Candidate project, returned only after successful validation."]
+    #[doc = "Final project supplied by the worker on success. Copilot's persisted outcome omits \
+             these bytes because edits were already delivered live."]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub files: Option<std::collections::HashMap<String, Vec<u8>>>,
     #[doc = "Terminal state. `running` is not a valid result."]
@@ -13843,7 +13844,8 @@ pub enum KclMigrationStatus {
     #[serde(rename = "running")]
     #[display("running")]
     Running,
-    #[doc = "A validated candidate is ready for review. No project has been applied."]
+    #[doc = "Conversion and final validation succeeded. Copilot delivers edits live; the legacy \
+             endpoint returns a candidate for separate application."]
     #[serde(rename = "succeeded")]
     #[display("succeeded")]
     Succeeded,
@@ -13855,7 +13857,7 @@ pub enum KclMigrationStatus {
     #[serde(rename = "timed_out")]
     #[display("timed_out")]
     TimedOut,
-    #[doc = "The attempt was cancelled, including loss of its execution connection."]
+    #[doc = "The attempt was cancelled."]
     #[serde(rename = "cancelled")]
     #[display("cancelled")]
     Cancelled,
@@ -14938,11 +14940,12 @@ pub enum MlCopilotClientMessage {
              the ordinary Copilot messages."]
     #[serde(rename = "migrate_kcl")]
     MigrateKcl {
-        #[doc = "Complete isolated input. API binds it to the active conversation; a supplied \
+        #[doc = "Complete original project. API binds it to the active conversation; a supplied \
                  conversation ID must match that conversation."]
         request: KclMigrationRequest,
     },
-    #[doc = "Report Apply/Undo/Redo without creating or charging for a chat turn."]
+    #[doc = "Retained for wire compatibility; Copilot rejects separate application reports \
+             because migration edits use ordinary project Undo."]
     #[serde(rename = "kcl_migration_application")]
     KclMigrationApplication {
         #[doc = "Last acknowledged revision. Retrying the same change is idempotent."]
@@ -15408,7 +15411,7 @@ pub enum MlCopilotServerMessage {
         #[doc = "Durable migration outcome and the source snapshot it was based on."]
         operation: KclMigrationOperation,
     },
-    #[doc = "Acknowledge the client's reported Apply/Undo/Redo state."]
+    #[doc = "Retained for wire compatibility; live Copilot migrations do not emit it."]
     #[serde(rename = "kcl_migration_application")]
     KclMigrationApplication {
         #[doc = "Accepted state and revision for subsequent acknowledgements."]
