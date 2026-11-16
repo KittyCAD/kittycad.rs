@@ -48565,7 +48565,7 @@
             ]
           },
           "project_snapshot": {
-            "description": "Source revision, retained for conflict detection when applying the result.",
+            "description": "Original project revision captured for this attempt.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
@@ -48574,7 +48574,7 @@
           },
           "result": {
             "nullable": true,
-            "description": "Terminal result, if available. The review itself has no execution deadline.",
+            "description": "Terminal result, if available.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/KclMigrationResult"
@@ -48641,7 +48641,7 @@
             "type": "string"
           },
           "project_snapshot": {
-            "description": "Revision against which the user will review and apply the candidate.",
+            "description": "Original project revision captured when the migration starts.",
             "allOf": [
               {
                 "$ref": "#/components/schemas/MlCopilotProjectSnapshotMetadata"
@@ -48675,7 +48675,7 @@
         "additionalProperties": false
       },
       "KclMigrationResult": {
-        "description": "A worker's terminal candidate, held separately from ordinary project edits.",
+        "description": "A migration's terminal outcome and validation evidence.",
         "type": "object",
         "properties": {
           "conversion_not_started": {
@@ -48688,7 +48688,7 @@
             "type": "string"
           },
           "files": {
-            "description": "Candidate project, returned only after successful validation.",
+            "description": "Final project supplied by the worker on success. Copilot's persisted outcome omits these bytes because edits were already delivered live.",
             "default": {},
             "type": "object",
             "additionalProperties": {
@@ -48874,7 +48874,7 @@
             ]
           },
           {
-            "description": "A validated candidate is ready for review. No project has been applied.",
+            "description": "Conversion and final validation succeeded. Copilot delivers edits live; the legacy endpoint returns a candidate for separate application.",
             "type": "string",
             "enum": [
               "succeeded"
@@ -48895,7 +48895,7 @@
             ]
           },
           {
-            "description": "The attempt was cancelled, including loss of its execution connection.",
+            "description": "The attempt was cancelled.",
             "type": "string",
             "enum": [
               "cancelled"
@@ -49934,7 +49934,7 @@
             "type": "object",
             "properties": {
               "request": {
-                "description": "Complete isolated input. API binds it to the active conversation; a supplied conversation ID must match that conversation.",
+                "description": "Complete original project. API binds it to the active conversation; a supplied conversation ID must match that conversation.",
                 "allOf": [
                   {
                     "$ref": "#/components/schemas/KclMigrationRequest"
@@ -49954,7 +49954,7 @@
             ]
           },
           {
-            "description": "Report Apply/Undo/Redo without creating or charging for a chat turn.",
+            "description": "Retained for wire compatibility; Copilot rejects separate application reports because migration edits use ordinary project Undo.",
             "type": "object",
             "properties": {
               "expected_revision": {
@@ -50633,7 +50633,7 @@
             "additionalProperties": false
           },
           {
-            "description": "Acknowledge the client's reported Apply/Undo/Redo state.",
+            "description": "Retained for wire compatibility; live Copilot migrations do not emit it.",
             "type": "object",
             "properties": {
               "kcl_migration_application": {
