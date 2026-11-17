@@ -38,7 +38,7 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
       - name: Create a Release
-        uses: softprops/action-gh-release@v3.0.3
+        uses: softprops/action-gh-release@v3.0.4
         with:
           prerelease: ${{ steps.version.outputs.prerelease }}
           make_latest: "false"
