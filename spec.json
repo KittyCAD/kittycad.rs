@@ -1730,6 +1730,1296 @@
         "x-billable": false
       }
     },
+    "/execution/inputs": {
+      "post": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Upload one input as binary data or multiple named files as multipart form data.",
+        "operationId": "upload_execution_input",
+        "requestBody": {
+          "description": "Send one raw file or a multipart file per workspace path. Each part's filename is its path.",
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionInputUploadResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": true
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "operationId": "options_execution_inputs",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "List execution jobs owned by the active user or organization.",
+        "operationId": "list_execution_jobs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Return only jobs in this lifecycle state.",
+            "schema": {
+              "$ref": "#/components/schemas/ExecutionJobStatus"
+            }
+          },
+          {
+            "in": "query",
+            "name": "runtime_id",
+            "description": "Return only jobs using this runtime.",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "created_after",
+            "description": "Return only jobs created after this timestamp.",
+            "schema": {
+              "nullable": true,
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/CreatedAtSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionJobResponseResultsPage"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      },
+      "post": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Submit an execution job.",
+        "description": "Requires the execution_jobs feature for the active user or organization. Retry a submission with the same Idempotency-Key and request body to recover the original job.",
+        "operationId": "create_execution_job",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "description": "Reuse this key with the same request body to recover the original submission.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionJobCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successful creation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "CORS preflight for the execution job collection.",
+        "operationId": "options_execution_jobs",
+        "responses": {
+          "204": {
+            "description": "resource updated",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs/{id}": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Get one execution job owned by the active user or organization.",
+        "operationId": "get_execution_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs/{id}/artifacts": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "List verified durable outputs owned by the active user or organization.",
+        "operationId": "list_execution_job_artifacts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum number of items returned by a single call",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_token",
+            "description": "Token returned by previous call to retrieve the subsequent page",
+            "schema": {
+              "nullable": true,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "schema": {
+              "$ref": "#/components/schemas/IdSortMode"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionArtifactsResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false,
+        "x-dropshot-pagination": {
+          "required": []
+        }
+      }
+    },
+    "/execution/jobs/{id}/artifacts/{artifact_id}": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Download a verified private execution artifact with bounded streaming.",
+        "operationId": "download_execution_job_artifact",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "Owning job.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "path",
+            "name": "artifact_id",
+            "description": "Archive-scoped artifact.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The retained artifact bytes.",
+            "headers": {
+              "X-Content-SHA256": {
+                "style": "simple",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs/{id}/cancel": {
+      "post": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Idempotently request cancellation of an execution job.",
+        "operationId": "cancel_execution_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionJobResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      },
+      "options": {
+        "tags": [
+          "hidden"
+        ],
+        "summary": "CORS preflight for execution job cancellation.",
+        "operationId": "options_cancel_execution_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "successful operation, no content",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs/{id}/logs": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Read a bounded binary-safe page from a verified execution log archive.",
+        "operationId": "get_execution_job_logs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "stream",
+            "description": "Which stream to read; defaults to stdout.",
+            "schema": {
+              "$ref": "#/components/schemas/ExecutionLogStream"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Byte offset, starting at zero.",
+            "schema": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Maximum returned bytes, 1 through 65536 (default 65536).",
+            "schema": {
+              "nullable": true,
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionLogResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
+    "/execution/jobs/{id}/specification": {
+      "get": {
+        "tags": [
+          "executor"
+        ],
+        "summary": "Get immutable execution inputs. Lifecycle polling does not require this object.",
+        "operationId": "get_execution_job_specification",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "description": "The identifier.",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "headers": {
+              "Access-Control-Allow-Credentials": {
+                "description": "Access-Control-Allow-Credentials header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Headers": {
+                "description": "Access-Control-Allow-Headers header. This is a comma-separated list of headers.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Methods": {
+                "description": "Access-Control-Allow-Methods header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Content-Location": {
+                "description": "The Content-Location header for responses that are not the final destination. This is used to indicate where the resource can be found, when it is finished.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Location": {
+                "description": "The location header for redirects and letting users know if there is a websocket they can listen to for status updates on their operation.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "Set-Cookie": {
+                "description": "Set-Cookie header.",
+                "style": "simple",
+                "schema": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "description": "ID for this request. We return it so that users can report this to us and help us debug their problems.",
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionJobSpecificationResponse"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
+          }
+        },
+        "x-billable": false
+      }
+    },
     "/file/bounding-box": {
       "post": {
         "tags": [
@@ -19396,11 +20686,36 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": "",
+          "200": {
+            "description": "Project files in the requested TAR or ZIP archive format.",
+            "headers": {
+              "Content-Disposition": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
-              "*/*": {
-                "schema": {}
+              "application/x-tar": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
@@ -19413,6 +20728,12 @@
                 }
               }
             }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
           }
         },
         "x-billable": false
@@ -19797,11 +21118,36 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": "",
+          "200": {
+            "description": "Project files in the requested TAR or ZIP archive format.",
+            "headers": {
+              "Content-Disposition": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
-              "*/*": {
-                "schema": {}
+              "application/x-tar": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
@@ -19814,6 +21160,12 @@
                 }
               }
             }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
           }
         },
         "x-billable": false
@@ -31959,11 +33311,29 @@
         "description": "Send multipart data with a JSON `body` part and file parts whose filenames are relative project paths. Include an optional `library_id` in the JSON to create the project in a named library:\n\n```json { \"title\": \"Bracket\", \"entrypoint_path\": \"main.kcl\", \"library_id\": \"<LIBRARY_ID>\" } ```\n\nA personal library creates a personal project. An accessible library belonging to the active organization creates an organization project with the caller as its creator; creating the project does not require library-management rights. Omitting `library_id` or passing null creates an unassigned personal project, even when the request has an active organization.\n\nThe HTTP 201 response includes `id`, `library_id`, content `revision`, and `metadata_revision`. Later saves preserve membership, even if they include a library field. Use `PUT /user/projects/{id}/library` to move or unassign an existing project instead of uploading its files again.",
         "operationId": "create_project",
         "requestBody": {
+          "description": "Send project metadata as a JSON body part and at least one file part. File part names are arbitrary, except body and event, which are reserved for JSON metadata. Each file part's filename must be its relative project path. Send the complete project snapshot, including unchanged files.",
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "binary"
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "$ref": "#/components/schemas/CreateProjectRequest"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "minProperties": 2
+              },
+              "encoding": {
+                "body": {
+                  "contentType": "application/json"
+                }
               }
             }
           },
@@ -32265,11 +33635,29 @@
           }
         ],
         "requestBody": {
+          "description": "Send project metadata as a JSON body part and at least one file part. File part names are arbitrary, except body and event, which are reserved for JSON metadata. Each file part's filename must be its relative project path. Send the complete project snapshot, including unchanged files.",
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "binary"
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "$ref": "#/components/schemas/UpdateProjectRequest"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "minProperties": 2
+              },
+              "encoding": {
+                "body": {
+                  "contentType": "application/json"
+                }
               }
             }
           },
@@ -32597,11 +33985,36 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": "",
+          "200": {
+            "description": "Project files in the requested TAR or ZIP archive format.",
+            "headers": {
+              "Content-Disposition": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
-              "*/*": {
-                "schema": {}
+              "application/x-tar": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
@@ -32614,6 +34027,12 @@
                 }
               }
             }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
           }
         },
         "x-billable": false
@@ -34157,14 +35576,42 @@
             "schema": {
               "$ref": "#/components/schemas/Uuid"
             }
+          },
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "description": "Reuse this key and the same save contents within 24 hours to recover the original version.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 255
+            }
           }
         ],
         "requestBody": {
+          "description": "Send project metadata as a JSON body part and at least one file part. File part names are arbitrary, except body and event, which are reserved for JSON metadata. Each file part's filename must be its relative project path. Send the complete project snapshot, including unchanged files.",
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "string",
-                "format": "binary"
+                "type": "object",
+                "properties": {
+                  "body": {
+                    "$ref": "#/components/schemas/CreateProjectVersionRequest"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "additionalProperties": {
+                  "type": "string",
+                  "format": "binary"
+                },
+                "minProperties": 2
+              },
+              "encoding": {
+                "body": {
+                  "contentType": "application/json"
+                }
               }
             }
           },
@@ -34625,11 +36072,36 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": "",
+          "200": {
+            "description": "Project files in the requested TAR or ZIP archive format.",
+            "headers": {
+              "Content-Disposition": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Api-Call-Id": {
+                "style": "simple",
+                "required": true,
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
-              "*/*": {
-                "schema": {}
+              "application/x-tar": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           },
@@ -34642,6 +36114,12 @@
                 }
               }
             }
+          },
+          "4XX": {
+            "$ref": "#/components/responses/Error"
+          },
+          "5XX": {
+            "$ref": "#/components/responses/Error"
           }
         },
         "x-billable": false
@@ -37806,49 +39284,6 @@
           }
         },
         "x-billable": true,
-        "x-dropshot-websocket": {}
-      }
-    },
-    "/ws/ml/kcl-migration": {
-      "get": {
-        "tags": [
-          "ml"
-        ],
-        "summary": "Open a sponsored KCL migration connection. It cannot execute ordinary prompts.",
-        "operationId": "kcl_migration_ws",
-        "requestBody": {
-          "description": "Websocket requests",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/KclMigrationClientMessage"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "Websocket responses",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/KclMigrationServerMessage"
-                }
-              }
-            }
-          },
-          "101": {
-            "description": "Negotiating protocol upgrade from HTTP/1.1 to WebSocket"
-          },
-          "4XX": {
-            "$ref": "#/components/responses/Error"
-          },
-          "5XX": {
-            "$ref": "#/components/responses/Error"
-          }
-        },
-        "x-billable": false,
         "x-dropshot-websocket": {}
       }
     },
@@ -42612,6 +44047,43 @@
           "scope"
         ]
       },
+      "CreateProjectRequest": {
+        "description": "Request payload for creating or replacing a user-owned project.",
+        "type": "object",
+        "properties": {
+          "category_ids": {
+            "description": "Selected submission categories for the project. New assignments must be active; updates may retain already assigned inactive categories.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          "description": {
+            "description": "User-facing description for the new project.",
+            "default": "",
+            "type": "string"
+          },
+          "entrypoint_path": {
+            "description": "Relative path to the project's entrypoint file.",
+            "default": "main.kcl",
+            "type": "string"
+          },
+          "library_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "publication_status": {
+            "$ref": "#/components/schemas/KclProjectPublicationStatus"
+          },
+          "title": {
+            "description": "User-facing title for the new project.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
       "CreateProjectShareLinkRequest": {
         "description": "Request payload for creating a new project share link.",
         "type": "object",
@@ -42626,6 +44098,41 @@
             ]
           }
         }
+      },
+      "CreateProjectVersionRequest": {
+        "description": "Request payload for saving a version without changing the current version.",
+        "type": "object",
+        "properties": {
+          "deleted_paths": {
+            "nullable": true,
+            "description": "Paths intentionally omitted from the chosen parent version.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "description": "Description saved with the new version.",
+            "default": "",
+            "type": "string"
+          },
+          "entrypoint_path": {
+            "description": "Relative path to the new version's entrypoint KCL file.",
+            "default": "main.kcl",
+            "type": "string"
+          },
+          "parent_version_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "title": {
+            "description": "Title saved with the new version.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parent_version_id",
+          "title"
+        ]
       },
       "CreateProjectVersionResponse": {
         "description": "Result of saving an alternate project version.",
@@ -44618,6 +46125,550 @@
           }
         ]
       },
+      "ExecutionArtifact": {
+        "description": "Public metadata, without internal bucket/key or routing identity.",
+        "type": "object",
+        "properties": {
+          "byte_length": {
+            "description": "Exact stored bytes.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "id": {
+            "description": "Archive-scoped identifier accepted by the download endpoint.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "path": {
+            "description": "Relative filename, not a storage location.",
+            "type": "string"
+          },
+          "sha256": {
+            "description": "Whole-object SHA-256 for client verification.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "byte_length",
+          "id",
+          "path",
+          "sha256"
+        ]
+      },
+      "ExecutionArtifactResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionArtifact"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ExecutionArtifactsResponse": {
+        "description": "Archival state and verified complete objects, including partial failure results.",
+        "type": "object",
+        "properties": {
+          "artifacts": {
+            "description": "A page of output metadata. Empty while pending; state distinguishes this from a complete empty archive.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionArtifactResultsPage"
+              }
+            ]
+          },
+          "failure_code": {
+            "nullable": true,
+            "description": "Safe archival failure classification, separate from execution outcome.",
+            "type": "string"
+          },
+          "state": {
+            "description": "Pending, complete, failed, or not_created when canceled before dispatch.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifacts",
+          "state"
+        ]
+      },
+      "ExecutionInputArtifact": {
+        "description": "An uploaded input and the filename supplied for a multipart upload.",
+        "type": "object",
+        "properties": {
+          "byte_length": {
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "path": {
+            "nullable": true,
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "byte_length",
+          "id",
+          "sha256"
+        ]
+      },
+      "ExecutionInputBatch": {
+        "description": "Inputs from a multipart upload, in request order.",
+        "type": "object",
+        "properties": {
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionInputArtifact"
+            }
+          }
+        },
+        "required": [
+          "artifacts"
+        ]
+      },
+      "ExecutionInputUploadResponse": {
+        "description": "A single raw input or a batch of multipart inputs.",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ExecutionInputArtifact"
+          },
+          {
+            "$ref": "#/components/schemas/ExecutionInputBatch"
+          }
+        ]
+      },
+      "ExecutionJobCreateRequest": {
+        "description": "Request to create an asynchronous execution job.",
+        "type": "object",
+        "properties": {
+          "command": {
+            "description": "Command and arguments. This is argv, not a shell command.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "compute_profile_id": {
+            "description": "Pinned compute-profile catalog identifier.",
+            "type": "string"
+          },
+          "environment": {
+            "description": "Bounded, non-secret environment variables.",
+            "default": {},
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "inputs": {
+            "description": "Artifacts to stage before execution.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionJobInput"
+            }
+          },
+          "outputs": {
+            "description": "Relative paths or globs to collect after execution.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionJobOutput"
+            }
+          },
+          "runtime_id": {
+            "description": "Pinned runtime catalog identifier.",
+            "type": "string"
+          },
+          "timeout_seconds": {
+            "description": "Hard execution timeout in seconds.",
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "command",
+          "compute_profile_id",
+          "runtime_id",
+          "timeout_seconds"
+        ],
+        "additionalProperties": false
+      },
+      "ExecutionJobInput": {
+        "description": "An input artifact staged at a relative path before execution.",
+        "type": "object",
+        "properties": {
+          "artifact_id": {
+            "description": "Owner-scoped artifact returned by `POST /execution/inputs`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "path": {
+            "description": "Relative path inside the isolated work directory.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "artifact_id",
+          "path"
+        ]
+      },
+      "ExecutionJobOutput": {
+        "description": "An output path or glob to collect after execution.",
+        "type": "object",
+        "properties": {
+          "path": {
+            "description": "Relative path or glob inside the isolated work directory.",
+            "type": "string"
+          },
+          "required": {
+            "description": "Missing required output fails archival; defaults to true.",
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "ExecutionJobResponse": {
+        "description": "Small lifecycle summary. Fetch immutable inputs explicitly via `/specification`.",
+        "type": "object",
+        "properties": {
+          "active_attempt": {
+            "description": "Most recently allocated attempt number, or zero before orchestration.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "completed_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Time output finalization reached a terminal state.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "compute_profile_id": {
+            "description": "Pinned compute-profile catalog identifier.",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "DateTime",
+            "description": "Creation time.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "execution_ended_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Time customer code stopped running.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "description": "Stable job identifier.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Uuid"
+              }
+            ]
+          },
+          "runtime_id": {
+            "description": "Pinned runtime catalog identifier.",
+            "type": "string"
+          },
+          "started_at": {
+            "nullable": true,
+            "title": "DateTime",
+            "description": "Time customer code first started.",
+            "type": "string",
+            "format": "date-time"
+          },
+          "state_version": {
+            "description": "Monotonic lifecycle version.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "description": "Current lifecycle state.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionJobStatus"
+              }
+            ]
+          },
+          "timeout_seconds": {
+            "description": "Hard execution timeout in seconds.",
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "title": "DateTime",
+            "description": "Last aggregate update time.",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "active_attempt",
+          "compute_profile_id",
+          "created_at",
+          "id",
+          "runtime_id",
+          "state_version",
+          "status",
+          "timeout_seconds",
+          "updated_at"
+        ]
+      },
+      "ExecutionJobResponseResultsPage": {
+        "description": "A single page of results",
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "list of items on this page of results",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionJobResponse"
+            }
+          },
+          "next_page": {
+            "nullable": true,
+            "description": "token used to fetch the next page of results (if any)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "ExecutionJobSpecificationResponse": {
+        "description": "Immutable customer-facing specification, excluding environment values and internal routing.",
+        "type": "object",
+        "properties": {
+          "command": {
+            "description": "Command and arguments.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "compute_profile_id": {
+            "description": "Pinned compute profile identifier.",
+            "type": "string"
+          },
+          "inputs": {
+            "description": "Input manifest.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionJobInput"
+            }
+          },
+          "outputs": {
+            "description": "Output manifest.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExecutionJobOutput"
+            }
+          },
+          "runtime_id": {
+            "description": "Pinned runtime identifier.",
+            "type": "string"
+          },
+          "timeout_seconds": {
+            "description": "Execution timeout.",
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "required": [
+          "command",
+          "compute_profile_id",
+          "inputs",
+          "outputs",
+          "runtime_id",
+          "timeout_seconds"
+        ]
+      },
+      "ExecutionJobStatus": {
+        "description": "Customer-visible execution lifecycle state.",
+        "oneOf": [
+          {
+            "description": "Waiting for an orchestrator to claim the job.",
+            "type": "string",
+            "enum": [
+              "queued"
+            ]
+          },
+          {
+            "description": "Allocating isolated compute and staging inputs.",
+            "type": "string",
+            "enum": [
+              "provisioning"
+            ]
+          },
+          {
+            "description": "Customer code is running.",
+            "type": "string",
+            "enum": [
+              "running"
+            ]
+          },
+          {
+            "description": "Cancellation has been requested and compute is being terminated.",
+            "type": "string",
+            "enum": [
+              "canceling"
+            ]
+          },
+          {
+            "description": "Outputs, logs, and trusted usage are being finalized.",
+            "type": "string",
+            "enum": [
+              "finalizing"
+            ]
+          },
+          {
+            "description": "The job was canceled.",
+            "type": "string",
+            "enum": [
+              "canceled"
+            ]
+          },
+          {
+            "description": "The job exceeded its requested timeout.",
+            "type": "string",
+            "enum": [
+              "timed_out"
+            ]
+          },
+          {
+            "description": "The command and output finalization succeeded.",
+            "type": "string",
+            "enum": [
+              "succeeded"
+            ]
+          },
+          {
+            "description": "The job failed.",
+            "type": "string",
+            "enum": [
+              "failed"
+            ]
+          }
+        ]
+      },
+      "ExecutionLogResponse": {
+        "description": "Binary-safe log page with explicit availability and incomplete-tail evidence.",
+        "type": "object",
+        "properties": {
+          "available": {
+            "description": "Whether a verified log manifest exists.",
+            "type": "boolean"
+          },
+          "complete": {
+            "description": "Whether capture observed the tail (independent of cursor position).",
+            "type": "boolean"
+          },
+          "data_base64": {
+            "description": "Base64 of the exact bytes; no lossy UTF-8 decoding.",
+            "type": "string"
+          },
+          "failure_code": {
+            "nullable": true,
+            "description": "Safe log capture or archival failure classification.",
+            "type": "string"
+          },
+          "next_offset": {
+            "description": "Offset for the next request.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "offset": {
+            "description": "Starting offset of this page.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "state": {
+            "description": "Archival state, not execution state.",
+            "type": "string"
+          },
+          "stored_bytes": {
+            "nullable": true,
+            "description": "Total retained bytes, absent until a manifest exists.",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0
+          },
+          "stream": {
+            "description": "Selected stream.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionLogStream"
+              }
+            ]
+          },
+          "truncated": {
+            "description": "Whether bytes were omitted at the configured limit.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available",
+          "complete",
+          "data_base64",
+          "next_offset",
+          "offset",
+          "state",
+          "stream",
+          "truncated"
+        ]
+      },
+      "ExecutionLogStream": {
+        "description": "A retained binary stream; live tailing is not part of this protocol.",
+        "oneOf": [
+          {
+            "description": "Standard output.",
+            "type": "string",
+            "enum": [
+              "stdout"
+            ]
+          },
+          {
+            "description": "Standard error.",
+            "type": "string",
+            "enum": [
+              "stderr"
+            ]
+          }
+        ]
+      },
       "Export": {
         "description": "The response from the `Export` endpoint.",
         "type": "object",
@@ -45781,13 +47832,6 @@
             ]
           },
           {
-            "description": "Enables the Z0006 lint, for converting to new face api syntax in Zoo Design Studio.",
-            "type": "string",
-            "enum": [
-              "enable_z0006_lint"
-            ]
-          },
-          {
             "description": "Enables the Factory portal.",
             "type": "string",
             "enum": [
@@ -46446,6 +48490,13 @@
             "enum": [
               "stl"
             ]
+          },
+          {
+            "description": "The 3DM file format. <https://deepwiki.com/mcneel/rhino3dm/6.1-3dm-file-format>",
+            "type": "string",
+            "enum": [
+              "rhino"
+            ]
           }
         ]
       },
@@ -46541,6 +48592,13 @@
             "type": "string",
             "enum": [
               "stl"
+            ]
+          },
+          {
+            "description": "The 3DM file format. <https://deepwiki.com/mcneel/rhino3dm/6.1-3dm-file-format>",
+            "type": "string",
+            "enum": [
+              "rhino"
             ]
           }
         ]
@@ -47072,6 +49130,32 @@
         "description": "The response from the `HandleMouseDragStart` endpoint.",
         "type": "object"
       },
+      "HiddenState": {
+        "description": "Visibility of an object, or whether the requested object does not exist.",
+        "oneOf": [
+          {
+            "description": "The object exists and is hidden.",
+            "type": "string",
+            "enum": [
+              "hidden"
+            ]
+          },
+          {
+            "description": "The object exists and is visible.",
+            "type": "string",
+            "enum": [
+              "visible"
+            ]
+          },
+          {
+            "description": "No object exists for the requested UUID.",
+            "type": "string",
+            "enum": [
+              "no_such_object"
+            ]
+          }
+        ]
+      },
       "HighlightSetEntities": {
         "description": "The response from the `HighlightSetEntities` endpoint.",
         "type": "object"
@@ -47119,6 +49203,25 @@
         },
         "required": [
           "urls"
+        ]
+      },
+      "IdSortMode": {
+        "description": "Supported set of sort modes for scanning by id only.\n\nCurrently, we only support scanning in ascending order.",
+        "oneOf": [
+          {
+            "description": "Sort in increasing order of \"id\".",
+            "type": "string",
+            "enum": [
+              "id_ascending"
+            ]
+          },
+          {
+            "description": "Sort in decreasing order of \"id\",",
+            "type": "string",
+            "enum": [
+              "id_descending"
+            ]
+          }
         ]
       },
       "IdpMetadataSource": {
@@ -47676,6 +49779,39 @@
                 "type": "string",
                 "enum": [
                   "stl"
+                ]
+              },
+              "units": {
+                "description": "The units of the input data.\n\nThis is very important for correct scaling and when calculating physics properties like mass, etc.\n\nDefaults to millimeters.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "coords",
+              "type",
+              "units"
+            ]
+          },
+          {
+            "description": "Rhino (3dm) file format",
+            "type": "object",
+            "properties": {
+              "coords": {
+                "description": "Co-ordinate system of input data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "rhino"
                 ]
               },
               "units": {
@@ -48269,290 +50405,13 @@
           "path"
         ]
       },
-      "KclMigrationApplication": {
-        "description": "A revision-fenced acknowledgement from the client that owns the project files.",
-        "type": "object",
-        "properties": {
-          "revision": {
-            "description": "Starts at zero. Each accepted state change increments it once.",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0
-          },
-          "status": {
-            "description": "Last reported state; not independent verification of local files.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/KclMigrationApplicationStatus"
-              }
-            ]
-          }
-        },
-        "required": [
-          "revision",
-          "status"
-        ]
-      },
-      "KclMigrationApplicationStatus": {
-        "description": "Client-reported application state, separate from conversion success.",
-        "oneOf": [
-          {
-            "description": "The client has not confirmed application. API does not infer project state.",
-            "type": "string",
-            "enum": [
-              "not_applied"
-            ]
-          },
-          {
-            "description": "The client reports completing the guarded project write (or redo).",
-            "type": "string",
-            "enum": [
-              "applied"
-            ]
-          },
-          {
-            "description": "The client reports undoing the migration.",
-            "type": "string",
-            "enum": [
-              "undone"
-            ]
-          }
-        ]
-      },
-      "KclMigrationClientMessage": {
-        "description": "The restricted public migration connection never accepts ordinary prompts.",
-        "oneOf": [
-          {
-            "description": "Authenticate the connection.",
-            "type": "object",
-            "properties": {
-              "headers": {
-                "type": "object",
-                "additionalProperties": {
-                  "type": "string"
-                }
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "headers"
-                ]
-              }
-            },
-            "required": [
-              "headers",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Start or retrieve the same attempt after a delivery retry.",
-            "type": "object",
-            "properties": {
-              "request": {
-                "$ref": "#/components/schemas/KclMigrationRequest"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "start"
-                ]
-              }
-            },
-            "required": [
-              "request",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Read an existing attempt without resuming it or changing its deadline.",
-            "type": "object",
-            "properties": {
-              "operation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "status"
-                ]
-              }
-            },
-            "required": [
-              "operation_id",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Cancel an existing attempt. Cancellation is idempotent.",
-            "type": "object",
-            "properties": {
-              "operation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "cancel"
-                ]
-              }
-            },
-            "required": [
-              "operation_id",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Read linked migration summaries, newest first, without loading or applying files.",
-            "type": "object",
-            "properties": {
-              "conversation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "history"
-                ]
-              }
-            },
-            "required": [
-              "conversation_id",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Acknowledge a successful local apply/undo/redo. Does not execute or charge work.",
-            "type": "object",
-            "properties": {
-              "expected_revision": {
-                "description": "The revision read before making the local change. Retrying is idempotent.",
-                "type": "integer",
-                "format": "uint32",
-                "minimum": 0
-              },
-              "operation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "status": {
-                "$ref": "#/components/schemas/KclMigrationApplicationStatus"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "application"
-                ]
-              }
-            },
-            "required": [
-              "expected_revision",
-              "operation_id",
-              "status",
-              "type"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Application heartbeat.",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "ping"
-                ]
-              }
-            },
-            "required": [
-              "type"
-            ],
-            "additionalProperties": false
-          }
-        ]
-      },
-      "KclMigrationHistoryEntry": {
-        "description": "Read-only conversation entry. It contains no files, edits or provider checkpoints.",
-        "type": "object",
-        "properties": {
-          "after_prompt_id": {
-            "nullable": true,
-            "description": "Place this entry after this ordinary prompt when replaying the conversation.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "application": {
-            "description": "Most recent client acknowledgement.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/KclMigrationApplication"
-              }
-            ]
-          },
-          "conversation_id": {
-            "description": "Conversation that owns this entry.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "created_at": {
-            "description": "Admission time, used for chronological display.",
-            "type": "string",
-            "format": "date-time"
-          },
-          "detail": {
-            "description": "Outcome summary for display and subsequent model context.",
-            "type": "string"
-          },
-          "operation_id": {
-            "description": "Migration request ID. Use the status command to retrieve a candidate explicitly.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "prompt_id": {
-            "nullable": true,
-            "description": "Persisted Copilot prompt, when this migration has a conversation transcript.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Uuid"
-              }
-            ]
-          },
-          "status": {
-            "description": "Conversion outcome. Success alone does not mean files were applied.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/KclMigrationStatus"
-              }
-            ]
-          }
-        },
-        "required": [
-          "application",
-          "conversation_id",
-          "created_at",
-          "detail",
-          "operation_id",
-          "status"
-        ]
-      },
       "KclMigrationOperation": {
         "description": "Persisted operation state, safe to retrieve again without starting new work.",
         "type": "object",
         "properties": {
           "deadline": {
-            "description": "Original deadline, including preparation and validation. Never extended.",
+            "nullable": true,
+            "description": "Admission setup expiry, cleared before Copilot execution begins.",
             "type": "string",
             "format": "date-time"
           },
@@ -48599,7 +50458,6 @@
           }
         },
         "required": [
-          "deadline",
           "id",
           "project_snapshot",
           "status",
@@ -48723,146 +50581,6 @@
           "status"
         ]
       },
-      "KclMigrationServerMessage": {
-        "description": "Public responses never contain ordinary auto-applying tool results.",
-        "oneOf": [
-          {
-            "description": "Current durable state, including a reviewable candidate when successful.",
-            "type": "object",
-            "properties": {
-              "operation": {
-                "$ref": "#/components/schemas/KclMigrationOperation"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "operation"
-                ]
-              }
-            },
-            "required": [
-              "operation",
-              "type"
-            ]
-          },
-          {
-            "description": "Best-effort, display-only progress on the execution connection. Only text, informational and supported reasoning messages are forwarded; candidate edits are returned solely in a validated terminal operation.",
-            "type": "object",
-            "properties": {
-              "message": {
-                "description": "Existing Copilot display message. Never dispatch it as a project edit.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/MlCopilotServerMessage"
-                  }
-                ]
-              },
-              "operation_id": {
-                "description": "The initiating request ID, used to keep progress with its migration.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ]
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "progress"
-                ]
-              }
-            },
-            "required": [
-              "message",
-              "operation_id",
-              "type"
-            ]
-          },
-          {
-            "description": "Read-only history; never route these entries through file-edit handlers.",
-            "type": "object",
-            "properties": {
-              "conversation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "entries": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/KclMigrationHistoryEntry"
-                }
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "history"
-                ]
-              }
-            },
-            "required": [
-              "conversation_id",
-              "entries",
-              "type"
-            ]
-          },
-          {
-            "description": "Current durable application acknowledgement.",
-            "type": "object",
-            "properties": {
-              "application": {
-                "$ref": "#/components/schemas/KclMigrationApplication"
-              },
-              "operation_id": {
-                "$ref": "#/components/schemas/Uuid"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "application"
-                ]
-              }
-            },
-            "required": [
-              "application",
-              "operation_id",
-              "type"
-            ]
-          },
-          {
-            "description": "A rejected request, without starting or charging for work.",
-            "type": "object",
-            "properties": {
-              "detail": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "error"
-                ]
-              }
-            },
-            "required": [
-              "detail",
-              "type"
-            ]
-          },
-          {
-            "description": "Heartbeat response.",
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "pong"
-                ]
-              }
-            },
-            "required": [
-              "type"
-            ]
-          }
-        ]
-      },
       "KclMigrationStatus": {
         "description": "Durable state of a migration attempt.",
         "oneOf": [
@@ -48874,7 +50592,7 @@
             ]
           },
           {
-            "description": "Conversion and final validation succeeded. Copilot delivers edits live; the legacy endpoint returns a candidate for separate application.",
+            "description": "Conversion and final validation succeeded. Copilot delivers edits live.",
             "type": "string",
             "enum": [
               "succeeded"
@@ -48888,7 +50606,7 @@
             ]
           },
           {
-            "description": "The original execution deadline expired.",
+            "description": "Admission setup expired before execution could begin.",
             "type": "string",
             "enum": [
               "timed_out"
@@ -48937,7 +50655,7 @@
         ]
       },
       "KclMigrationValidation": {
-        "description": "Evidence required before a candidate may be returned as successful.",
+        "description": "Evidence required before a migration may be reported as successful.",
         "type": "object",
         "properties": {
           "behavior_preserved": {
@@ -49954,46 +51672,6 @@
             ]
           },
           {
-            "description": "Retained for wire compatibility; Copilot rejects separate application reports because migration edits use ordinary project Undo.",
-            "type": "object",
-            "properties": {
-              "expected_revision": {
-                "description": "Last acknowledged revision. Retrying the same change is idempotent.",
-                "type": "integer",
-                "format": "uint32",
-                "minimum": 0
-              },
-              "operation_id": {
-                "description": "Migration request ID, independent of the connection and prompt IDs.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Uuid"
-                  }
-                ]
-              },
-              "status": {
-                "description": "Client-reported project state.",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/KclMigrationApplicationStatus"
-                  }
-                ]
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "kcl_migration_application"
-                ]
-              }
-            },
-            "required": [
-              "expected_revision",
-              "operation_id",
-              "status",
-              "type"
-            ]
-          },
-          {
             "description": "Request persisted attachments from conversation history over the active websocket.",
             "type": "object",
             "properties": {
@@ -50607,7 +52285,7 @@
             "additionalProperties": false
           },
           {
-            "description": "API-owned migration state. Candidate files are released only after API validates and stores the worker result. Replaying conversation history must not apply these files again.",
+            "description": "API-owned migration state for an existing attempt. Edits use ordinary Copilot delivery; replaying this state must not apply them again.",
             "type": "object",
             "properties": {
               "kcl_migration_operation": {
@@ -50629,41 +52307,6 @@
             },
             "required": [
               "kcl_migration_operation"
-            ],
-            "additionalProperties": false
-          },
-          {
-            "description": "Retained for wire compatibility; live Copilot migrations do not emit it.",
-            "type": "object",
-            "properties": {
-              "kcl_migration_application": {
-                "type": "object",
-                "properties": {
-                  "application": {
-                    "description": "Accepted state and revision for subsequent acknowledgements.",
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/KclMigrationApplication"
-                      }
-                    ]
-                  },
-                  "operation_id": {
-                    "description": "Migration request ID.",
-                    "allOf": [
-                      {
-                        "$ref": "#/components/schemas/Uuid"
-                      }
-                    ]
-                  }
-                },
-                "required": [
-                  "application",
-                  "operation_id"
-                ]
-              }
-            },
-            "required": [
-              "kcl_migration_application"
             ],
             "additionalProperties": false
           },
@@ -50911,6 +52554,17 @@
             },
             "required": [
               "reasoning"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "description": "User-facing progress, separate from model reasoning.",
+            "type": "object",
+            "properties": {
+              "activity": {}
+            },
+            "required": [
+              "activity"
             ],
             "additionalProperties": false
           },
@@ -54301,6 +55955,30 @@
             "required": [
               "hidden",
               "object_id",
+              "type"
+            ]
+          },
+          {
+            "description": "Query whether each object is hidden, preserving input order. Missing objects are reported as `no_such_object` in the response.",
+            "type": "object",
+            "properties": {
+              "object_ids": {
+                "description": "The IDs of the objects to query. Order and duplicates are preserved. An empty list returns an empty result.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_is_hidden"
+                ]
+              }
+            },
+            "required": [
+              "object_ids",
               "type"
             ]
           },
@@ -58124,6 +59802,22 @@
         "description": "The response from the `ObjectBringToFront` endpoint.",
         "type": "object"
       },
+      "ObjectIsHidden": {
+        "description": "The response from the `ObjectIsHidden` endpoint.",
+        "type": "object",
+        "properties": {
+          "hidden": {
+            "description": "The hidden or missing-object state of each UUID, in the same order as `object_ids`. Contains one entry per requested ID, including duplicates.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HiddenState"
+            }
+          }
+        },
+        "required": [
+          "hidden"
+        ]
+      },
       "ObjectSetMaterialParamsPbr": {
         "description": "The response from the `ObjectSetMaterialParamsPbr` endpoint.",
         "type": "object"
@@ -58672,6 +60366,24 @@
                 "type": "string",
                 "enum": [
                   "object_visible"
+                ]
+              }
+            },
+            "required": [
+              "data",
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "$ref": "#/components/schemas/ObjectIsHidden"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "object_is_hidden"
                 ]
               }
             },
@@ -63170,6 +64882,39 @@
               "coords",
               "selection",
               "storage",
+              "type",
+              "units"
+            ]
+          },
+          {
+            "description": "Rhino (3dm) file format",
+            "type": "object",
+            "properties": {
+              "coords": {
+                "description": "Co-ordinate system of output data.\n\nDefaults to the [KittyCAD co-ordinate system].\n\n[KittyCAD co-ordinate system]: ../coord/constant.KITTYCAD.html",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/System"
+                  }
+                ]
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "rhino"
+                ]
+              },
+              "units": {
+                "description": "Export length unit.\n\nDefaults to millimeters.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UnitLength"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "coords",
               "type",
               "units"
             ]
@@ -70325,6 +72070,56 @@
         },
         "required": [
           "expected_revision"
+        ]
+      },
+      "UpdateProjectRequest": {
+        "description": "Request payload for replacing a user-owned project.",
+        "type": "object",
+        "properties": {
+          "category_ids": {
+            "description": "Selected submission categories for the project. New assignments must be active; updates may retain already assigned inactive categories.",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Uuid"
+            }
+          },
+          "deleted_paths": {
+            "nullable": true,
+            "description": "Relative paths intentionally omitted from this whole-project replacement.\n\nWhen present, this must exactly match the non-preview files removed from the currently acknowledged project version.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "description": "User-facing description for the new project.",
+            "default": "",
+            "type": "string"
+          },
+          "entrypoint_path": {
+            "description": "Relative path to the project's entrypoint file.",
+            "default": "main.kcl",
+            "type": "string"
+          },
+          "expected_revision": {
+            "nullable": true,
+            "description": "Optional optimistic concurrency token from the last project response.",
+            "type": "string"
+          },
+          "library_id": {
+            "$ref": "#/components/schemas/Uuid"
+          },
+          "publication_status": {
+            "$ref": "#/components/schemas/KclProjectPublicationStatus"
+          },
+          "title": {
+            "description": "User-facing title for the new project.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
         ]
       },
       "UpdateShortlinkRequest": {
