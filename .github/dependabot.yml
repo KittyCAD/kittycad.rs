@@ -43,6 +43,12 @@ updates:
       patterns:
       - ezpz
       - kcl*
+    wasm-bindgen:
+      applies-to: version-updates
+      patterns:
+      - js-sys
+      - wasm-bindgen*
+      - web-sys
   cooldown:
     default-days: 7
     exclude:
@@ -91,6 +97,12 @@ updates:
       patterns:
       - ezpz
       - kcl*
+    wasm-bindgen:
+      applies-to: version-updates
+      patterns:
+      - js-sys
+      - wasm-bindgen*
+      - web-sys
   cooldown:
     default-days: 7
     exclude:
